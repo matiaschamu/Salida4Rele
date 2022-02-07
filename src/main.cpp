@@ -25,6 +25,7 @@ String convertToString(byte *, int);
 
 #pragma region "Configuracion" //////////////////////////////////////////////////////////
 
+const String Version = "1.0.4";
 const char *ssid = "Domotics";
 const char *password = "Mato19428426";
 
@@ -114,7 +115,7 @@ String Relay4_MQTT_Status = "Acantilados/Luz/Lavadero/Estado"; */
 
 /* //Placa5
 #define Report_IP_DuckDNS
-//#define Report_HealthChecks
+#define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 15);
 const char *hostName = "ESP_Tablero";
 String Relay1_Name = "Bomba Agua";
@@ -256,7 +257,7 @@ void setup_wifi()
 {
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
-  delay(100);
+  delay(500);
 
   if (WiFi.config(local_IP, gateway, subnet, primaryDNS) == false)
   {
@@ -275,9 +276,9 @@ void setup_wifi()
   while (WiFi.status() != WL_CONNECTED)
   {
     SerialPrint(".");
-    delay(100);
+    delay(500);
   }
-
+  delay(500);
   SerialPrint("");
   SerialPrint("WiFi connected");
   SerialPrint("IP address: ");
@@ -489,6 +490,7 @@ void WebServer_Loop()
             client.println(".button2 {background-color: #4CAF50;}</style></head>");
 
             client.println("<body><h1>" + String(hostName) + " Web Server (" + WiFi.localIP().toString() + ")</h1>");
+            client.println("<body><p> Version: " +  Version + "</p>");
 
             if (Relay1Status == 0)
             {
