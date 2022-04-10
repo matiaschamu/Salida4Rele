@@ -25,7 +25,7 @@ String convertToString(byte *, int);
 
 #pragma region "Configuracion" //////////////////////////////////////////////////////////
 
-const String Version = "1.0.4";
+const String Version = "1.0.5";
 const char *ssid = "Domotics";
 const char *password = "Mato19428426";
 
@@ -221,19 +221,17 @@ void loop()
   }
 
   client_MQTT.loop();
-
   WebServer_Loop();
 
   long now = millis();
   if (now - lastMsg5seg > 5000)
   {
     lastMsg5seg = now;
-
+    Relay_Loop();
     if (!client_MQTT.loop())
     {
       MQTT_Reconnect();
     }
-    Relay_Loop();
   }
 
   if (now - lastMsg1min > 60000)
@@ -423,6 +421,7 @@ void WebServer_Loop()
   {
     currentTime = millis();
     previousTime = currentTime;
+    bool reset = false;
     SerialPrint("New Client.");
     String currentLine = "";
     while (client.connected() && currentTime - previousTime <= timeoutTime)
@@ -478,6 +477,10 @@ void WebServer_Loop()
             {
               Relay4Status = 0;
             }
+            else if (header.indexOf("GET /reset") >= 0)
+            {
+              reset = true;
+            }
             lastMsg5seg = 0;
 
             client.println("<!DOCTYPE html><html>");
@@ -487,86 +490,98 @@ void WebServer_Loop()
             client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
             client.println(".button { background-color: #555555; border: none; color: white; padding: 16px 40px;");
             client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
-            client.println(".button2 {background-color: #4CAF50;}</style></head>");
+            client.println(".button2 {background-color: #4CAF50;}");
+            client.println(".button3 {background-color: #FF0000; font-size: 10px; padding: 10px 20px;}</style></head>");
+            client.println("<body>");
+            if (reset == false)
+            {
+              client.println("<h1>" + String(hostName) + " Web Server (" + WiFi.localIP().toString() + ")</h1>");
+              client.println("<p> Version: " + Version + "</p>");
 
-            client.println("<body><h1>" + String(hostName) + " Web Server (" + WiFi.localIP().toString() + ")</h1>");
-            client.println("<body><p> Version: " +  Version + "</p>");
+              if (Relay1Status == 0)
+              {
+                client.println("<p>Relay 1 estado: " + String(Relay1Status) + " --> " + Relay1_Name + "</p>");
+                client.println("<p><a href=\"/relay1/on\"><button class=\"button\">OFF</button></a></p>");
+              }
+              else
+              {
+                client.println("<b style="
+                               "color:red;"
+                               ">Relay 1 estado: " +
+                               String(Relay1Status) + " --> " + Relay1_Name + "</b>");
+                client.println("<p><a href=\"/relay1/off\"><button class=\"button button2\">ON</button></a></p>");
+              }
 
-            if (Relay1Status == 0)
-            {
-              client.println("<p>Relay 1 estado: " + String(Relay1Status) + " --> " + Relay1_Name + "</p>");
-              client.println("<p><a href=\"/relay1/on\"><button class=\"button\">OFF</button></a></p>");
-            }
-            else
-            {
-              client.println("<b style="
-                             "color:red;"
-                             ">Relay 1 estado: " +
-                             String(Relay1Status) + " --> " + Relay1_Name + "</b>");
-              client.println("<p><a href=\"/relay1/off\"><button class=\"button button2\">ON</button></a></p>");
-            }
+              if (Relay2Status == 0)
+              {
+                client.println("<p>Relay 2 estado: " + String(Relay2Status) + " --> " + Relay2_Name + "</p>");
+                client.println("<p><a href=\"/relay2/on\"><button class=\"button\">OFF</button></a></p>");
+              }
+              else
+              {
+                client.println("<b style="
+                               "color:red;"
+                               ">Relay 2 estado: " +
+                               String(Relay2Status) + " --> " + Relay2_Name + "</b>");
+                client.println("<p><a href=\"/relay2/off\"><button class=\"button button2\">ON</button></a></p>");
+              }
 
-            if (Relay2Status == 0)
-            {
-              client.println("<p>Relay 2 estado: " + String(Relay2Status) + " --> " + Relay2_Name + "</p>");
-              client.println("<p><a href=\"/relay2/on\"><button class=\"button\">OFF</button></a></p>");
-            }
-            else
-            {
-              client.println("<b style="
-                             "color:red;"
-                             ">Relay 2 estado: " +
-                             String(Relay2Status) + " --> " + Relay2_Name + "</b>");
-              client.println("<p><a href=\"/relay2/off\"><button class=\"button button2\">ON</button></a></p>");
-            }
+              if (Relay3Status == 0)
+              {
+                client.println("<p>Relay 3 estado: " + String(Relay3Status) + " --> " + Relay3_Name + "</p>");
+                client.println("<p><a href=\"/relay3/on\"><button class=\"button\">OFF</button></a></p>");
+              }
+              else
+              {
+                client.println("<b style="
+                               "color:red;"
+                               ">Relay 3 estado: " +
+                               String(Relay3Status) + " --> " + Relay3_Name + "</b>");
+                client.println("<p><a href=\"/relay3/off\"><button class=\"button button2\">ON</button></a></p>");
+              }
 
-            if (Relay3Status == 0)
-            {
-              client.println("<p>Relay 3 estado: " + String(Relay3Status) + " --> " + Relay3_Name + "</p>");
-              client.println("<p><a href=\"/relay3/on\"><button class=\"button\">OFF</button></a></p>");
-            }
-            else
-            {
-              client.println("<b style="
-                             "color:red;"
-                             ">Relay 3 estado: " +
-                             String(Relay3Status) + " --> " + Relay3_Name + "</b>");
-              client.println("<p><a href=\"/relay3/off\"><button class=\"button button2\">ON</button></a></p>");
-            }
+              if (Relay4Status == 0)
+              {
+                client.println("<p>Relay 4 estado: " + String(Relay4Status) + " --> " + Relay4_Name + "</p>");
+                client.println("<p><a href=\"/relay4/on\"><button class=\"button\">OFF</button></a></p>");
+              }
+              else
+              {
+                client.println("<b style="
+                               "color:red;"
+                               ">Relay 4 estado: " +
+                               String(Relay4Status) + " --> " + Relay4_Name + "</b>");
+                client.println("<p><a href=\"/relay4/off\"><button class=\"button button2\">ON</button></a></p>");
+              }
 
-            if (Relay4Status == 0)
-            {
-              client.println("<p>Relay 4 estado: " + String(Relay4Status) + " --> " + Relay4_Name + "</p>");
-              client.println("<p><a href=\"/relay4/on\"><button class=\"button\">OFF</button></a></p>");
-            }
-            else
-            {
-              client.println("<b style="
-                             "color:red;"
-                             ">Relay 4 estado: " +
-                             String(Relay4Status) + " --> " + Relay4_Name + "</b>");
-              client.println("<p><a href=\"/relay4/off\"><button class=\"button button2\">ON</button></a></p>");
-            }
-
-            client.println("<p>MQTT server status: " + MqttStatus() + "</p>");
+              client.println("<p>MQTT server status: " + MqttStatus() + "</p>");
 
 #ifdef Report_IP_DuckDNS
-            client.println("<p>DuckDNS Updated every 1 min: " + urlDuckDNS + "</p>");
+              client.println("<p>DuckDNS Updated every 1 min: " + urlDuckDNS + "</p>");
 #endif
 #ifndef Report_IP_DuckDNS
-            client.println("<p>DuckDNS Updated disabled</p>");
+              client.println("<p>DuckDNS Updated disabled</p>");
 #endif
 #ifdef Report_HealthChecks
-            client.println("<p>HealthChecks Updated every 5 min: " + urlHealthChecks + "</p>");
+              client.println("<p>HealthChecks Updated every 5 min: " + urlHealthChecks + "</p>");
 #endif
 #ifndef Report_HealthChecks
-            client.println("<p>HealthChecks Updated disabled</p>");
+              client.println("<p>HealthChecks Updated disabled</p>");
 #endif
+              client.println("<p><a href=\"/reset\"><button class=\"button button3\">RESET</button></a></p>");
+            }
+            else
+            {
+              client.println("<script>");
+              client.println("setTimeout(function(){");
+              client.println("window.history.back();");
+              client.println("}, 20000);");
+              client.println("</script>");
+              client.println("<p>Reseting in 5 sec... Reloading page in 20 sec</p>");
+            }
 
             client.println("</body></html>");
-
             client.println();
-
             break;
           }
           else
@@ -580,12 +595,27 @@ void WebServer_Loop()
         }
       }
     }
-
     header = "";
 
     client.stop();
     SerialPrint("Client disconnected.");
     SerialPrint("");
+
+    if (reset == true)
+    {
+      Serial.write(Relay1_OFF, sizeof(Relay1_OFF));
+      delay(50);
+      Serial.write(Relay2_OFF, sizeof(Relay2_OFF));
+      delay(50);
+      Serial.write(Relay3_OFF, sizeof(Relay3_OFF));
+      delay(50);
+      Serial.write(Relay4_OFF, sizeof(Relay4_OFF));
+      delay(50);
+      Serial.println(" ");
+      Serial.println("Reset in 5 sec..");
+      delay(5000);
+      ESP.restart();
+    }
   }
 }
 
