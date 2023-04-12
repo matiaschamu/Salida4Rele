@@ -1,21 +1,22 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-//#include <WiFi.h>
+// #include <WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <PubSubClient.h>
 
 //#define debug
 
-void setup_wifi();
-void setup_MQTT();
+void WIFI_Setup();
+void MQTT_Setup();
 void MQTT_Callback(char *, byte *, unsigned int);
-void WebServer_Loop();
-void Relay_Loop();
+void WEBSERVER_Loop();
+void RELAY_Loop();
 void DuckDNS_Loop();
 void HealthChecks_Loop();
-void HttpGet(String);
+void HTTP_Get(String);
 void MQTT_Reconnect();
-String MqttStatus();
+void MQTT_SubscribeToTopic(String);
+String MQTT_Status();
 void SerialPrint();
 void SerialPrint(String);
 void SerialPrint(char);
@@ -25,7 +26,7 @@ String convertToString(byte *, int);
 
 #pragma region "Configuracion" //////////////////////////////////////////////////////////
 
-const String Version = "1.0.5";
+const String Version = "1.0.7";
 const char *ssid = "Domotics";
 const char *password = "Mato19428426";
 
@@ -35,13 +36,15 @@ IPAddress primaryDNS(192, 168, 1, 1);
 // IPAddress secondaryDNS(8, 8, 4, 4);
 
 const char *mqtt_server = "192.168.1.10";
+const uint16_t mqtt_port = 1883;
 const char *mqtt_user = "matias";
 const char *mqtt_pass = "Mato19428426.";
 
 String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 String urlHealthChecks = "http://hc-ping.com/6b750dde-84ed-424a-b708-7c869b8c5253";
 
-//Placa1
+/* //Placa1
+#define Board_4OutRelay
 //#define Report_IP_DuckDNS
 //#define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 11);
@@ -57,9 +60,10 @@ String Relay3_MQTT_Command = "Acantilados/Luz/Ventanal/Comando";
 String Relay3_MQTT_Status = "Acantilados/Luz/Ventanal/Estado";
 String Relay4_Name = "Luz Arcada";
 String Relay4_MQTT_Command = "Acantilados/Luz/Arcada/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/Arcada/Estado";
+String Relay4_MQTT_Status = "Acantilados/Luz/Arcada/Estado"; */
 
 /* //Placa2
+#define Board_4OutRelay
 //#define Report_IP_DuckDNS
 //#define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 12);
@@ -78,6 +82,7 @@ String Relay4_MQTT_Command = "Acantilados/Luz/CaraSur/Comando";
 String Relay4_MQTT_Status = "Acantilados/Luz/CaraSur/Estado"; */
 
 /* //Placa3
+#define Board_4OutRelay
 //#define Report_IP_DuckDNS
 //#define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 13);
@@ -96,6 +101,7 @@ String Relay4_MQTT_Command = "Acantilados/Luz/Farolas/Comando";
 String Relay4_MQTT_Status = "Acantilados/Luz/Farolas/Estado"; */
 
 /* //Placa4
+#define Board_4OutRelay
 //#define Report_IP_DuckDNS
 //#define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 14);
@@ -113,7 +119,8 @@ String Relay4_Name = "Luz Lavadero";
 String Relay4_MQTT_Command = "Acantilados/Luz/Lavadero/Comando";
 String Relay4_MQTT_Status = "Acantilados/Luz/Lavadero/Estado"; */
 
-/* //Placa5
+// Placa5
+#define Board_4OutRelay
 #define Report_IP_DuckDNS
 #define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 15);
@@ -129,9 +136,10 @@ String Relay3_MQTT_Command = "";
 String Relay3_MQTT_Status = "";
 String Relay4_Name = "";
 String Relay4_MQTT_Command = "";
-String Relay4_MQTT_Status = ""; */
+String Relay4_MQTT_Status = "";
 
 /* //Placa6
+#define Board_4OutRelay
 //#define Report_IP_DuckDNS
 //#define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 16);
@@ -149,23 +157,15 @@ String Relay4_Name = "";
 String Relay4_MQTT_Command = "";
 String Relay4_MQTT_Status = ""; */
 
-/* // Placa7
-#define Report_IP_DuckDNS
-#define Report_HealthChecks
+/* //Placa7
+#define Board_Temp_Humedad
+//#define Report_IP_DuckDNS
+//#define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 17);
-const char *hostName = "ESP_AireAcondicionado";
-String Relay1_Name = "Aire1";
-String Relay1_MQTT_Command = "Acantilados/Servicios/AireAcondicionado1/Comando";
-String Relay1_MQTT_Status = "Acantilados/Servicios/AireAcondicionado1/Estado";
-String Relay2_Name = "Aire2";
-String Relay2_MQTT_Command = "Acantilados/Servicios/AireAcondicionado2/Comando";
-String Relay2_MQTT_Status = "Acantilados/Servicios/AireAcondicionado2/Estado";
-String Relay3_Name = "Aire3";
-String Relay3_MQTT_Command = "Acantilados/Servicios/AireAcondicionado3/Comando";
-String Relay3_MQTT_Status = "Acantilados/Servicios/AireAcondicionado3/Estado";
-String Relay4_Name = "Aire4";
-String Relay4_MQTT_Command = "Acantilados/Servicios/AireAcondicionado4/Comando";
-String Relay4_MQTT_Status = "Acantilados/Servicios/AireAcondicionado4/Estado"; */
+const char *hostName = "ESP_TemperaturaPB";
+String Sensor_Name = "TemperaturaPB";
+String TemperaturaPB_MQTT_Status = "Acantilados/Servicios/Meteorologia/TemperaturaInteriorPB";
+String HumedadPB_MQTT_Status = "Acantilados/Servicios/Meteorologia/HumedadInteriorPB"; */
 
 #pragma endregion /////////////////////////////////////////////////////////////////////
 
@@ -204,11 +204,10 @@ const long timeoutTime = 2000;
 void setup()
 {
   Serial.begin(115200);
-  // pinMode(LED_BUILTIN, OUTPUT); // Initialize the BUILTIN_LED pin as an output
-  SerialPrint("Configurando WiFI");
-  setup_wifi();
-  SerialPrint("Configurando MQTT");
-  setup_MQTT();
+  SerialPrint("WIFI - Configurando WiFI");
+  WIFI_Setup();
+  SerialPrint("MQTT - Configurando MQTT");
+  MQTT_Setup();
 
   WEB_Server.begin();
 }
@@ -217,28 +216,29 @@ void loop()
 {
   if (WiFi.status() != WL_CONNECTED)
   {
-    setup_wifi();
+    WIFI_Setup();
+  }
+
+  if (!client_MQTT.connected())
+  {
+    MQTT_Reconnect();
   }
 
   client_MQTT.loop();
-  WebServer_Loop();
+  WEBSERVER_Loop();
 
   long now = millis();
   if (now - lastMsg5seg > 5000)
   {
     lastMsg5seg = now;
-    Relay_Loop();
-    if (!client_MQTT.loop())
-    {
-      MQTT_Reconnect();
-    }
+    RELAY_Loop();
   }
 
   if (now - lastMsg1min > 60000)
   {
     lastMsg1min = now;
 #ifdef Report_IP_DuckDNS
-    HttpGet(urlDuckDNS);
+    HTTP_Get(urlDuckDNS);
 #endif
   }
 
@@ -246,12 +246,12 @@ void loop()
   {
     lastMsg5min = now;
 #ifdef Report_HealthChecks
-    HttpGet(urlHealthChecks);
+    HTTP_Get(urlHealthChecks);
 #endif
   }
 }
 
-void setup_wifi()
+void WIFI_Setup()
 {
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
@@ -259,96 +259,129 @@ void setup_wifi()
 
   if (WiFi.config(local_IP, gateway, subnet, primaryDNS) == false)
   {
-    SerialPrint("Configuration failed.");
+    SerialPrint("WIFI - Configuration failed.");
   }
 
   SerialPrint();
-  SerialPrint("Connecting to ");
+  SerialPrint("WIFI - Connecting to ");
   SerialPrint(ssid);
   WiFi.hostname(hostName);
-  SerialPrint("WIFI Status  : ");
+  SerialPrint("WIFI - Status  : ");
   SerialPrint(WiFi.status());
-  SerialPrint("Conectando...");
+  SerialPrint("WIFI - Conectando...");
   WiFi.begin(ssid, password);
 
-  while (WiFi.status() != WL_CONNECTED)
+  unsigned long startMillis = millis();
+  while (WiFi.status() != WL_CONNECTED && (millis() - startMillis) < 60000)
   {
     SerialPrint(".");
     delay(500);
   }
-  delay(500);
-  SerialPrint("");
-  SerialPrint("WiFi connected");
-  SerialPrint("IP address: ");
-  SerialPrint(WiFi.localIP().toString());
 
-  SerialPrint("RRSI: ");
-  SerialPrint(WiFi.RSSI());
+  if (WiFi.status() == WL_CONNECTED)
+  {
+    SerialPrint("");
+    SerialPrint("WIFI - connected");
+    SerialPrint("WIFI - IP address: ");
+    SerialPrint(WiFi.localIP().toString());
+    SerialPrint("WIFI - RRSI: ");
+    SerialPrint(WiFi.RSSI());
+  }
+  else
+  {
+    SerialPrint("");
+    SerialPrint("WIFI - Connection timeout");
+    SerialPrint("WIFI - Performing hard reset...");
+    delay(5000);
+    ESP.restart();
+  }
 }
 
-void setup_MQTT()
+void MQTT_Setup()
 {
-  client_MQTT.setServer(mqtt_server, 1883);
-  SerialPrint("Declarando el Callback");
+  client_MQTT.setServer(mqtt_server, mqtt_port);
+  SerialPrint("MQTT - Declarando el Callback");
   client_MQTT.setCallback(MQTT_Callback);
-  SerialPrint("Setup done");
+  SerialPrint("MQTT - Setup done");
 }
 
 void MQTT_Reconnect()
 {
-  SerialPrint("Intentando MQTT Conexion...");
-  SerialPrint(client_MQTT.state());
+  static int connectionAttempts = 0;
+  SerialPrint("MQTT - Intentando Conexion...");
+  SerialPrint("MQTT - " + client_MQTT.state());
 
   if (client_MQTT.connect(hostName, mqtt_user, mqtt_pass))
   {
-    SerialPrint("Conectado");
-    if (Relay1_MQTT_Command != "")
-    {
-      SerialPrint("Suscribiendo en " + Relay1_MQTT_Command + " ...");
-      while (client_MQTT.subscribe(Relay1_MQTT_Command.c_str()) == false)
-      {
-      }
-      SerialPrint("Suscripcion OK");
-    }
+    SerialPrint("MQTT - Conectado");
 
-    if (Relay2_MQTT_Command != "")
+    // Suscribir a los temas MQTT si se han configurado
+    if (!Relay1_MQTT_Command.isEmpty())
     {
-      SerialPrint("Suscribiendo en " + Relay2_MQTT_Command + " ...");
-      while (client_MQTT.subscribe(Relay2_MQTT_Command.c_str()) == false)
-      {
-      }
-      SerialPrint("Suscripcion OK");
+      MQTT_SubscribeToTopic(Relay1_MQTT_Command);
     }
-
-    if (Relay3_MQTT_Command != "")
+    if (!Relay2_MQTT_Command.isEmpty())
     {
-      SerialPrint("Suscribiendo en " + Relay3_MQTT_Command + " ...");
-      while (client_MQTT.subscribe(Relay3_MQTT_Command.c_str()) == false)
-      {
-      }
-      SerialPrint("Suscripcion OK");
+      MQTT_SubscribeToTopic(Relay2_MQTT_Command);
     }
-
-    if (Relay4_MQTT_Command != "")
+    if (!Relay3_MQTT_Command.isEmpty())
     {
-      SerialPrint("Suscribiendo en " + Relay4_MQTT_Command + " ...");
-      while (client_MQTT.subscribe(Relay4_MQTT_Command.c_str()) == false)
-      {
-      }
-      SerialPrint("Suscripcion OK");
+      MQTT_SubscribeToTopic(Relay3_MQTT_Command);
     }
+    if (!Relay4_MQTT_Command.isEmpty())
+    {
+      MQTT_SubscribeToTopic(Relay4_MQTT_Command);
+    }
+    connectionAttempts = 0;
   }
   else
   {
-    SerialPrint("Fallo conexion MQTT");
+    connectionAttempts++; // Incrementar el contador de intentos de conexión fallidos
+    SerialPrint("MQTT - Fallo conexion");
     SerialPrint(client_MQTT.state());
-    SerialPrint("Intentando en 5 seg...");
+    SerialPrint("MQTT - Intentando en 5 seg...");
+    delay(5000);
+
+    if (connectionAttempts >= 10) // Realizar un hard reset después de 10 intentos
+    {
+      SerialPrint("MQTT - Maximo de intentos alcanzado. Realizando hard reset...");
+      delay(5000);
+      ESP.restart(); // Realizar un reinicio completo (hard reset)
+    }
   }
 }
 
+// Función auxiliar para suscribir a un tema MQTT de forma no bloqueante
+void MQTT_SubscribeToTopic(String topic)
+{
+  if (topic != "")
+  {
+    SerialPrint("MQTT - Suscribiendo en " + topic + " ...");
+
+    unsigned long startTime = millis();
+    while (!client_MQTT.subscribe(topic.c_str()))
+    {
+      client_MQTT.loop();
+
+      if (millis() - startTime > 5000)
+      {
+        SerialPrint("MQTT - Fallo suscripcion");
+        // rebootCount++;
+        // EEPROM.put(0, rebootCount);
+        // EEPROM.commit();
+        delay(5000);
+        ESP.restart();
+        while (true)
+          ;
+        break;
+      }
+    }
+    SerialPrint("MQTT - Suscripcion OK");
+  }
+}
 void MQTT_Callback(char *topic, byte *payload, unsigned int length)
 {
-  SerialPrint("Message arrived: ");
+  SerialPrint("MQTT - Message arrived: ");
   String mTopic = convertToString(topic, strlen(topic));
   String mPayload = convertToString(payload, sizeof(payload));
   SerialPrint(mTopic);
@@ -413,7 +446,7 @@ void MQTT_Callback(char *topic, byte *payload, unsigned int length)
   }
 }
 
-void WebServer_Loop()
+void WEBSERVER_Loop()
 {
   WiFiClient client = WEB_Server.available();
 
@@ -422,7 +455,7 @@ void WebServer_Loop()
     currentTime = millis();
     previousTime = currentTime;
     bool reset = false;
-    SerialPrint("New Client.");
+    SerialPrint("WebServer - New Client.");
     String currentLine = "";
     while (client.connected() && currentTime - previousTime <= timeoutTime)
     {
@@ -487,88 +520,101 @@ void WebServer_Loop()
             client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
             client.println("<link rel=\"icon\" href=\"data:,\">");
 
-            client.println("<style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}");
-            client.println(".button { background-color: #555555; border: none; color: white; padding: 16px 40px;");
-            client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
-            client.println(".button2 {background-color: #4CAF50;}");
-            client.println(".button3 {background-color: #FF0000; font-size: 10px; padding: 10px 20px;}</style></head>");
-            client.println("<body>");
+            client.println("<style>body{font-family: \"Helvetica Neue\", Arial, sans-serif; background-color: #f9f9f9; color: #333; margin: 0; padding: 0;}");
+            client.println(".container{max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0px 0px 5px rgba(0,0,0,0.2);}");
+            client.println("h1{font-size: 36px; margin-bottom: 20px; color: #007bff; background-color: #f0f0f0; padding: 10px 20px; border-radius: 5px;}");
+            client.println("p{font-size: 18px;margin: 10px 0;color: #666;}");
+
+            client.println(".button{width:100px; text-align: center; display: inline-block;background-color: #007bff;color: #fff;padding: 12px 24px;font-size: 18px;text-decoration: none;margin: 5px;cursor: pointer;border: none;outline: none;transition: background-color 0.3s ease;border-radius: 5px;}");
+            client.println(".button:hover{background-color: #004a99;}");
+            client.println(".button2{width:100px; text-align: center; display: inline-block;background-color: #4CAF50;color: #fff;padding: 12px 24px;font-size: 18px;text-decoration: none;margin: 5px;cursor: pointer;border: none;outline: none;transition: background-color 0.3s ease;border-radius: 5px;}");
+            client.println(".button2:hover{background-color: #2f6a31;}");
+            client.println(".button3{width:100px; text-align: center; display: inline-block;background-color: #FF0000;color: #fff;padding: 12px 24px;font-size: 18px;text-decoration: none;margin: 5px;cursor: pointer;border: none;outline: none;transition: background-color 0.3s ease;border-radius: 5px;}");
+            client.println(".button3:hover{background-color: #990000;}");
+
+            // client.println(".bomb {color: #ff4545;}");
+            // client.println(".reset{margin-top: 40px;}");
+            client.println(".foot{font-size: 12px;background-color: #f0f0f0;border-radius: 5px;}</style></head>");
+
+            client.println("<body><div class=\"container\">");
             if (reset == false)
             {
-              client.println("<h1>" + String(hostName) + " Web Server (" + WiFi.localIP().toString() + ")</h1>");
-              client.println("<p> Version: " + Version + "</p>");
+              client.println("<h1 style=\"font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: bold; text-align: center;\">" + String(hostName) + "<br>(" + WiFi.localIP().toString() + ")</h1>");
+              client.println("<p  style=\"text-align: center;\"> Version: " + Version + "</p>");
 
               if (Relay1Status == 0)
               {
-                client.println("<p>Relay 1 estado: " + String(Relay1Status) + " --> " + Relay1_Name + "</p>");
+                client.println("<p>Relay 1 estado: " + String(Relay1Status) + " &rarr; " + Relay1_Name + "</p>");
                 client.println("<p><a href=\"/relay1/on\"><button class=\"button\">OFF</button></a></p>");
               }
               else
               {
-                client.println("<b style="
+                client.println("<p style="
                                "color:red;"
                                ">Relay 1 estado: " +
-                               String(Relay1Status) + " --> " + Relay1_Name + "</b>");
-                client.println("<p><a href=\"/relay1/off\"><button class=\"button button2\">ON</button></a></p>");
+                               String(Relay1Status) + " &rarr; " + Relay1_Name + "</p>");
+                client.println("<p><a href=\"/relay1/off\"><button class=\"button2\">ON</button></a></p>");
               }
 
               if (Relay2Status == 0)
               {
-                client.println("<p>Relay 2 estado: " + String(Relay2Status) + " --> " + Relay2_Name + "</p>");
+                client.println("<p>Relay 2 estado: " + String(Relay2Status) + " &rarr; " + Relay2_Name + "</p>");
                 client.println("<p><a href=\"/relay2/on\"><button class=\"button\">OFF</button></a></p>");
               }
               else
               {
-                client.println("<b style="
+                client.println("<p style="
                                "color:red;"
                                ">Relay 2 estado: " +
-                               String(Relay2Status) + " --> " + Relay2_Name + "</b>");
-                client.println("<p><a href=\"/relay2/off\"><button class=\"button button2\">ON</button></a></p>");
+                               String(Relay2Status) + " &rarr; " + Relay2_Name + "</p>");
+                client.println("<p><a href=\"/relay2/off\"><button class=\"button2\">ON</button></a></p>");
               }
 
               if (Relay3Status == 0)
               {
-                client.println("<p>Relay 3 estado: " + String(Relay3Status) + " --> " + Relay3_Name + "</p>");
+                client.println("<p>Relay 3 estado: " + String(Relay3Status) + " &rarr; " + Relay3_Name + "</p>");
                 client.println("<p><a href=\"/relay3/on\"><button class=\"button\">OFF</button></a></p>");
               }
               else
               {
-                client.println("<b style="
+                client.println("<p style="
                                "color:red;"
                                ">Relay 3 estado: " +
-                               String(Relay3Status) + " --> " + Relay3_Name + "</b>");
-                client.println("<p><a href=\"/relay3/off\"><button class=\"button button2\">ON</button></a></p>");
+                               String(Relay3Status) + " &rarr; " + Relay3_Name + "</p>");
+                client.println("<p><a href=\"/relay3/off\"><button class=\"button2\">ON</button></a></p>");
               }
 
               if (Relay4Status == 0)
               {
-                client.println("<p>Relay 4 estado: " + String(Relay4Status) + " --> " + Relay4_Name + "</p>");
+                client.println("<p>Relay 4 estado: " + String(Relay4Status) + " &rarr; " + Relay4_Name + "</p>");
                 client.println("<p><a href=\"/relay4/on\"><button class=\"button\">OFF</button></a></p>");
               }
               else
               {
-                client.println("<b style="
+                client.println("<p style="
                                "color:red;"
                                ">Relay 4 estado: " +
-                               String(Relay4Status) + " --> " + Relay4_Name + "</b>");
-                client.println("<p><a href=\"/relay4/off\"><button class=\"button button2\">ON</button></a></p>");
+                               String(Relay4Status) + " &rarr; " + Relay4_Name + "</p>");
+                client.println("<p><a href=\"/relay4/off\"><button class=\"button2\">ON</button></a></p>");
               }
 
-              client.println("<p>MQTT server status: " + MqttStatus() + "</p>");
+              client.println("<div class=\"foot\">");
+              client.println("<p class=\"foot\">MQTT server status: " + MQTT_Status() + "</p>");
 
 #ifdef Report_IP_DuckDNS
-              client.println("<p>DuckDNS Updated every 1 min: " + urlDuckDNS + "</p>");
+              client.println("<p class=\"foot\">DuckDNS Updated every 1 min: " + urlDuckDNS + "</p>");
 #endif
 #ifndef Report_IP_DuckDNS
-              client.println("<p>DuckDNS Updated disabled</p>");
+              client.println("<p class=\"foot\">DuckDNS Updated disabled</p>");
 #endif
 #ifdef Report_HealthChecks
-              client.println("<p>HealthChecks Updated every 5 min: " + urlHealthChecks + "</p>");
+              client.println("<p class=\"foot\">HealthChecks Updated every 5 min: " + urlHealthChecks + "</p>");
 #endif
 #ifndef Report_HealthChecks
-              client.println("<p>HealthChecks Updated disabled</p>");
+              client.println("<p class=\"foot\">HealthChecks Updated disabled</p>");
 #endif
-              client.println("<p><a href=\"/reset\"><button class=\"button button3\">RESET</button></a></p>");
+              client.println("</div>");
+              client.println("<p><a href=\"/reset\"><button class=\"button3\">RESET</button></a></p>");
             }
             else
             {
@@ -598,7 +644,7 @@ void WebServer_Loop()
     header = "";
 
     client.stop();
-    SerialPrint("Client disconnected.");
+    SerialPrint("WebServer - Client disconnected.");
     SerialPrint("");
 
     if (reset == true)
@@ -619,7 +665,7 @@ void WebServer_Loop()
   }
 }
 
-void Relay_Loop()
+void RELAY_Loop()
 {
   if (Relay1_Name != "")
   {
@@ -686,7 +732,7 @@ void Relay_Loop()
   }
 }
 
-void HttpGet(String url)
+void HTTP_Get(String url)
 {
   if ((WiFi.status() == WL_CONNECTED))
   {
@@ -694,7 +740,7 @@ void HttpGet(String url)
     WiFiClient client;
     HTTPClient http;
 
-    SerialPrint("Iniciando cliete HTTP");
+    SerialPrint("Iniciando cliente HTTP");
 
     if (http.begin(client, urlRequest))
     {
@@ -726,7 +772,7 @@ void HttpGet(String url)
   }
 }
 
-String MqttStatus()
+String MQTT_Status()
 {
   switch (client_MQTT.state())
   {
