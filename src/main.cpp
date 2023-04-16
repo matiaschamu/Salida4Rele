@@ -1,52 +1,59 @@
+#define Numero_Version "1.0.8"
+
+// #define Board_4OutRelay_Living
+// #define Board_4OutRelay_Living2
+// #define Board_4OutRelay_Comedor
+// #define Board_4OutRelay_Garage
+// #define Board_4OutRelay_Tablero
+// #define Board_4OutRelay_1erPiso
+// #define Board_4OutRelay_Living
+#define Board_Temp_Humedad_PB
+// #define Board_Temp_Humedad_Exterior_Galeria
+// #define Board_Temp_Humedad_Exterior
+
+// Define if use ESP8266
+#ifndef ESP8266
+#define ESP8266
+#endif
+
+// Define if use ESP32
+// #ifndef ESP32
+//  #define ESP32
+// #endif
+
+// Define for debug information
+//  #define debug
+
+#if defined(Board_4OutRelay_Living) || defined(Board_4OutRelay_Living2) || defined(Board_4OutRelay_Comedor) || defined(Board_4OutRelay_Garage) || defined(Board_4OutRelay_Tablero) || defined(Board_4OutRelay_1erPiso) || defined(Board_4OutRelay_Living)
+#define Board_4OutRelay
+#endif
+
+#if defined(Board_Temp_Humedad_PB) || defined(Board_Temp_Humedad_Exterior_Galeria) || defined(Board_Temp_Humedad_Exterior)
+#define Board_DHT22
+#define DHT_PIN 2
+#endif
+
+//**************************************************   LIBRERIAS   ******************************************
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-// #include <WiFi.h>
+#ifdef ESP32
+#include <WiFi.h>
+#endif
+#ifdef ESP8266
 #include <ESP8266HTTPClient.h>
+#endif
 #include <PubSubClient.h>
 
-//#define debug
+#if defined(Board_DHT22)
+#include <DHTesp.h> // Incluir la librería DHTesp
+#endif
 
-void WIFI_Setup();
-void MQTT_Setup();
-void MQTT_Callback(char *, byte *, unsigned int);
-void WEBSERVER_Loop();
-void RELAY_Loop();
-void DuckDNS_Loop();
-void HealthChecks_Loop();
-void HTTP_Get(String);
-void MQTT_Reconnect();
-void MQTT_SubscribeToTopic(String);
-String MQTT_Status();
-void SerialPrint();
-void SerialPrint(String);
-void SerialPrint(char);
-void SerialPrint(int);
-String convertToString(char *, int);
-String convertToString(byte *, int);
+//**************************************************   BOARDS   ********************************************
 
-#pragma region "Configuracion" //////////////////////////////////////////////////////////
-
-const String Version = "1.0.7";
-const char *ssid = "Domotics";
-const char *password = "Mato19428426";
-
-IPAddress gateway(192, 168, 1, 1);
-IPAddress subnet(255, 255, 255, 0);
-IPAddress primaryDNS(192, 168, 1, 1);
-// IPAddress secondaryDNS(8, 8, 4, 4);
-
-const char *mqtt_server = "192.168.1.10";
-const uint16_t mqtt_port = 1883;
-const char *mqtt_user = "matias";
-const char *mqtt_pass = "Mato19428426.";
-
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
-String urlHealthChecks = "http://hc-ping.com/6b750dde-84ed-424a-b708-7c869b8c5253";
-
-/* //Placa1
-#define Board_4OutRelay
-//#define Report_IP_DuckDNS
-//#define Report_HealthChecks
+#ifdef Board_4OutRelay_Living
+// Placa1
+// #define Report_IP_DuckDNS
+// #define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 11);
 const char *hostName = "ESP_Living";
 String Relay1_Name = "Luz Living";
@@ -60,12 +67,13 @@ String Relay3_MQTT_Command = "Acantilados/Luz/Ventanal/Comando";
 String Relay3_MQTT_Status = "Acantilados/Luz/Ventanal/Estado";
 String Relay4_Name = "Luz Arcada";
 String Relay4_MQTT_Command = "Acantilados/Luz/Arcada/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/Arcada/Estado"; */
+String Relay4_MQTT_Status = "Acantilados/Luz/Arcada/Estado";
+#endif
 
-/* //Placa2
-#define Board_4OutRelay
-//#define Report_IP_DuckDNS
-//#define Report_HealthChecks
+#ifdef Board_4OutRelay_Living2
+// Placa2
+// #define Report_IP_DuckDNS
+// #define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 12);
 const char *hostName = "ESP_Living2";
 String Relay1_Name = "Luz PuertaEnt";
@@ -79,12 +87,13 @@ String Relay3_MQTT_Command = "Acantilados/Luz/Habitacion/Comando";
 String Relay3_MQTT_Status = "Acantilados/Luz/Habitacion/Estado";
 String Relay4_Name = "Luz CaraSur";
 String Relay4_MQTT_Command = "Acantilados/Luz/CaraSur/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/CaraSur/Estado"; */
+String Relay4_MQTT_Status = "Acantilados/Luz/CaraSur/Estado";
+#endif
 
-/* //Placa3
-#define Board_4OutRelay
-//#define Report_IP_DuckDNS
-//#define Report_HealthChecks
+#ifdef Board_4OutRelay_Comedor
+// Placa3
+// #define Report_IP_DuckDNS
+// #define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 13);
 const char *hostName = "ESP_Galeria";
 String Relay1_Name = "Luz Comedor";
@@ -98,12 +107,13 @@ String Relay3_MQTT_Command = "Acantilados/Luz/Galeria/Comando";
 String Relay3_MQTT_Status = "Acantilados/Luz/Galeria/Estado";
 String Relay4_Name = "Luz Farolas";
 String Relay4_MQTT_Command = "Acantilados/Luz/Farolas/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/Farolas/Estado"; */
+String Relay4_MQTT_Status = "Acantilados/Luz/Farolas/Estado";
+#endif
 
-/* //Placa4
-#define Board_4OutRelay
-//#define Report_IP_DuckDNS
-//#define Report_HealthChecks
+#ifdef Board_4OutRelay_Garage
+// Placa4
+// #define Report_IP_DuckDNS
+// #define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 14);
 const char *hostName = "ESP_Garage";
 String Relay1_Name = "Luz Garage";
@@ -117,10 +127,11 @@ String Relay3_MQTT_Command = "Acantilados/Luz/Servicio/Comando";
 String Relay3_MQTT_Status = "Acantilados/Luz/Servicio/Estado";
 String Relay4_Name = "Luz Lavadero";
 String Relay4_MQTT_Command = "Acantilados/Luz/Lavadero/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/Lavadero/Estado"; */
+String Relay4_MQTT_Status = "Acantilados/Luz/Lavadero/Estado";
+#endif
 
+#ifdef Board_4OutRelay_Tablero
 // Placa5
-#define Board_4OutRelay
 #define Report_IP_DuckDNS
 #define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 15);
@@ -137,11 +148,12 @@ String Relay3_MQTT_Status = "";
 String Relay4_Name = "";
 String Relay4_MQTT_Command = "";
 String Relay4_MQTT_Status = "";
+#endif
 
-/* //Placa6
-#define Board_4OutRelay
-//#define Report_IP_DuckDNS
-//#define Report_HealthChecks
+#ifdef Board_4OutRelay_1erPiso
+// Placa6
+// #define Report_IP_DuckDNS
+// #define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 16);
 const char *hostName = "ESP_1erPiso";
 String Relay1_Name = "Luz 1er Piso";
@@ -155,21 +167,70 @@ String Relay3_MQTT_Command = "Acantilados/Servicios/ResistenciaTermo/Comando";
 String Relay3_MQTT_Status = "Acantilados/Servicios/ResistenciaTermo/Estado";
 String Relay4_Name = "";
 String Relay4_MQTT_Command = "";
-String Relay4_MQTT_Status = ""; */
+String Relay4_MQTT_Status = "";
+#endif
 
-/* //Placa7
-#define Board_Temp_Humedad
-//#define Report_IP_DuckDNS
-//#define Report_HealthChecks
+#ifdef Board_Temp_Humedad_PB
+// Placa7
+// #define Report_IP_DuckDNS
+// #define Report_HealthChecks
 IPAddress local_IP(192, 168, 1, 17);
 const char *hostName = "ESP_TemperaturaPB";
 String Sensor_Name = "TemperaturaPB";
-String TemperaturaPB_MQTT_Status = "Acantilados/Servicios/Meteorologia/TemperaturaInteriorPB";
-String HumedadPB_MQTT_Status = "Acantilados/Servicios/Meteorologia/HumedadInteriorPB"; */
+String TemperaturaPB_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/TemperaturaPB";
+String HumedadPB_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/HumedadPB";
+#endif
 
-#pragma endregion /////////////////////////////////////////////////////////////////////
+#if defined(Board_DHT22)
+#include <DHTesp.h> // Incluir la librería DHTesp
+#endif
 
-#pragma region "Inicializacion de variables" //////////////////////////////////////////////////////////
+void WIFI_Setup();
+void MQTT_Setup();
+void MQTT_Callback(char *, byte *, unsigned int);
+void MQTT_Reconnect();
+void MQTT_SubscribeToTopic(String);
+String MQTT_Status();
+void WEBSERVER_Loop();
+void HTTP_Get(String);
+void DuckDNS_Loop();
+void HealthChecks_Loop();
+void SerialPrint();
+void SerialPrint(String);
+void SerialPrint(char);
+void SerialPrint(int);
+String convertToString(char *, int);
+String convertToString(byte *, int);
+
+#ifdef Board_4OutRelay
+void RELAY_Loop();
+#endif
+
+#ifdef Board_DHT22
+void TEMPERATURA_loop(float &temperature, float &humidity);
+#endif
+
+//**************************************************   Configuracion   ***************************************
+
+const String Version = Numero_Version;
+const char *ssid = "Domotics";
+const char *password = "Mato19428426";
+
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
+IPAddress primaryDNS(192, 168, 1, 1);
+// IPAddress secondaryDNS(8, 8, 4, 4);
+
+const char *mqtt_server = "192.168.1.10";
+const uint16_t mqtt_port = 1883;
+const char *mqtt_user = "matias";
+const char *mqtt_pass = "Mato19428426.";
+
+String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
+String urlHealthChecks = "http://hc-ping.com/6b750dde-84ed-424a-b708-7c869b8c5253";
+
+//**************************************************   Inicializacion de variables   ************************
+#ifdef Board_4OutRelay
 bool Relay1Status = false;
 bool Relay2Status = false;
 bool Relay3Status = false;
@@ -183,57 +244,77 @@ byte Relay3_OFF[] = {0xa0, 0x03, 0x00, 0xa3};
 byte Relay3_ON[] = {0xa0, 0x03, 0x01, 0xa4};
 byte Relay4_OFF[] = {0xa0, 0x04, 0x00, 0xa4};
 byte Relay4_ON[] = {0xa0, 0x04, 0x01, 0xa5};
+#endif
+
+#ifdef Board_DHT22
+DHTesp dht;
+#endif
 
 int status = WL_IDLE_STATUS;
-WiFiClient espClient;
-PubSubClient client_MQTT(espClient);
+WiFiClient WifiClient;
+PubSubClient MQTTClient(WifiClient);
 long lastMsg5seg = 0;
 long lastMsg1min = 0;
 long lastMsg5min = 0;
 char msg[50];
 
-#pragma region "web server Config"
+float temperature = 0;
+float humidity = 0;
+
+//**************************************************   web server Config   *********************************
 WiFiServer WEB_Server(80);
 String header;
 unsigned long currentTime = millis();
 unsigned long previousTime = 0;
 const long timeoutTime = 2000;
-#pragma endregion
-#pragma endregion /////////////////////////////////////////////////////////////////////
 
+//**************************************************   CODE SETUP   *****************************************
 void setup()
 {
   Serial.begin(115200);
+  dht.setup(DHT_PIN, DHTesp::DHT22);
   SerialPrint("WIFI - Configurando WiFI");
   WIFI_Setup();
   SerialPrint("MQTT - Configurando MQTT");
   MQTT_Setup();
-
   WEB_Server.begin();
 }
 
+//**************************************************   CODE LOOP   *****************************************
 void loop()
 {
+  // Verifica si no está conectado a WiFi
   if (WiFi.status() != WL_CONNECTED)
   {
     WIFI_Setup();
   }
-
-  if (!client_MQTT.connected())
+  // Verifica si el cliente MQTT no está conectado
+  if (!MQTTClient.connected())
   {
     MQTT_Reconnect();
   }
 
-  client_MQTT.loop();
+  MQTTClient.loop();
   WEBSERVER_Loop();
 
   long now = millis();
+
+  // Verifica si han pasado 5 segundos
   if (now - lastMsg5seg > 5000)
   {
     lastMsg5seg = now;
+
+#ifdef Board_4OutRelay
     RELAY_Loop();
+#endif
+#ifdef Board_DHT22
+    TEMPERATURA_loop(temperature, humidity);
+    MQTTClient.publish(TemperaturaPB_MQTT_Status.c_str(), String(temperature, 2).c_str());
+    MQTTClient.publish(HumedadPB_MQTT_Status.c_str(), String(humidity, 2).c_str());
+#endif
   }
 
+  // Verifica si ha pasado 1 minuto
   if (now - lastMsg1min > 60000)
   {
     lastMsg1min = now;
@@ -242,6 +323,7 @@ void loop()
 #endif
   }
 
+  // Verifica si han pasado 5 minutos
   if (now - lastMsg5min > 300000)
   {
     lastMsg5min = now;
@@ -251,6 +333,7 @@ void loop()
   }
 }
 
+//**************************************************   WIFI   **********************************************
 void WIFI_Setup()
 {
   WiFi.mode(WIFI_STA);
@@ -297,24 +380,25 @@ void WIFI_Setup()
   }
 }
 
+//**************************************************   MQTT   ***********************************************
 void MQTT_Setup()
 {
-  client_MQTT.setServer(mqtt_server, mqtt_port);
+  MQTTClient.setServer(mqtt_server, mqtt_port);
   SerialPrint("MQTT - Declarando el Callback");
-  client_MQTT.setCallback(MQTT_Callback);
+  MQTTClient.setCallback(MQTT_Callback);
   SerialPrint("MQTT - Setup done");
 }
-
 void MQTT_Reconnect()
 {
   static int connectionAttempts = 0;
   SerialPrint("MQTT - Intentando Conexion...");
-  SerialPrint("MQTT - " + client_MQTT.state());
+  SerialPrint("MQTT - " + MQTTClient.state());
 
-  if (client_MQTT.connect(hostName, mqtt_user, mqtt_pass))
+  if (MQTTClient.connect(hostName, mqtt_user, mqtt_pass))
   {
     SerialPrint("MQTT - Conectado");
 
+#ifdef Board_4OutRelay
     // Suscribir a los temas MQTT si se han configurado
     if (!Relay1_MQTT_Command.isEmpty())
     {
@@ -332,13 +416,15 @@ void MQTT_Reconnect()
     {
       MQTT_SubscribeToTopic(Relay4_MQTT_Command);
     }
+#endif
+
     connectionAttempts = 0;
   }
   else
   {
     connectionAttempts++; // Incrementar el contador de intentos de conexión fallidos
     SerialPrint("MQTT - Fallo conexion");
-    SerialPrint(client_MQTT.state());
+    SerialPrint(MQTTClient.state());
     SerialPrint("MQTT - Intentando en 5 seg...");
     delay(5000);
 
@@ -350,7 +436,6 @@ void MQTT_Reconnect()
     }
   }
 }
-
 // Función auxiliar para suscribir a un tema MQTT de forma no bloqueante
 void MQTT_SubscribeToTopic(String topic)
 {
@@ -359,9 +444,9 @@ void MQTT_SubscribeToTopic(String topic)
     SerialPrint("MQTT - Suscribiendo en " + topic + " ...");
 
     unsigned long startTime = millis();
-    while (!client_MQTT.subscribe(topic.c_str()))
+    while (!MQTTClient.subscribe(topic.c_str()))
     {
-      client_MQTT.loop();
+      MQTTClient.loop();
 
       if (millis() - startTime > 5000)
       {
@@ -388,6 +473,7 @@ void MQTT_Callback(char *topic, byte *payload, unsigned int length)
   SerialPrint(mPayload);
   SerialPrint();
 
+#ifdef Board_4OutRelay
   if (mTopic == Relay1_MQTT_Command)
   {
     if ((char)payload[1] == 'N')
@@ -444,8 +530,71 @@ void MQTT_Callback(char *topic, byte *payload, unsigned int length)
     }
     lastMsg5seg = 0;
   }
+#endif
+}
+String MQTT_Status()
+{
+  switch (MQTTClient.state())
+  {
+  case -4:
+    return "MQTT_CONNECTION_TIMEOUT - the server didn't respond within the keepalive time";
+    break;
+  case -3:
+    return "MQTT_CONNECTION_LOST - the network connection was broken";
+    break;
+  case -2:
+    return "MQTT_CONNECT_FAILED - the network connection failed";
+    break;
+  case -1:
+    return "MQTT_DISCONNECTED - the client is disconnected cleanly";
+    break;
+  case 0:
+    return "MQTT_CONNECTED - the client is connected";
+    break;
+  case 1:
+    return "MQTT_CONNECT_BAD_PROTOCOL - the server doesn't support the requested version of MQTT";
+    break;
+  case 2:
+    return "MQTT_CONNECT_BAD_CLIENT_ID - the server rejected the client identifier";
+    break;
+  case 3:
+    return "MQTT_CONNECT_UNAVAILABLE - the server was unable to accept the connection";
+    break;
+  case 4:
+    return "MQTT_CONNECT_BAD_CREDENTIALS - the username/password were rejected";
+    break;
+  case 5:
+    return "MQTT_CONNECT_UNAUTHORIZED - the client was not authorized to connect";
+    break;
+  default:
+    return "";
+    break;
+  }
 }
 
+//**************************************************   Temperature   ***************************************
+#ifdef Board_DHT22
+void TEMPERATURA_loop(float &temperature, float &humidity)
+{
+  float t = dht.getTemperature(); // Obtener la temperatura en grados Celsius
+  float h = dht.getHumidity();    // Obtener la humedad relativa en porcentaje
+
+  // Verificar si la lectura del sensor es válida
+  if (!isnan(t) && !isnan(h))
+  {
+    temperature = t;
+    humidity = h;
+    SerialPrint("Temperatura: " + String(temperature) + " °C");
+    SerialPrint("Humedad: " + String(humidity) + " %");
+  }
+  else
+  {
+    SerialPrint("Error al leer el sensor DHT22");
+  }
+}
+#endif
+
+//**************************************************   Web Server   ****************************************
 void WEBSERVER_Loop()
 {
   WiFiClient client = WEB_Server.available();
@@ -478,6 +627,7 @@ void WEBSERVER_Loop()
             client.println("Connection: close");
             client.println();
 
+#ifdef Board_4OutRelay
             if (header.indexOf("GET /relay1/on") >= 0)
             {
               Relay1Status = 1;
@@ -514,6 +664,13 @@ void WEBSERVER_Loop()
             {
               reset = true;
             }
+#endif
+#ifdef Board_DHT22
+            if (header.indexOf("GET /reset") >= 0)
+            {
+              reset = true;
+            }
+#endif
             lastMsg5seg = 0;
 
             client.println("<!DOCTYPE html><html>");
@@ -542,6 +699,7 @@ void WEBSERVER_Loop()
               client.println("<h1 style=\"font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: bold; text-align: center;\">" + String(hostName) + "<br>(" + WiFi.localIP().toString() + ")</h1>");
               client.println("<p  style=\"text-align: center;\"> Version: " + Version + "</p>");
 
+#ifdef Board_4OutRelay
               if (Relay1Status == 0)
               {
                 client.println("<p>Relay 1 estado: " + String(Relay1Status) + " &rarr; " + Relay1_Name + "</p>");
@@ -597,7 +755,12 @@ void WEBSERVER_Loop()
                                String(Relay4Status) + " &rarr; " + Relay4_Name + "</p>");
                 client.println("<p><a href=\"/relay4/off\"><button class=\"button2\">ON</button></a></p>");
               }
+#endif
+#ifdef Board_DHT22
 
+              client.println("<p>Temperatura: " + String(temperature) + " grados" + "</p>");
+              client.println("<p>Humedad: " + String(humidity) + " %" + "</p>");
+#endif
               client.println("<div class=\"foot\">");
               client.println("<p class=\"foot\">MQTT server status: " + MQTT_Status() + "</p>");
 
@@ -649,6 +812,7 @@ void WEBSERVER_Loop()
 
     if (reset == true)
     {
+#ifdef Board_4OutRelay
       Serial.write(Relay1_OFF, sizeof(Relay1_OFF));
       delay(50);
       Serial.write(Relay2_OFF, sizeof(Relay2_OFF));
@@ -657,6 +821,7 @@ void WEBSERVER_Loop()
       delay(50);
       Serial.write(Relay4_OFF, sizeof(Relay4_OFF));
       delay(50);
+#endif
       Serial.println(" ");
       Serial.println("Reset in 5 sec..");
       delay(5000);
@@ -665,6 +830,8 @@ void WEBSERVER_Loop()
   }
 }
 
+//**************************************************   Relay   **********************************************
+#ifdef Board_4OutRelay
 void RELAY_Loop()
 {
   if (Relay1_Name != "")
@@ -672,13 +839,13 @@ void RELAY_Loop()
     if (Relay1Status == true)
     {
       Serial.write(Relay1_ON, sizeof(Relay1_ON));
-      client_MQTT.publish(Relay1_MQTT_Status.c_str(), "ON");
+      MQTTClient.publish(Relay1_MQTT_Status.c_str(), "ON");
       SerialPrint("Relay 1 -> 1");
     }
     else
     {
       Serial.write(Relay1_OFF, sizeof(Relay1_OFF));
-      client_MQTT.publish(Relay1_MQTT_Status.c_str(), "OFF");
+      MQTTClient.publish(Relay1_MQTT_Status.c_str(), "OFF");
       SerialPrint("Relay 1 -> 0");
     }
   }
@@ -688,13 +855,13 @@ void RELAY_Loop()
     if (Relay2Status == true)
     {
       Serial.write(Relay2_ON, sizeof(Relay2_ON));
-      client_MQTT.publish(Relay2_MQTT_Status.c_str(), "ON");
+      MQTTClient.publish(Relay2_MQTT_Status.c_str(), "ON");
       SerialPrint("Relay 2 -> 1");
     }
     else
     {
       Serial.write(Relay2_OFF, sizeof(Relay2_OFF));
-      client_MQTT.publish(Relay2_MQTT_Status.c_str(), "OFF");
+      MQTTClient.publish(Relay2_MQTT_Status.c_str(), "OFF");
       SerialPrint("Relay 2 -> 0");
     }
   }
@@ -704,13 +871,13 @@ void RELAY_Loop()
     if (Relay3Status == true)
     {
       Serial.write(Relay3_ON, sizeof(Relay3_ON));
-      client_MQTT.publish(Relay3_MQTT_Status.c_str(), "ON");
+      MQTTClient.publish(Relay3_MQTT_Status.c_str(), "ON");
       SerialPrint("Relay 3 -> 1");
     }
     else
     {
       Serial.write(Relay3_OFF, sizeof(Relay3_OFF));
-      client_MQTT.publish(Relay3_MQTT_Status.c_str(), "OFF");
+      MQTTClient.publish(Relay3_MQTT_Status.c_str(), "OFF");
       SerialPrint("Relay 3 -> 0");
     }
   }
@@ -720,18 +887,20 @@ void RELAY_Loop()
     if (Relay4Status == true)
     {
       Serial.write(Relay4_ON, sizeof(Relay4_ON));
-      client_MQTT.publish(Relay4_MQTT_Status.c_str(), "ON");
+      MQTTClient.publish(Relay4_MQTT_Status.c_str(), "ON");
       SerialPrint("Relay 4 -> 1");
     }
     else
     {
       Serial.write(Relay4_OFF, sizeof(Relay4_OFF));
-      client_MQTT.publish(Relay4_MQTT_Status.c_str(), "OFF");
+      MQTTClient.publish(Relay4_MQTT_Status.c_str(), "OFF");
       SerialPrint("Relay 4 -> 0");
     }
   }
 }
+#endif
 
+//**************************************************   Funciones   ******************************************
 void HTTP_Get(String url)
 {
   if ((WiFi.status() == WL_CONNECTED))
@@ -769,46 +938,6 @@ void HTTP_Get(String url)
     {
       SerialPrint("[HTTP] Unable to connect\n");
     }
-  }
-}
-
-String MQTT_Status()
-{
-  switch (client_MQTT.state())
-  {
-  case -4:
-    return "MQTT_CONNECTION_TIMEOUT - the server didn't respond within the keepalive time";
-    break;
-  case -3:
-    return "MQTT_CONNECTION_LOST - the network connection was broken";
-    break;
-  case -2:
-    return "MQTT_CONNECT_FAILED - the network connection failed";
-    break;
-  case -1:
-    return "MQTT_DISCONNECTED - the client is disconnected cleanly";
-    break;
-  case 0:
-    return "MQTT_CONNECTED - the client is connected";
-    break;
-  case 1:
-    return "MQTT_CONNECT_BAD_PROTOCOL - the server doesn't support the requested version of MQTT";
-    break;
-  case 2:
-    return "MQTT_CONNECT_BAD_CLIENT_ID - the server rejected the client identifier";
-    break;
-  case 3:
-    return "MQTT_CONNECT_UNAVAILABLE - the server was unable to accept the connection";
-    break;
-  case 4:
-    return "MQTT_CONNECT_BAD_CREDENTIALS - the username/password were rejected";
-    break;
-  case 5:
-    return "MQTT_CONNECT_UNAUTHORIZED - the client was not authorized to connect";
-    break;
-  default:
-    return "";
-    break;
   }
 }
 
