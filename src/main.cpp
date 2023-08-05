@@ -1,52 +1,4 @@
-#define Numero_Version "1.0.8"
-
-// #define Board_4OutRelay_Living
-// #define Board_4OutRelay_Living2
-// #define Board_4OutRelay_Comedor
-// #define Board_4OutRelay_Garage
-// #define Board_4OutRelay_Tablero
-// #define Board_4OutRelay_1erPiso
-// #define Board_4OutRelay_Living
-#define Board_Temp_Humedad_PB
-// #define Board_Temp_Humedad_Exterior_Galeria
-// #define Board_Temp_Humedad_Exterior
-
-// Define if use ESP8266
-#ifndef ESP8266
-#define ESP8266
-#endif
-
-// Define if use ESP32
-// #ifndef ESP32
-//  #define ESP32
-// #endif
-
-// Define for debug information
-//  #define debug
-
-#if defined(Board_4OutRelay_Living) || defined(Board_4OutRelay_Living2) || defined(Board_4OutRelay_Comedor) || defined(Board_4OutRelay_Garage) || defined(Board_4OutRelay_Tablero) || defined(Board_4OutRelay_1erPiso) || defined(Board_4OutRelay_Living)
-#define Board_4OutRelay
-#endif
-
-#if defined(Board_Temp_Humedad_PB) || defined(Board_Temp_Humedad_Exterior_Galeria) || defined(Board_Temp_Humedad_Exterior)
-#define Board_DHT22
-#define DHT_PIN 2
-#endif
-
-//**************************************************   LIBRERIAS   ******************************************
-#include <Arduino.h>
-#include <ESP8266WiFi.h>
-#ifdef ESP32
-#include <WiFi.h>
-#endif
-#ifdef ESP8266
-#include <ESP8266HTTPClient.h>
-#endif
-#include <PubSubClient.h>
-
-#if defined(Board_DHT22)
-#include <DHTesp.h> // Incluir la librería DHTesp
-#endif
+#include <main.h>
 
 //**************************************************   BOARDS   ********************************************
 
@@ -54,7 +6,6 @@
 // Placa1
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
-IPAddress local_IP(192, 168, 1, 11);
 const char *hostName = "ESP_Living";
 String Relay1_Name = "Luz Living";
 String Relay1_MQTT_Command = "Acantilados/Luz/Living/Comando";
@@ -74,7 +25,6 @@ String Relay4_MQTT_Status = "Acantilados/Luz/Arcada/Estado";
 // Placa2
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
-IPAddress local_IP(192, 168, 1, 12);
 const char *hostName = "ESP_Living2";
 String Relay1_Name = "Luz PuertaEnt";
 String Relay1_MQTT_Command = "Acantilados/Luz/PuertaEnt/Comando";
@@ -94,7 +44,6 @@ String Relay4_MQTT_Status = "Acantilados/Luz/CaraSur/Estado";
 // Placa3
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
-IPAddress local_IP(192, 168, 1, 13);
 const char *hostName = "ESP_Galeria";
 String Relay1_Name = "Luz Comedor";
 String Relay1_MQTT_Command = "Acantilados/Luz/Comedor/Comando";
@@ -114,7 +63,6 @@ String Relay4_MQTT_Status = "Acantilados/Luz/Farolas/Estado";
 // Placa4
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
-IPAddress local_IP(192, 168, 1, 14);
 const char *hostName = "ESP_Garage";
 String Relay1_Name = "Luz Garage";
 String Relay1_MQTT_Command = "Acantilados/Luz/Garage/Comando";
@@ -134,7 +82,6 @@ String Relay4_MQTT_Status = "Acantilados/Luz/Lavadero/Estado";
 // Placa5
 #define Report_IP_DuckDNS
 #define Report_HealthChecks
-IPAddress local_IP(192, 168, 1, 15);
 const char *hostName = "ESP_Tablero";
 String Relay1_Name = "Bomba Agua";
 String Relay1_MQTT_Command = "Acantilados/Servicios/BombaAgua/Comando";
@@ -154,7 +101,6 @@ String Relay4_MQTT_Status = "";
 // Placa6
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
-IPAddress local_IP(192, 168, 1, 16);
 const char *hostName = "ESP_1erPiso";
 String Relay1_Name = "Luz 1er Piso";
 String Relay1_MQTT_Command = "Acantilados/Luz/PlantaAlta/Comando";
@@ -174,40 +120,46 @@ String Relay4_MQTT_Status = "";
 // Placa7
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
-IPAddress local_IP(192, 168, 1, 17);
 const char *hostName = "ESP_TemperaturaPB";
-String Sensor_Name = "TemperaturaPB";
-String TemperaturaPB_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/TemperaturaPB";
-String HumedadPB_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/HumedadPB";
+float Calibracion = 0;
+String Temperatura_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/Temperatura";
+String Humedad_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/Humedad";
+String SensacionTermica_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/SensacionTermica";
+String PuntoRocio_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/PuntoRocio";
+String HumedadAbsoluta_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/HumedadAbsoluta";
+String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/PercepcionTermica";
+#endif
+
+#ifdef Board_Temp_Humedad_Galeria
+// Placa8
+// #define Report_IP_DuckDNS
+// #define Report_HealthChecks
+const char *hostName = "ESP_TemperaturaGaleria";
+float Calibracion = 0;
+String Temperatura_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/Temperatura";
+String Humedad_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/Humedad";
+String SensacionTermica_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/SensacionTermica";
+String PuntoRocio_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/PuntoRocio";
+String HumedadAbsoluta_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/HumedadAbsoluta";
+String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/PercepcionTermica";
+#endif
+
+#ifdef Board_Temp_Humedad_Exterior
+// Placa9
+// #define Report_IP_DuckDNS
+// #define Report_HealthChecks
+const char *hostName = "ESP_TemperaturaExterior";
+float Calibracion = 0;
+String Temperatura_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/TemperaturaExterior";
+String Humedad_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/HumedadExterior";
+String SensacionTermica_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/SensacionTermica";
+String PuntoRocio_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/PuntoRocio";
+String HumedadAbsoluta_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/HumedadAbsoluta";
+String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/PercepcionTermica";
 #endif
 
 #if defined(Board_DHT22)
 #include <DHTesp.h> // Incluir la librería DHTesp
-#endif
-
-void WIFI_Setup();
-void MQTT_Setup();
-void MQTT_Callback(char *, byte *, unsigned int);
-void MQTT_Reconnect();
-void MQTT_SubscribeToTopic(String);
-String MQTT_Status();
-void WEBSERVER_Loop();
-void HTTP_Get(String);
-void DuckDNS_Loop();
-void HealthChecks_Loop();
-void SerialPrint();
-void SerialPrint(String);
-void SerialPrint(char);
-void SerialPrint(int);
-String convertToString(char *, int);
-String convertToString(byte *, int);
-
-#ifdef Board_4OutRelay
-void RELAY_Loop();
-#endif
-
-#ifdef Board_DHT22
-void TEMPERATURA_loop(float &temperature, float &humidity);
 #endif
 
 //**************************************************   Configuracion   ***************************************
@@ -216,9 +168,10 @@ const String Version = Numero_Version;
 const char *ssid = "Domotics";
 const char *password = "Mato19428426";
 
-IPAddress gateway(192, 168, 1, 1);
+IPAddress local_IP(IP1, IP2, IP3, IP4);
+IPAddress gateway(IP1, IP2, IP3, 1);
 IPAddress subnet(255, 255, 255, 0);
-IPAddress primaryDNS(192, 168, 1, 1);
+IPAddress primaryDNS(IP1, IP2, IP3, 1);
 // IPAddress secondaryDNS(8, 8, 4, 4);
 
 const char *mqtt_server = "192.168.1.10";
@@ -250,16 +203,24 @@ byte Relay4_ON[] = {0xa0, 0x04, 0x01, 0xa5};
 DHTesp dht;
 #endif
 
+#ifdef Board_AHT10
+DHTesp dht;
+// Adafruit_AHTX0 aht;
+AHT10 aht(AHT10_ADDRESS_0X38);
+#endif
+
 int status = WL_IDLE_STATUS;
 WiFiClient WifiClient;
 PubSubClient MQTTClient(WifiClient);
-long lastMsg5seg = 0;
-long lastMsg1min = 0;
-long lastMsg5min = 0;
+unsigned long lastMsg10seg = 0;
+unsigned long lastMsg1min = 0;
+unsigned long lastMsg5min = 0;
 char msg[50];
 
-float temperature = 0;
-float humidity = 0;
+DataAnalisis temp;
+
+float temperature = 0, humidity = 0, hIndex = 0, dPoint = 0, AbsoluteH = 0;
+byte perception;
 
 //**************************************************   web server Config   *********************************
 WiFiServer WEB_Server(80);
@@ -268,11 +229,19 @@ unsigned long currentTime = millis();
 unsigned long previousTime = 0;
 const long timeoutTime = 2000;
 
+bool status_AHT;
 //**************************************************   CODE SETUP   *****************************************
 void setup()
 {
   Serial.begin(115200);
+  InitOTA();
+#if defined(Board_DHT22)
   dht.setup(DHT_PIN, DHTesp::DHT22);
+#endif
+#if defined(Board_AHT10)
+  status_AHT = aht.begin(0, 2);
+  aht.setCycleMode();
+#endif
   SerialPrint("WIFI - Configurando WiFI");
   WIFI_Setup();
   SerialPrint("MQTT - Configurando MQTT");
@@ -288,6 +257,9 @@ void loop()
   {
     WIFI_Setup();
   }
+
+  ArduinoOTA.handle();
+
   // Verifica si el cliente MQTT no está conectado
   if (!MQTTClient.connected())
   {
@@ -297,20 +269,31 @@ void loop()
   MQTTClient.loop();
   WEBSERVER_Loop();
 
-  long now = millis();
-
-  // Verifica si han pasado 5 segundos
-  if (now - lastMsg5seg > 5000)
+  unsigned long now = millis();
+  if (now < lastMsg10seg)
   {
-    lastMsg5seg = now;
+    lastMsg10seg = 0;
+    lastMsg1min = 0;
+    lastMsg5min = 0;
+  }
+
+  // Verifica si han pasado 10 segundos
+  if (now - lastMsg10seg > 10000)
+  {
+    lastMsg10seg = now;
 
 #ifdef Board_4OutRelay
     RELAY_Loop();
 #endif
-#ifdef Board_DHT22
-    TEMPERATURA_loop(temperature, humidity);
-    MQTTClient.publish(TemperaturaPB_MQTT_Status.c_str(), String(temperature, 2).c_str());
-    MQTTClient.publish(HumedadPB_MQTT_Status.c_str(), String(humidity, 2).c_str());
+
+#if defined(Board_DHT22) || defined(Board_AHT10)
+    TEMPERATURA_loop(temperature, humidity, hIndex, dPoint, AbsoluteH, perception);
+    MQTTClient.publish(Temperatura_MQTT_Status.c_str(), String(temperature, 2).c_str());
+    MQTTClient.publish(Humedad_MQTT_Status.c_str(), String(humidity, 2).c_str());
+    MQTTClient.publish(SensacionTermica_MQTT_Status.c_str(), String(hIndex, 2).c_str());
+    MQTTClient.publish(PuntoRocio_MQTT_Status.c_str(), String(dPoint, 2).c_str());
+    MQTTClient.publish(HumedadAbsoluta_MQTT_Status.c_str(), String(AbsoluteH, 2).c_str());
+    MQTTClient.publish(Percepcion_MQTT_Status.c_str(), String(perception, 2).c_str());
 #endif
   }
 
@@ -573,23 +556,51 @@ String MQTT_Status()
 }
 
 //**************************************************   Temperature   ***************************************
-#ifdef Board_DHT22
-void TEMPERATURA_loop(float &temperature, float &humidity)
+#if defined(Board_DHT22) || defined(Board_AHT10)
+void TEMPERATURA_loop(float &temperature, float &humidity, float &hIndex, float &dPoint, float &AbsoluteH, byte &perception)
 {
-  float t = dht.getTemperature(); // Obtener la temperatura en grados Celsius
-  float h = dht.getHumidity();    // Obtener la humedad relativa en porcentaje
+#if defined(Board_DHT22)
+  TempAndHumidity val = dht.getTempAndHumidity();
+  float t = val.temperature + Calibracion; // Obtener la temperatura en grados Celsius
+  float h = val.humidity;                  // Obtener la humedad relativa en porcentaje
+#endif
+#if defined(Board_AHT10)
+  // sensors_event_t hh, tt;
+  // aht.getEvent(&hh, &tt);
+  // float t = tt.temperature + Calibracion;
+  // float h = hh.relative_humidity;
 
+  float t = aht.readTemperature(true) + Calibracion;
+  float h = aht.readHumidity(true);
+
+  /* String payload = "{\"temperature\":" + String(t) + ", \"humidity\":" + String(h) + "}";
+      char message[100];
+      payload.toCharArray(message, 100);
+
+      // Publish payload to MQTT
+      MQTTClient.publish("Debug", message); */
+
+  // MQTTClient.publish("Debug/temp", String(t, 2).c_str());
+  // MQTTClient.publish("Debug/hum", String(h, 2).c_str());
+  // MQTTClient.publish("Debug/status", String(status_AHT, 10).c_str());
+
+#endif
   // Verificar si la lectura del sensor es válida
   if (!isnan(t) && !isnan(h))
   {
     temperature = t;
     humidity = h;
+    hIndex = dht.computeHeatIndex(t, h);
+    dPoint = dht.computeDewPoint(t, h);
+    AbsoluteH = dht.computeAbsoluteHumidity(t, h);
+    perception = dht.computePerception(t, h);
+
     SerialPrint("Temperatura: " + String(temperature) + " °C");
     SerialPrint("Humedad: " + String(humidity) + " %");
   }
   else
   {
-    SerialPrint("Error al leer el sensor DHT22");
+    SerialPrint("Error al leer el sensor DHT22 o el AHT10");
   }
 }
 #endif
@@ -597,7 +608,7 @@ void TEMPERATURA_loop(float &temperature, float &humidity)
 //**************************************************   Web Server   ****************************************
 void WEBSERVER_Loop()
 {
-  WiFiClient client = WEB_Server.available();
+  WiFiClient client = WEB_Server.accept();
 
   if (client)
   {
@@ -665,13 +676,13 @@ void WEBSERVER_Loop()
               reset = true;
             }
 #endif
-#ifdef Board_DHT22
+#if defined(Board_DHT22) || defined(Board_AHT10)
             if (header.indexOf("GET /reset") >= 0)
             {
               reset = true;
             }
 #endif
-            lastMsg5seg = 0;
+            lastMsg10seg = 0;
 
             client.println("<!DOCTYPE html><html>");
             client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
@@ -756,8 +767,7 @@ void WEBSERVER_Loop()
                 client.println("<p><a href=\"/relay4/off\"><button class=\"button2\">ON</button></a></p>");
               }
 #endif
-#ifdef Board_DHT22
-
+#if defined(Board_DHT22) || defined(Board_AHT10)
               client.println("<p>Temperatura: " + String(temperature) + " grados" + "</p>");
               client.println("<p>Humedad: " + String(humidity) + " %" + "</p>");
 #endif
@@ -993,4 +1003,58 @@ void SerialPrint(int msg)
 #ifdef debug
   Serial.println(msg);
 #endif
+}
+
+//**************************************************   OTA   ***********************************************
+void InitOTA()
+{
+  // Port defaults to 8266
+  ArduinoOTA.setPort(8266);
+
+  // Hostname defaults to esp8266-[ChipID]
+  ArduinoOTA.setHostname(hostName);
+
+  // No authentication by default
+  // ArduinoOTA.setPassword("admin");
+
+  // Password can be set with it's md5 value as well
+  // MD5(admin) = 21232f297a57a5a743894a0e4a801fc3
+  // ArduinoOTA.setPasswordHash("21232f297a57a5a743894a0e4a801fc3");
+
+  ArduinoOTA.onStart([]()
+                     {
+  String type;
+  if (ArduinoOTA.getCommand() == U_FLASH) {
+    type = "sketch";
+  } else { // U_SPIFFS
+    type = "filesystem";
+  }
+
+  // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+  Serial.println("Start updating " + type); });
+
+  ArduinoOTA.onEnd([]()
+                   { Serial.println("\nEnd"); });
+
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total)
+                        { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); });
+
+  ArduinoOTA.onError([](ota_error_t error)
+                     {
+  Serial.printf("Error[%u]: ", error);
+  if (error == OTA_AUTH_ERROR) {
+    Serial.println("Auth Failed");
+  } else if (error == OTA_BEGIN_ERROR) {
+    Serial.println("Begin Failed");
+  } else if (error == OTA_CONNECT_ERROR) {
+    Serial.println("Connect Failed");
+  } else if (error == OTA_RECEIVE_ERROR) {
+    Serial.println("Receive Failed");
+  } else if (error == OTA_END_ERROR) {
+    Serial.println("End Failed");
+  } });
+
+  ArduinoOTA.begin();
+  Serial.println("");
+  Serial.println("OTA iniciado");
 }
