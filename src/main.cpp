@@ -158,6 +158,44 @@ String HumedadAbsoluta_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterio
 String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/PercepcionTermica";
 #endif
 
+#ifdef Board_4OutRelay_Emmanuel_Living
+// Placa1
+// #define Report_IP_DuckDNS
+// #define Report_HealthChecks
+const char *hostName = "Living";
+String Relay1_Name = "Luz Living";
+String Relay1_MQTT_Command = "Acantilados/Luz/Living/Comando";
+String Relay1_MQTT_Status = "Acantilados/Luz/Living/Estado";
+String Relay2_Name = "Luz Dormitorio";
+String Relay2_MQTT_Command = "Acantilados/Luz/Dormitorio/Comando";
+String Relay2_MQTT_Status = "Acantilados/Luz/Dormitorio/Estado";
+String Relay3_Name = "Luz Dorm Superior";
+String Relay3_MQTT_Command = "Acantilados/Luz/Superior/Comando";
+String Relay3_MQTT_Status = "Acantilados/Luz/Superior/Estado";
+String Relay4_Name = "Luz Garage";
+String Relay4_MQTT_Command = "Acantilados/Luz/Garage/Comando";
+String Relay4_MQTT_Status = "Acantilados/Luz/Garage/Estado";
+#endif
+
+#ifdef Board_4OutRelay_Emmanuel_Lavadero
+// Placa2
+ #define Report_IP_DuckDNS
+// #define Report_HealthChecks
+const char *hostName = "Lavadero";
+String Relay1_Name = "Luz Cocina";
+String Relay1_MQTT_Command = "Acantilados/Luz/Cocina/Comando";
+String Relay1_MQTT_Status = "Acantilados/Luz/Cocina/Estado";
+String Relay2_Name = "Luz Lavadero";
+String Relay2_MQTT_Command = "Acantilados/Luz/Lavadero/Comando";
+String Relay2_MQTT_Status = "Acantilados/Luz/Lavadero/Estado";
+String Relay3_Name = "Luz Farolas";
+String Relay3_MQTT_Command = "Acantilados/Luz/Farolas/Comando";
+String Relay3_MQTT_Status = "Acantilados/Luz/Farolas/Estado";
+String Relay4_Name = "Bomba Agua";
+String Relay4_MQTT_Command = "Acantilados/Luz/Bomba/Comando";
+String Relay4_MQTT_Status = "Acantilados/Luz/Bomba/Estado";
+#endif
+
 #if defined(Board_DHT22)
 #include <DHTesp.h> // Incluir la librería DHTesp
 #endif
@@ -469,7 +507,7 @@ void MQTT_Callback(char *topic, byte *payload, unsigned int length)
       Relay1Status = false;
       SerialPrint("Relay1_OFF");
     }
-    lastMsg5seg = 0;
+    lastMsg10seg = 0;
   }
   else if (mTopic == Relay2_MQTT_Command)
   {
@@ -483,7 +521,7 @@ void MQTT_Callback(char *topic, byte *payload, unsigned int length)
       Relay2Status = false;
       SerialPrint("Relay2_OFF");
     }
-    lastMsg5seg = 0;
+    lastMsg10seg = 0;
   }
   else if (mTopic == Relay3_MQTT_Command)
   {
@@ -497,7 +535,7 @@ void MQTT_Callback(char *topic, byte *payload, unsigned int length)
       Relay3Status = false;
       SerialPrint("Relay3_OFF");
     }
-    lastMsg5seg = 0;
+    lastMsg10seg = 0;
   }
   else if (mTopic == Relay4_MQTT_Command)
   {
@@ -511,7 +549,7 @@ void MQTT_Callback(char *topic, byte *payload, unsigned int length)
       Relay4Status = false;
       SerialPrint("Relay4_OFF");
     }
-    lastMsg5seg = 0;
+    lastMsg10seg = 0;
   }
 #endif
 }
