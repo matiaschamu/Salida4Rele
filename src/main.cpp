@@ -222,8 +222,6 @@ const char *ssid = "Domotics";
 const char *password = "Mato19428426";
 #endif
 
-
-
 IPAddress local_IP(IP1, IP2, IP3, IP4);
 IPAddress gateway(IP1, IP2, IP3, 1);
 IPAddress subnet(255, 255, 255, 0);
@@ -300,8 +298,13 @@ void setup()
 #endif
   SerialPrint("WIFI - Configurando WiFI");
   WIFI_Setup();
+
+#if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Living)
+#else
   SerialPrint("MQTT - Configurando MQTT");
   MQTT_Setup();
+#endif
+
   WEB_Server.begin();
 }
 
@@ -316,13 +319,16 @@ void loop()
 
   ArduinoOTA.handle();
 
+#if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Living)
+#else
   // Verifica si el cliente MQTT no está conectado
   if (!MQTTClient.connected())
   {
     MQTT_Reconnect();
   }
-
   MQTTClient.loop();
+#endif
+
   WEBSERVER_Loop();
 
   unsigned long now = millis();
