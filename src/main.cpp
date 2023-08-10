@@ -7,6 +7,7 @@
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
 const char *hostName = "ESP_Living";
+const int webServerPort = 80;
 String Relay1_Name = "Luz Living";
 String Relay1_MQTT_Command = "Acantilados/Luz/Living/Comando";
 String Relay1_MQTT_Status = "Acantilados/Luz/Living/Estado";
@@ -26,6 +27,7 @@ String Relay4_MQTT_Status = "Acantilados/Luz/Arcada/Estado";
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
 const char *hostName = "ESP_Living2";
+const int webServerPort = 80;
 String Relay1_Name = "Luz PuertaEnt";
 String Relay1_MQTT_Command = "Acantilados/Luz/PuertaEnt/Comando";
 String Relay1_MQTT_Status = "Acantilados/Luz/PuertaEnt/Estado";
@@ -45,6 +47,7 @@ String Relay4_MQTT_Status = "Acantilados/Luz/CaraSur/Estado";
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
 const char *hostName = "ESP_Galeria";
+const int webServerPort = 80;
 String Relay1_Name = "Luz Comedor";
 String Relay1_MQTT_Command = "Acantilados/Luz/Comedor/Comando";
 String Relay1_MQTT_Status = "Acantilados/Luz/Comedor/Estado";
@@ -64,6 +67,7 @@ String Relay4_MQTT_Status = "Acantilados/Luz/Farolas/Estado";
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
 const char *hostName = "ESP_Garage";
+const int webServerPort = 80;
 String Relay1_Name = "Luz Garage";
 String Relay1_MQTT_Command = "Acantilados/Luz/Garage/Comando";
 String Relay1_MQTT_Status = "Acantilados/Luz/Garage/Estado";
@@ -83,6 +87,7 @@ String Relay4_MQTT_Status = "Acantilados/Luz/Lavadero/Estado";
 #define Report_IP_DuckDNS
 #define Report_HealthChecks
 const char *hostName = "ESP_Tablero";
+const int webServerPort = 80;
 String Relay1_Name = "Bomba Agua";
 String Relay1_MQTT_Command = "Acantilados/Servicios/BombaAgua/Comando";
 String Relay1_MQTT_Status = "Acantilados/Servicios/BombaAgua/Estado";
@@ -102,6 +107,7 @@ String Relay4_MQTT_Status = "";
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
 const char *hostName = "ESP_1erPiso";
+const int webServerPort = 80;
 String Relay1_Name = "Luz 1er Piso";
 String Relay1_MQTT_Command = "Acantilados/Luz/PlantaAlta/Comando";
 String Relay1_MQTT_Status = "Acantilados/Luz/PlantaAlta/Estado";
@@ -121,6 +127,7 @@ String Relay4_MQTT_Status = "";
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
 const char *hostName = "ESP_TemperaturaPB";
+const int webServerPort = 80;
 float Calibracion = 0;
 String Temperatura_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/Temperatura";
 String Humedad_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/Humedad";
@@ -135,6 +142,7 @@ String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Liv
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
 const char *hostName = "ESP_TemperaturaGaleria";
+const int webServerPort = 80;
 float Calibracion = 0;
 String Temperatura_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/Temperatura";
 String Humedad_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/Humedad";
@@ -149,6 +157,7 @@ String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Gal
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
 const char *hostName = "ESP_TemperaturaExterior";
+const int webServerPort = 80;
 float Calibracion = 0;
 String Temperatura_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/TemperaturaExterior";
 String Humedad_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/HumedadExterior";
@@ -163,37 +172,39 @@ String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Par
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
 const char *hostName = "Living";
+const int webServerPort = 8083;
 String Relay1_Name = "Luz Living";
-String Relay1_MQTT_Command = "Acantilados/Luz/Living/Comando";
-String Relay1_MQTT_Status = "Acantilados/Luz/Living/Estado";
+String Relay1_MQTT_Command = "CasaEmma/Luz/Living/Comando";
+String Relay1_MQTT_Status = "CasaEmma/Luz/Living/Estado";
 String Relay2_Name = "Luz Dormitorio";
-String Relay2_MQTT_Command = "Acantilados/Luz/Dormitorio/Comando";
-String Relay2_MQTT_Status = "Acantilados/Luz/Dormitorio/Estado";
+String Relay2_MQTT_Command = "CasaEmma/Luz/Dormitorio/Comando";
+String Relay2_MQTT_Status = "CasaEmma/Luz/Dormitorio/Estado";
 String Relay3_Name = "Luz Dorm Superior";
-String Relay3_MQTT_Command = "Acantilados/Luz/Superior/Comando";
-String Relay3_MQTT_Status = "Acantilados/Luz/Superior/Estado";
+String Relay3_MQTT_Command = "CasaEmma/Luz/Superior/Comando";
+String Relay3_MQTT_Status = "CasaEmma/Luz/Superior/Estado";
 String Relay4_Name = "Luz Garage";
-String Relay4_MQTT_Command = "Acantilados/Luz/Garage/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/Garage/Estado";
+String Relay4_MQTT_Command = "CasaEmma/Luz/Garage/Comando";
+String Relay4_MQTT_Status = "CasaEmma/Luz/Garage/Estado";
 #endif
 
 #ifdef Board_4OutRelay_Emmanuel_Lavadero
 // Placa2
- #define Report_IP_DuckDNS
+#define Report_IP_DuckDNS
 // #define Report_HealthChecks
 const char *hostName = "Lavadero";
+const int webServerPort = 8084;
 String Relay1_Name = "Luz Cocina";
-String Relay1_MQTT_Command = "Acantilados/Luz/Cocina/Comando";
-String Relay1_MQTT_Status = "Acantilados/Luz/Cocina/Estado";
+String Relay1_MQTT_Command = "CasaEmma/Luz/Cocina/Comando";
+String Relay1_MQTT_Status = "CasaEmma/Luz/Cocina/Estado";
 String Relay2_Name = "Luz Lavadero";
-String Relay2_MQTT_Command = "Acantilados/Luz/Lavadero/Comando";
-String Relay2_MQTT_Status = "Acantilados/Luz/Lavadero/Estado";
+String Relay2_MQTT_Command = "CasaEmma/Luz/Lavadero/Comando";
+String Relay2_MQTT_Status = "CasaEmma/Luz/Lavadero/Estado";
 String Relay3_Name = "Luz Farolas";
-String Relay3_MQTT_Command = "Acantilados/Luz/Farolas/Comando";
-String Relay3_MQTT_Status = "Acantilados/Luz/Farolas/Estado";
+String Relay3_MQTT_Command = "CasaEmma/Luz/Farola/Comando";
+String Relay3_MQTT_Status = "CasaEmma/Luz/Farola/Estado";
 String Relay4_Name = "Bomba Agua";
-String Relay4_MQTT_Command = "Acantilados/Luz/Bomba/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/Bomba/Estado";
+String Relay4_MQTT_Command = "CasaEmma/Servicios/BombaAgua/Comando";
+String Relay4_MQTT_Status = "CasaEmma/Servicios/BombaAgua/Estado";
 #endif
 
 #if defined(Board_DHT22)
@@ -201,10 +212,15 @@ String Relay4_MQTT_Status = "Acantilados/Luz/Bomba/Estado";
 #endif
 
 //**************************************************   Configuracion   ***************************************
-
+#if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Living)
+const String Version = Numero_Version;
+const char *ssid = "Camaras";
+const char *password = "37615097";
+#else
 const String Version = Numero_Version;
 const char *ssid = "Domotics";
 const char *password = "Mato19428426";
+#endif
 
 IPAddress local_IP(IP1, IP2, IP3, IP4);
 IPAddress gateway(IP1, IP2, IP3, 1);
@@ -261,7 +277,7 @@ float temperature = 0, humidity = 0, hIndex = 0, dPoint = 0, AbsoluteH = 0;
 byte perception;
 
 //**************************************************   web server Config   *********************************
-WiFiServer WEB_Server(80);
+WiFiServer WEB_Server(webServerPort);
 String header;
 unsigned long currentTime = millis();
 unsigned long previousTime = 0;
@@ -282,8 +298,13 @@ void setup()
 #endif
   SerialPrint("WIFI - Configurando WiFI");
   WIFI_Setup();
+
+#if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Living)
+#else
   SerialPrint("MQTT - Configurando MQTT");
   MQTT_Setup();
+#endif
+
   WEB_Server.begin();
 }
 
@@ -298,13 +319,16 @@ void loop()
 
   ArduinoOTA.handle();
 
+
+#if !defined(Board_4OutRelay_Emmanuel_Living) && !defined(Board_4OutRelay_Emmanuel_Lavadero)
   // Verifica si el cliente MQTT no está conectado
   if (!MQTTClient.connected())
   {
     MQTT_Reconnect();
   }
-
   MQTTClient.loop();
+#endif
+
   WEBSERVER_Loop();
 
   unsigned long now = millis();
@@ -615,9 +639,8 @@ void TEMPERATURA_loop(float &temperature, float &humidity, float &hIndex, float 
       char message[100];
       payload.toCharArray(message, 100);
 
-      // Publish payload to MQTT
-      MQTTClient.publish("Debug", message); */
-
+   // Publish payload to MQTT
+     MQTTClient.publish("Debug", message); */
   // MQTTClient.publish("Debug/temp", String(t, 2).c_str());
   // MQTTClient.publish("Debug/hum", String(h, 2).c_str());
   // MQTTClient.publish("Debug/status", String(status_AHT, 10).c_str());
