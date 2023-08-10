@@ -1,4 +1,4 @@
-#define Numero_Version "1.0.15"
+#define Numero_Version "1.0.16"
 // Define for debug information
 //  #define debug
 
@@ -14,7 +14,7 @@
 //  #define ESP32
 // #endif
 
-#if defined(Board_4OutRelay_Living) || defined(Board_4OutRelay_Living2) || defined(Board_4OutRelay_Comedor) || defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Tablero) || defined(Board_4OutRelay_1erPiso) || defined(Board_4OutRelay_Emmanuel_Living)|| defined(Board_4OutRelay_Emmanuel_Lavadero)
+#if defined(Board_4OutRelay_Living) || defined(Board_4OutRelay_Living2) || defined(Board_4OutRelay_Comedor) || defined(Board_4OutRelay_Tablero) || defined(Board_4OutRelay_Garage)  || defined(Board_4OutRelay_1erPiso) || defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero)
 #define Board_4OutRelay
 #endif
 
