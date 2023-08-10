@@ -1,4 +1,4 @@
-#define Numero_Version "1.0.16"
+#define Numero_Version "1.0.17"
 // Define for debug information
 //  #define debug
 

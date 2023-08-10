@@ -6,6 +6,7 @@
 // Placa1
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
+// #define NO_MQTT
 const char *hostName = "ESP_Living";
 const int webServerPort = 80;
 String Relay1_Name = "Luz Living";
@@ -26,6 +27,7 @@ String Relay4_MQTT_Status = "Acantilados/Luz/Arcada/Estado";
 // Placa2
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
+// #define NO_MQTT
 const char *hostName = "ESP_Living2";
 const int webServerPort = 80;
 String Relay1_Name = "Luz PuertaEnt";
@@ -46,6 +48,7 @@ String Relay4_MQTT_Status = "Acantilados/Luz/CaraSur/Estado";
 // Placa3
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
+// #define NO_MQTT
 const char *hostName = "ESP_Galeria";
 const int webServerPort = 80;
 String Relay1_Name = "Luz Comedor";
@@ -66,6 +69,7 @@ String Relay4_MQTT_Status = "Acantilados/Luz/Farolas/Estado";
 // Placa4
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
+// #define NO_MQTT
 const char *hostName = "ESP_Garage";
 const int webServerPort = 80;
 String Relay1_Name = "Luz Garage";
@@ -86,6 +90,7 @@ String Relay4_MQTT_Status = "Acantilados/Luz/Lavadero/Estado";
 // Placa5
 #define Report_IP_DuckDNS
 #define Report_HealthChecks
+// #define NO_MQTT
 const char *hostName = "ESP_Tablero";
 const int webServerPort = 80;
 String Relay1_Name = "Bomba Agua";
@@ -106,6 +111,7 @@ String Relay4_MQTT_Status = "";
 // Placa6
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
+// #define NO_MQTT
 const char *hostName = "ESP_1erPiso";
 const int webServerPort = 80;
 String Relay1_Name = "Luz 1er Piso";
@@ -126,6 +132,7 @@ String Relay4_MQTT_Status = "";
 // Placa7
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
+// #define NO_MQTT
 const char *hostName = "ESP_TemperaturaPB";
 const int webServerPort = 80;
 float Calibracion = 0;
@@ -141,6 +148,7 @@ String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Liv
 // Placa8
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
+// #define NO_MQTT
 const char *hostName = "ESP_TemperaturaGaleria";
 const int webServerPort = 80;
 float Calibracion = 0;
@@ -156,6 +164,7 @@ String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Gal
 // Placa9
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
+// #define NO_MQTT
 const char *hostName = "ESP_TemperaturaExterior";
 const int webServerPort = 80;
 float Calibracion = 0;
@@ -171,6 +180,7 @@ String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Par
 // Placa1
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
+#define NO_MQTT
 const char *hostName = "Living";
 const int webServerPort = 8083;
 String Relay1_Name = "Luz Living";
@@ -191,6 +201,7 @@ String Relay4_MQTT_Status = "CasaEmma/Luz/Garage/Estado";
 // Placa2
 #define Report_IP_DuckDNS
 // #define Report_HealthChecks
+#define NO_MQTT
 const char *hostName = "Lavadero";
 const int webServerPort = 8084;
 String Relay1_Name = "Luz Cocina";
@@ -212,12 +223,12 @@ String Relay4_MQTT_Status = "CasaEmma/Servicios/BombaAgua/Estado";
 #endif
 
 //**************************************************   Configuracion   ***************************************
-#if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Living)
 const String Version = Numero_Version;
+
+#if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero)
 const char *ssid = "Camaras";
 const char *password = "37615097";
 #else
-const String Version = Numero_Version;
 const char *ssid = "Domotics";
 const char *password = "Mato19428426";
 #endif
@@ -299,8 +310,7 @@ void setup()
   SerialPrint("WIFI - Configurando WiFI");
   WIFI_Setup();
 
-#if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Living)
-#else
+#if !defined(NO_MQTT)
   SerialPrint("MQTT - Configurando MQTT");
   MQTT_Setup();
 #endif
@@ -319,8 +329,7 @@ void loop()
 
   ArduinoOTA.handle();
 
-
-#if !defined(Board_4OutRelay_Emmanuel_Living) && !defined(Board_4OutRelay_Emmanuel_Lavadero)
+#if !defined(NO_MQTT)
   // Verifica si el cliente MQTT no está conectado
   if (!MQTTClient.connected())
   {
@@ -681,6 +690,11 @@ void WEBSERVER_Loop()
     while (client.connected() && currentTime - previousTime <= timeoutTime)
     {
       currentTime = millis();
+      if (currentTime < previousTime)
+      {
+        previousTime = currentTime;
+      }
+
       if (client.available())
       {
         char c = client.read();
