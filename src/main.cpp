@@ -44,7 +44,7 @@ String Relay4_MQTT_Command = "Acantilados/Luz/CaraSur/Comando";
 String Relay4_MQTT_Status = "Acantilados/Luz/CaraSur/Estado";
 #endif
 
-#ifdef Board_4OutRelay_Comedor
+#ifdef Board_4OutRelay_Galeria
 // Placa3
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
