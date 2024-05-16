@@ -21,6 +21,8 @@ String Relay3_MQTT_Status = "Acantilados/Luz/Ventanal/Estado";
 String Relay4_Name = "Luz Arcada";
 String Relay4_MQTT_Command = "Acantilados/Luz/Arcada/Comando";
 String Relay4_MQTT_Status = "Acantilados/Luz/Arcada/Estado";
+
+String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 #endif
 
 #ifdef Board_4OutRelay_Living2
@@ -42,6 +44,8 @@ String Relay3_MQTT_Status = "Acantilados/Luz/Habitacion/Estado";
 String Relay4_Name = "Luz CaraSur";
 String Relay4_MQTT_Command = "Acantilados/Luz/CaraSur/Comando";
 String Relay4_MQTT_Status = "Acantilados/Luz/CaraSur/Estado";
+
+String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 #endif
 
 #ifdef Board_4OutRelay_Galeria
@@ -63,6 +67,8 @@ String Relay3_MQTT_Status = "Acantilados/Luz/Galeria/Estado";
 String Relay4_Name = "Luz Farolas";
 String Relay4_MQTT_Command = "Acantilados/Luz/Farolas/Comando";
 String Relay4_MQTT_Status = "Acantilados/Luz/Farolas/Estado";
+
+String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 #endif
 
 #ifdef Board_4OutRelay_Garage
@@ -84,6 +90,8 @@ String Relay3_MQTT_Status = "Acantilados/Luz/Servicio/Estado";
 String Relay4_Name = "Luz Lavadero";
 String Relay4_MQTT_Command = "Acantilados/Luz/Lavadero/Comando";
 String Relay4_MQTT_Status = "Acantilados/Luz/Lavadero/Estado";
+
+String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 #endif
 
 #ifdef Board_4OutRelay_Tablero
@@ -105,6 +113,8 @@ String Relay3_MQTT_Status = "";
 String Relay4_Name = "";
 String Relay4_MQTT_Command = "";
 String Relay4_MQTT_Status = "";
+
+String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 #endif
 
 #ifdef Board_4OutRelay_1erPiso
@@ -126,6 +136,8 @@ String Relay3_MQTT_Status = "Acantilados/Servicios/ResistenciaTermo/Estado";
 String Relay4_Name = "";
 String Relay4_MQTT_Command = "";
 String Relay4_MQTT_Status = "";
+
+String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 #endif
 
 #ifdef Board_Temp_Humedad_PB
@@ -142,6 +154,8 @@ String SensacionTermica_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interi
 String PuntoRocio_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/PuntoRocio";
 String HumedadAbsoluta_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/HumedadAbsoluta";
 String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/PercepcionTermica";
+
+String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 #endif
 
 #ifdef Board_Temp_Humedad_Galeria
@@ -158,6 +172,8 @@ String SensacionTermica_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exteri
 String PuntoRocio_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/PuntoRocio";
 String HumedadAbsoluta_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/HumedadAbsoluta";
 String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/PercepcionTermica";
+
+String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 #endif
 
 #ifdef Board_Temp_Humedad_Exterior
@@ -174,6 +190,8 @@ String SensacionTermica_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exteri
 String PuntoRocio_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/PuntoRocio";
 String HumedadAbsoluta_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/HumedadAbsoluta";
 String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/PercepcionTermica";
+
+String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 #endif
 
 #ifdef Board_4OutRelay_Emmanuel_Living
@@ -195,6 +213,8 @@ String Relay3_MQTT_Status = "CasaEmma/Luz/Superior/Estado";
 String Relay4_Name = "Luz Garage";
 String Relay4_MQTT_Command = "CasaEmma/Luz/Garage/Comando";
 String Relay4_MQTT_Status = "CasaEmma/Luz/Garage/Estado";
+
+String urlDuckDNS = "http://www.duckdns.org/update/casaemmadebo/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 #endif
 
 #ifdef Board_4OutRelay_Emmanuel_Lavadero
@@ -216,6 +236,31 @@ String Relay3_MQTT_Status = "CasaEmma/Luz/Farola/Estado";
 String Relay4_Name = "Bomba Agua";
 String Relay4_MQTT_Command = "CasaEmma/Servicios/BombaAgua/Comando";
 String Relay4_MQTT_Status = "CasaEmma/Servicios/BombaAgua/Estado";
+
+String urlDuckDNS = "http://www.duckdns.org/update/casaemmadebo/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
+#endif
+
+#ifdef Board_4OutRelay_Valencia_Living
+// Placa1
+#define Report_IP_DuckDNS
+// #define Report_HealthChecks
+#define NO_MQTT
+const char *hostName = "Living";
+const int webServerPort = 80;
+String Relay1_Name = "Luz Living";
+String Relay1_MQTT_Command = "CasaValencia/Luz/Living/Comando";
+String Relay1_MQTT_Status = "CasaValencia/Luz/Living/Estado";
+String Relay2_Name = "Luz Frente";
+String Relay2_MQTT_Command = "CasaValencia/Luz/Frente/Comando";
+String Relay2_MQTT_Status = "CasaValencia/Luz/Frente/Estado";
+String Relay3_Name = "Luz Habitacion";
+String Relay3_MQTT_Command = "CasaValencia/Luz/Habitacion/Comando";
+String Relay3_MQTT_Status = "CasaValencia/Luz/Habitacion/Estado";
+String Relay4_Name = "Bomba Agua";
+String Relay4_MQTT_Command = "CasaValencia/Servicios/BombaAgua/Comando";
+String Relay4_MQTT_Status = "CasaValencia/Servicios/BombaAgua/Estado";
+
+String urlDuckDNS = "http://www.duckdns.org/update/valencia/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 #endif
 
 #if defined(Board_DHT22)
@@ -228,6 +273,9 @@ const String Version = Numero_Version;
 #if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero)
 const char *ssid = "Camaras";
 const char *password = "37615097";
+#elif defined(Board_4OutRelay_Valencia_Living)
+const char *ssid = "PoneteWifi";
+const char *password = "ratondemierda";
 #else
 const char *ssid = "Domotics";
 const char *password = "Mato19428426";
@@ -239,12 +287,16 @@ IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(IP1, IP2, IP3, 1);
 // IPAddress secondaryDNS(8, 8, 4, 4);
 
+#if defined(Board_4OutRelay_Valencia_Living)
+const char *mqtt_server = "https:www.acantilados-io.com";
+#else
 const char *mqtt_server = "192.168.1.10";
+#endif
+
 const uint16_t mqtt_port = 1883;
 const char *mqtt_user = "matias";
 const char *mqtt_pass = "Mato19428426.";
 
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 String urlHealthChecks = "http://hc-ping.com/6b750dde-84ed-424a-b708-7c869b8c5253";
 
 //**************************************************   Inicializacion de variables   ************************
