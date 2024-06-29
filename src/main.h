@@ -1,4 +1,4 @@
-#define Numero_Version "1.0.19"
+#define Numero_Version "1.0.20"
 // Define for debug information
 //  #define debug
 
@@ -54,11 +54,13 @@
 //**************************************************   DECLARACIONES   **************************************
 void WIFI_Setup();
 void InitOTA();
+#if !defined(NO_MQTT)
 void MQTT_Setup();
 void MQTT_Callback(char *, byte *, unsigned int);
 void MQTT_Reconnect();
 void MQTT_SubscribeToTopic(String);
 String MQTT_Status();
+#endif
 void WEBSERVER_Loop();
 void HTTP_Get(String);
 void DuckDNS_Loop();

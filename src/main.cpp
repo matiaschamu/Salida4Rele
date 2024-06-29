@@ -328,7 +328,9 @@ AHT10 aht(AHT10_ADDRESS_0X38);
 
 int status = WL_IDLE_STATUS;
 WiFiClient WifiClient;
+#if !defined(NO_MQTT)
 PubSubClient MQTTClient(WifiClient);
+#endif
 unsigned long lastMsg10seg = 0;
 unsigned long lastMsg1min = 0;
 unsigned long lastMsg5min = 0;
@@ -350,6 +352,8 @@ bool status_AHT;
 //**************************************************   CODE SETUP   *****************************************
 void setup()
 {
+  // Inicializa el Watchdog Timer para 8 segundos
+  wdt_enable(WDTO_8S);
   Serial.begin(115200);
   InitOTA();
 #if defined(Board_DHT22)
@@ -373,6 +377,9 @@ void setup()
 //**************************************************   CODE LOOP   *****************************************
 void loop()
 {
+  // Reinicia el Watchdog Timer
+  wdt_reset();
+
   // Verifica si no está conectado a WiFi
   if (WiFi.status() != WL_CONNECTED)
   {
@@ -486,6 +493,7 @@ void WIFI_Setup()
   }
 }
 
+#if !defined(NO_MQTT)
 //**************************************************   MQTT   ***********************************************
 void MQTT_Setup()
 {
@@ -677,7 +685,7 @@ String MQTT_Status()
     break;
   }
 }
-
+#endif
 //**************************************************   Temperature   ***************************************
 #if defined(Board_DHT22) || defined(Board_AHT10)
 void TEMPERATURA_loop(float &temperature, float &humidity, float &hIndex, float &dPoint, float &AbsoluteH, byte &perception)
@@ -898,9 +906,10 @@ void WEBSERVER_Loop()
               client.println("<p>Temperatura: " + String(temperature) + " grados" + "</p>");
               client.println("<p>Humedad: " + String(humidity) + " %" + "</p>");
 #endif
+#if !defined(NO_MQTT)
               client.println("<div class=\"foot\">");
               client.println("<p class=\"foot\">MQTT server status: " + MQTT_Status() + "</p>");
-
+#endif
 #ifdef Report_IP_DuckDNS
               client.println("<p class=\"foot\">DuckDNS Updated every 1 min: " + urlDuckDNS + "</p>");
 #endif
@@ -976,13 +985,17 @@ void RELAY_Loop()
     if (Relay1Status == true)
     {
       Serial.write(Relay1_ON, sizeof(Relay1_ON));
+#if !defined(NO_MQTT)
       MQTTClient.publish(Relay1_MQTT_Status.c_str(), "ON");
+#endif
       SerialPrint("Relay 1 -> 1");
     }
     else
     {
       Serial.write(Relay1_OFF, sizeof(Relay1_OFF));
+#if !defined(NO_MQTT)
       MQTTClient.publish(Relay1_MQTT_Status.c_str(), "OFF");
+#endif
       SerialPrint("Relay 1 -> 0");
     }
   }
@@ -992,13 +1005,17 @@ void RELAY_Loop()
     if (Relay2Status == true)
     {
       Serial.write(Relay2_ON, sizeof(Relay2_ON));
+#if !defined(NO_MQTT)
       MQTTClient.publish(Relay2_MQTT_Status.c_str(), "ON");
+#endif
       SerialPrint("Relay 2 -> 1");
     }
     else
     {
       Serial.write(Relay2_OFF, sizeof(Relay2_OFF));
+#if !defined(NO_MQTT)
       MQTTClient.publish(Relay2_MQTT_Status.c_str(), "OFF");
+#endif
       SerialPrint("Relay 2 -> 0");
     }
   }
@@ -1008,13 +1025,17 @@ void RELAY_Loop()
     if (Relay3Status == true)
     {
       Serial.write(Relay3_ON, sizeof(Relay3_ON));
+#if !defined(NO_MQTT)
       MQTTClient.publish(Relay3_MQTT_Status.c_str(), "ON");
+#endif
       SerialPrint("Relay 3 -> 1");
     }
     else
     {
       Serial.write(Relay3_OFF, sizeof(Relay3_OFF));
+#if !defined(NO_MQTT)
       MQTTClient.publish(Relay3_MQTT_Status.c_str(), "OFF");
+#endif
       SerialPrint("Relay 3 -> 0");
     }
   }
@@ -1024,13 +1045,17 @@ void RELAY_Loop()
     if (Relay4Status == true)
     {
       Serial.write(Relay4_ON, sizeof(Relay4_ON));
+#if !defined(NO_MQTT)
       MQTTClient.publish(Relay4_MQTT_Status.c_str(), "ON");
+#endif
       SerialPrint("Relay 4 -> 1");
     }
     else
     {
       Serial.write(Relay4_OFF, sizeof(Relay4_OFF));
+#if !defined(NO_MQTT)
       MQTTClient.publish(Relay4_MQTT_Status.c_str(), "OFF");
+#endif
       SerialPrint("Relay 4 -> 0");
     }
   }
