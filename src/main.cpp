@@ -124,7 +124,7 @@ String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-483
 // #define NO_MQTT
 const char *hostName = "ESP_1erPiso";
 const int webServerPort = 80;
-String Relay1_Name = "Luz 1er Piso";
+String Relay1_Name = "Luz 1er Piso 1";
 String Relay1_MQTT_Command = "Acantilados/Luz/PlantaAlta/Comando";
 String Relay1_MQTT_Status = "Acantilados/Luz/PlantaAlta/Estado";
 String Relay2_Name = "Luz Reflector";
@@ -133,9 +133,9 @@ String Relay2_MQTT_Status = "Acantilados/Luz/Reflector/Estado";
 String Relay3_Name = "Resistencia Termo";
 String Relay3_MQTT_Command = "Acantilados/Servicios/ResistenciaTermo/Comando";
 String Relay3_MQTT_Status = "Acantilados/Servicios/ResistenciaTermo/Estado";
-String Relay4_Name = "";
-String Relay4_MQTT_Command = "";
-String Relay4_MQTT_Status = "";
+String Relay4_Name = "Luz 1er Piso 2";
+String Relay4_MQTT_Command = "Acantilados/Luz/PlantaAlta2/Comando";;
+String Relay4_MQTT_Status = "Acantilados/Luz/PlantaAlta2/Estado";
 
 String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
 #endif
