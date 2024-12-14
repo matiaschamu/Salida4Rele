@@ -1,267 +1,5 @@
 #include <main.h>
-
-//**************************************************   BOARDS   ********************************************
-
-#ifdef Board_4OutRelay_Living
-// Placa1
-// #define Report_IP_DuckDNS
-// #define Report_HealthChecks
-// #define NO_MQTT
-const char *hostName = "ESP_Living";
-const int webServerPort = 80;
-String Relay1_Name = "Luz Living";
-String Relay1_MQTT_Command = "Acantilados/Luz/Living/Comando";
-String Relay1_MQTT_Status = "Acantilados/Luz/Living/Estado";
-String Relay2_Name = "Luz Frente";
-String Relay2_MQTT_Command = "Acantilados/Luz/Frente/Comando";
-String Relay2_MQTT_Status = "Acantilados/Luz/Frente/Estado";
-String Relay3_Name = "Luz Ventanal";
-String Relay3_MQTT_Command = "Acantilados/Luz/Ventanal/Comando";
-String Relay3_MQTT_Status = "Acantilados/Luz/Ventanal/Estado";
-String Relay4_Name = "Luz Arcada";
-String Relay4_MQTT_Command = "Acantilados/Luz/Arcada/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/Arcada/Estado";
-
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
-#endif
-
-#ifdef Board_4OutRelay_Living2
-// Placa2
-// #define Report_IP_DuckDNS
-// #define Report_HealthChecks
-// #define NO_MQTT
-const char *hostName = "ESP_Living2";
-const int webServerPort = 80;
-String Relay1_Name = "Luz PuertaEnt";
-String Relay1_MQTT_Command = "Acantilados/Luz/PuertaEnt/Comando";
-String Relay1_MQTT_Status = "Acantilados/Luz/PuertaEnt/Estado";
-String Relay2_Name = "Luz Entrada";
-String Relay2_MQTT_Command = "Acantilados/Luz/Entrada/Comando";
-String Relay2_MQTT_Status = "Acantilados/Luz/Entrada/Estado";
-String Relay3_Name = "Luz Habitacion";
-String Relay3_MQTT_Command = "Acantilados/Luz/Habitacion/Comando";
-String Relay3_MQTT_Status = "Acantilados/Luz/Habitacion/Estado";
-String Relay4_Name = "Luz CaraSur";
-String Relay4_MQTT_Command = "Acantilados/Luz/CaraSur/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/CaraSur/Estado";
-
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
-#endif
-
-#ifdef Board_4OutRelay_Galeria
-// Placa3
-// #define Report_IP_DuckDNS
-// #define Report_HealthChecks
-// #define NO_MQTT
-const char *hostName = "ESP_Galeria";
-const int webServerPort = 80;
-String Relay1_Name = "Luz Comedor";
-String Relay1_MQTT_Command = "Acantilados/Luz/Comedor/Comando";
-String Relay1_MQTT_Status = "Acantilados/Luz/Comedor/Estado";
-String Relay2_Name = "Luz Cocina";
-String Relay2_MQTT_Command = "Acantilados/Luz/Cocina/Comando";
-String Relay2_MQTT_Status = "Acantilados/Luz/Cocina/Estado";
-String Relay3_Name = "Luz Galeria";
-String Relay3_MQTT_Command = "Acantilados/Luz/Galeria/Comando";
-String Relay3_MQTT_Status = "Acantilados/Luz/Galeria/Estado";
-String Relay4_Name = "Luz Farolas";
-String Relay4_MQTT_Command = "Acantilados/Luz/Farolas/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/Farolas/Estado";
-
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
-#endif
-
-#ifdef Board_4OutRelay_Garage
-// Placa4
-// #define Report_IP_DuckDNS
-// #define Report_HealthChecks
-// #define NO_MQTT
-const char *hostName = "ESP_Garage";
-const int webServerPort = 80;
-String Relay1_Name = "Luz Garage";
-String Relay1_MQTT_Command = "Acantilados/Luz/Garage/Comando";
-String Relay1_MQTT_Status = "Acantilados/Luz/Garage/Estado";
-String Relay2_Name = "Luz LateralGarage";
-String Relay2_MQTT_Command = "Acantilados/Luz/LateralGarage/Comando";
-String Relay2_MQTT_Status = "Acantilados/Luz/LateralGarage/Estado";
-String Relay3_Name = "Luz Servicio";
-String Relay3_MQTT_Command = "Acantilados/Luz/Servicio/Comando";
-String Relay3_MQTT_Status = "Acantilados/Luz/Servicio/Estado";
-String Relay4_Name = "Luz Lavadero";
-String Relay4_MQTT_Command = "Acantilados/Luz/Lavadero/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/Lavadero/Estado";
-
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
-#endif
-
-#ifdef Board_4OutRelay_Tablero
-// Placa5
-#define Report_IP_DuckDNS
-#define Report_HealthChecks
-// #define NO_MQTT
-const char *hostName = "ESP_Tablero";
-const int webServerPort = 80;
-String Relay1_Name = "Bomba Agua";
-String Relay1_MQTT_Command = "Acantilados/Servicios/BombaAgua/Comando";
-String Relay1_MQTT_Status = "Acantilados/Servicios/BombaAgua/Estado";
-String Relay2_Name = "";
-String Relay2_MQTT_Command = "";
-String Relay2_MQTT_Status = "";
-String Relay3_Name = "";
-String Relay3_MQTT_Command = "";
-String Relay3_MQTT_Status = "";
-String Relay4_Name = "";
-String Relay4_MQTT_Command = "";
-String Relay4_MQTT_Status = "";
-
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
-#endif
-
-#ifdef Board_4OutRelay_1erPiso
-// Placa6
-// #define Report_IP_DuckDNS
-// #define Report_HealthChecks
-// #define NO_MQTT
-const char *hostName = "ESP_1erPiso";
-const int webServerPort = 80;
-String Relay1_Name = "Luz 1er Piso 1";
-String Relay1_MQTT_Command = "Acantilados/Luz/PlantaAlta/Comando";
-String Relay1_MQTT_Status = "Acantilados/Luz/PlantaAlta/Estado";
-String Relay2_Name = "Luz Reflector";
-String Relay2_MQTT_Command = "Acantilados/Luz/Reflector/Comando";
-String Relay2_MQTT_Status = "Acantilados/Luz/Reflector/Estado";
-String Relay3_Name = "Resistencia Termo";
-String Relay3_MQTT_Command = "Acantilados/Servicios/ResistenciaTermo/Comando";
-String Relay3_MQTT_Status = "Acantilados/Servicios/ResistenciaTermo/Estado";
-String Relay4_Name = "Luz 1er Piso 2";
-String Relay4_MQTT_Command = "Acantilados/Luz/PlantaAlta2/Comando";;
-String Relay4_MQTT_Status = "Acantilados/Luz/PlantaAlta2/Estado";
-
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
-#endif
-
-#ifdef Board_Temp_Humedad_PB
-// Placa7
-// #define Report_IP_DuckDNS
-// #define Report_HealthChecks
-// #define NO_MQTT
-const char *hostName = "ESP_TemperaturaPB";
-const int webServerPort = 80;
-float Calibracion = 0;
-String Temperatura_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/Temperatura";
-String Humedad_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/Humedad";
-String SensacionTermica_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/SensacionTermica";
-String PuntoRocio_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/PuntoRocio";
-String HumedadAbsoluta_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/HumedadAbsoluta";
-String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Interior/Living/PercepcionTermica";
-
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
-#endif
-
-#ifdef Board_Temp_Humedad_Galeria
-// Placa8
-// #define Report_IP_DuckDNS
-// #define Report_HealthChecks
-// #define NO_MQTT
-const char *hostName = "ESP_TemperaturaGaleria";
-const int webServerPort = 80;
-float Calibracion = 0;
-String Temperatura_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/Temperatura";
-String Humedad_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/Humedad";
-String SensacionTermica_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/SensacionTermica";
-String PuntoRocio_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/PuntoRocio";
-String HumedadAbsoluta_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/HumedadAbsoluta";
-String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Galeria/PercepcionTermica";
-
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
-#endif
-
-#ifdef Board_Temp_Humedad_Exterior
-// Placa9
-// #define Report_IP_DuckDNS
-// #define Report_HealthChecks
-// #define NO_MQTT
-const char *hostName = "ESP_TemperaturaExterior";
-const int webServerPort = 80;
-float Calibracion = 0;
-String Temperatura_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/TemperaturaExterior";
-String Humedad_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/HumedadExterior";
-String SensacionTermica_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/SensacionTermica";
-String PuntoRocio_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/PuntoRocio";
-String HumedadAbsoluta_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/HumedadAbsoluta";
-String Percepcion_MQTT_Status = "Acantilados/Servicios/Meteorologia/Exterior/Parque/PercepcionTermica";
-
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
-#endif
-
-#ifdef Board_4OutRelay_Emmanuel_Living
-// Placa1
-// #define Report_IP_DuckDNS
-// #define Report_HealthChecks
-#define NO_MQTT
-const char *hostName = "Living";
-const int webServerPort = 8083;
-String Relay1_Name = "Luz Living";
-String Relay1_MQTT_Command = "CasaEmma/Luz/Living/Comando";
-String Relay1_MQTT_Status = "CasaEmma/Luz/Living/Estado";
-String Relay2_Name = "Luz Dormitorio";
-String Relay2_MQTT_Command = "CasaEmma/Luz/Dormitorio/Comando";
-String Relay2_MQTT_Status = "CasaEmma/Luz/Dormitorio/Estado";
-String Relay3_Name = "Luz Dorm Superior";
-String Relay3_MQTT_Command = "CasaEmma/Luz/Superior/Comando";
-String Relay3_MQTT_Status = "CasaEmma/Luz/Superior/Estado";
-String Relay4_Name = "Luz Garage";
-String Relay4_MQTT_Command = "CasaEmma/Luz/Garage/Comando";
-String Relay4_MQTT_Status = "CasaEmma/Luz/Garage/Estado";
-
-String urlDuckDNS = "http://www.duckdns.org/update/casaemmadebo/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
-#endif
-
-#ifdef Board_4OutRelay_Emmanuel_Lavadero
-// Placa2
-#define Report_IP_DuckDNS
-// #define Report_HealthChecks
-#define NO_MQTT
-const char *hostName = "Lavadero";
-const int webServerPort = 8084;
-String Relay1_Name = "Luz Cocina";
-String Relay1_MQTT_Command = "CasaEmma/Luz/Cocina/Comando";
-String Relay1_MQTT_Status = "CasaEmma/Luz/Cocina/Estado";
-String Relay2_Name = "Luz Lavadero";
-String Relay2_MQTT_Command = "CasaEmma/Luz/Lavadero/Comando";
-String Relay2_MQTT_Status = "CasaEmma/Luz/Lavadero/Estado";
-String Relay3_Name = "Luz Farolas";
-String Relay3_MQTT_Command = "CasaEmma/Luz/Farola/Comando";
-String Relay3_MQTT_Status = "CasaEmma/Luz/Farola/Estado";
-String Relay4_Name = "Bomba Agua";
-String Relay4_MQTT_Command = "CasaEmma/Servicios/BombaAgua/Comando";
-String Relay4_MQTT_Status = "CasaEmma/Servicios/BombaAgua/Estado";
-
-String urlDuckDNS = "http://www.duckdns.org/update/casaemmadebo/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
-#endif
-
-#ifdef Board_4OutRelay_Valencia_Living
-// Placa1
-#define Report_IP_DuckDNS
-// #define Report_HealthChecks
-#define NO_MQTT
-const char *hostName = "Living";
-const int webServerPort = 80;
-String Relay1_Name = "Luz Living";
-String Relay1_MQTT_Command = "CasaValencia/Luz/Living/Comando";
-String Relay1_MQTT_Status = "CasaValencia/Luz/Living/Estado";
-String Relay2_Name = "Luz Frente";
-String Relay2_MQTT_Command = "CasaValencia/Luz/Frente/Comando";
-String Relay2_MQTT_Status = "CasaValencia/Luz/Frente/Estado";
-String Relay3_Name = "Luz Habitacion";
-String Relay3_MQTT_Command = "CasaValencia/Luz/Habitacion/Comando";
-String Relay3_MQTT_Status = "CasaValencia/Luz/Habitacion/Estado";
-String Relay4_Name = "Bomba Agua";
-String Relay4_MQTT_Command = "CasaValencia/Servicios/BombaAgua/Comando";
-String Relay4_MQTT_Status = "CasaValencia/Servicios/BombaAgua/Estado";
-
-String urlDuckDNS = "http://www.duckdns.org/update/valencia/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
-#endif
+#include <mainDefinition.h>
 
 #if defined(Board_DHT22)
 #include <DHTesp.h> // Incluir la librería DHTesp
@@ -270,7 +8,7 @@ String urlDuckDNS = "http://www.duckdns.org/update/valencia/f4be5f35-a9c4-4837-b
 //**************************************************   Configuracion   ***************************************
 const String Version = Numero_Version;
 
-#if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero)
+#if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero) || defined(Board_4OutRelay_Emmanuel_Living_ESP32)
 const char *ssid = "Camaras";
 const char *password = "37615097";
 #elif defined(Board_4OutRelay_Valencia_Living)
@@ -296,8 +34,6 @@ const char *mqtt_server = "192.168.1.10";
 const uint16_t mqtt_port = 1883;
 const char *mqtt_user = "matias";
 const char *mqtt_pass = "Mato19428426.";
-
-String urlHealthChecks = "http://hc-ping.com/6b750dde-84ed-424a-b708-7c869b8c5253";
 
 //**************************************************   Inicializacion de variables   ************************
 #ifdef Board_4OutRelay
@@ -332,8 +68,8 @@ WiFiClient WifiClient;
 PubSubClient MQTTClient(WifiClient);
 #endif
 unsigned long lastMsg10seg = 0;
-unsigned long lastMsg1min = 0;
-unsigned long lastMsg5min = 0;
+unsigned long lastMsg1min = 60;
+unsigned long lastMsg5min = 60;
 char msg[50];
 
 DataAnalisis temp;
@@ -353,8 +89,12 @@ bool status_AHT;
 void setup()
 {
   // Inicializa el Watchdog Timer para 8 segundos
-  wdt_enable(WDTO_8S);
+  // wdt_enable(WDTO_8S);
   Serial.begin(115200);
+
+  SerialPrint("WIFI - Configurando WiFI");
+  WIFI_Setup();
+
   InitOTA();
 #if defined(Board_DHT22)
   dht.setup(DHT_PIN, DHTesp::DHT22);
@@ -363,8 +103,6 @@ void setup()
   status_AHT = aht.begin(0, 2);
   aht.setCycleMode();
 #endif
-  SerialPrint("WIFI - Configurando WiFI");
-  WIFI_Setup();
 
 #if !defined(NO_MQTT)
   SerialPrint("MQTT - Configurando MQTT");
@@ -372,22 +110,24 @@ void setup()
 #endif
 
   WEB_Server.begin();
+  SerialPrint("WEBServer - Iniciado:");
+  SerialPrint("WEBServer - Puerto: " + String(webServerPort));
 }
 
 //**************************************************   CODE LOOP   *****************************************
 void loop()
 {
   // Reinicia el Watchdog Timer
-  wdt_reset();
+  // wdt_reset();
 
   // Verifica si no está conectado a WiFi
   if (WiFi.status() != WL_CONNECTED)
   {
     WIFI_Setup();
   }
-
+  // SerialPrint("WIFI - LOOP()");
   ArduinoOTA.handle();
-
+  // SerialPrint("OTA - LOOP()");
 #if !defined(NO_MQTT)
   // Verifica si el cliente MQTT no está conectado
   if (!MQTTClient.connected())
@@ -398,10 +138,12 @@ void loop()
 #endif
 
   WEBSERVER_Loop();
+  // SerialPrint("WEBServer - LOOP()");
 
   unsigned long now = millis();
   if (now < lastMsg10seg)
   {
+    SerialPrint("TIMER - ROLLOVER");
     lastMsg10seg = 0;
     lastMsg1min = 0;
     lastMsg5min = 0;
@@ -410,10 +152,13 @@ void loop()
   // Verifica si han pasado 10 segundos
   if (now - lastMsg10seg > 10000)
   {
+    SerialPrint("");
+    SerialPrint("10SEG -> " + String(now) + "-" + String(lastMsg10seg));
     lastMsg10seg = now;
 
 #ifdef Board_4OutRelay
     RELAY_Loop();
+    SerialPrint("RELAY - LOOP()");
 #endif
 
 #if defined(Board_DHT22) || defined(Board_AHT10)
@@ -425,24 +170,36 @@ void loop()
     MQTTClient.publish(HumedadAbsoluta_MQTT_Status.c_str(), String(AbsoluteH, 2).c_str());
     MQTTClient.publish(Percepcion_MQTT_Status.c_str(), String(perception, 2).c_str());
 #endif
-  }
 
-  // Verifica si ha pasado 1 minuto
-  if (now - lastMsg1min > 60000)
-  {
-    lastMsg1min = now;
+    // Verifica si ha pasado 1 minuto
+    if (lastMsg1min > 4)
+    {
+      SerialPrint("60SEG -> " + String(now) + "-" + String(lastMsg1min));
+      lastMsg1min = 0;
+
 #ifdef Report_IP_DuckDNS
-    HTTP_Get(urlDuckDNS);
+      HTTP_Get(urlDuckDNS);
 #endif
-  }
+    }
+    else
+    {
+      lastMsg1min++;
+    }
 
-  // Verifica si han pasado 5 minutos
-  if (now - lastMsg5min > 300000)
-  {
-    lastMsg5min = now;
+    // Verifica si han pasado 5 minutos
+    if (lastMsg5min > 28)
+    {
+      SerialPrint("5MIN -> " + String(now) + "-" + String(lastMsg5min));
+      lastMsg5min = 0;
+
 #ifdef Report_HealthChecks
-    HTTP_Get(urlHealthChecks);
+      HTTP_Get(urlHealthChecks);
 #endif
+    }
+    else
+    {
+      lastMsg5min++;
+    }
   }
 }
 
@@ -451,6 +208,7 @@ void WIFI_Setup()
 {
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
+  SerialPrint("WIFI - Desconectado");
   delay(500);
 
   if (WiFi.config(local_IP, gateway, subnet, primaryDNS) == false)
@@ -458,12 +216,12 @@ void WIFI_Setup()
     SerialPrint("WIFI - Configuration failed.");
   }
 
-  SerialPrint();
-  SerialPrint("WIFI - Connecting to ");
-  SerialPrint(ssid);
+  // SerialPrint();
+  SerialPrint("WIFI - Connecting to ->" + String(ssid));
+  // SerialPrint(ssid);
   WiFi.hostname(hostName);
-  SerialPrint("WIFI - Status  : ");
-  SerialPrint(WiFi.status());
+  SerialPrint("WIFI - Status  : " + String(WiFi.status()));
+  // SerialPrint(WiFi.status());
   SerialPrint("WIFI - Conectando...");
   WiFi.begin(ssid, password);
 
@@ -476,12 +234,12 @@ void WIFI_Setup()
 
   if (WiFi.status() == WL_CONNECTED)
   {
-    SerialPrint("");
+    // SerialPrint("");
     SerialPrint("WIFI - connected");
-    SerialPrint("WIFI - IP address: ");
-    SerialPrint(WiFi.localIP().toString());
-    SerialPrint("WIFI - RRSI: ");
-    SerialPrint(WiFi.RSSI());
+    SerialPrint("WIFI - IP address: " + WiFi.localIP().toString());
+    // SerialPrint(WiFi.localIP().toString());
+    SerialPrint("WIFI - RRSI: " + String(WiFi.RSSI()));
+    // SerialPrint(WiFi.RSSI());
   }
   else
   {
@@ -1206,7 +964,9 @@ void InitOTA()
     Serial.println("End Failed");
   } });
 
+  SerialPrint("OTA Configurado");
   ArduinoOTA.begin();
-  Serial.println("");
-  Serial.println("OTA iniciado");
+  SerialPrint("OTA iniciado");
+  // Serial.println("");
+  // Serial.println("OTA iniciado");
 }
