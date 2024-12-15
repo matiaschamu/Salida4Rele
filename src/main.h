@@ -1,53 +1,37 @@
-#define Numero_Version "1.0.22"
+#define Numero_Version "1.0.23"
 // Define for debug information
-#define debug
+//  #define debug
 
 //**************************************************   DEFINE   ********************************************
 
-// Define if use ESP8266
-//#ifndef ESP8266
-//#define ESP8266
-//#endif
-
-// Define if use ESP32
-//#ifndef ESP32
-//#define ESP32
-//#endif
-
 #if defined(Board_4OutRelay_Living) || defined(Board_4OutRelay_Living2) || defined(Board_4OutRelay_Galeria) || defined(Board_4OutRelay_Tablero) || defined(Board_4OutRelay_Garage)  || defined(Board_4OutRelay_1erPiso) || defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero) || defined(Board_4OutRelay_Valencia_Living)
 #define Board_4OutRelay
-#define ESP8266
 #endif
 
 #if defined(Board_Temp_Humedad_PB) || defined(Board_Temp_Humedad_Exterior)
 #define Board_DHT22
 #define DHT_PIN 3
-#define ESP8266
 #endif
 
 #if defined(Board_Temp_Humedad_Galeria)
 #define Board_AHT10
-#define ESP8266
-#endif
-
-#if defined(Board_4OutRelay_Emmanuel_Living_ESP32)
-#define Board_4OutRelay
-//#define ESP32
 #endif
 
 //**************************************************   LIBRERIAS   ******************************************
 
 #include <Arduino.h>
-
 #include <ArduinoOTA.h>
+
 #ifdef ESP32
 #include <WiFi.h>
 #include <HTTPClient.h>
 #endif
+
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #endif
+
 #include <PubSubClient.h>
 
 #if defined(Board_DHT22)

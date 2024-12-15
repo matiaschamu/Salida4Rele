@@ -200,6 +200,7 @@ void loop()
     {
       lastMsg5min++;
     }
+    SerialPrint("RSSI -> " + String(WiFi.RSSI()));
   }
 }
 
@@ -217,7 +218,7 @@ void WIFI_Setup()
   }
 
   // SerialPrint();
-  SerialPrint("WIFI - Connecting to ->" + String(ssid));
+  SerialPrint("WIFI - Connecting to -> " + String(ssid));
   // SerialPrint(ssid);
   WiFi.hostname(hostName);
   SerialPrint("WIFI - Status  : " + String(WiFi.status()));
@@ -918,8 +919,16 @@ void SerialPrint(int msg)
 //**************************************************   OTA   ***********************************************
 void InitOTA()
 {
-  // Port defaults to 8266
-  ArduinoOTA.setPort(8266);
+
+#ifdef ESP32
+ArduinoOTA.setPort(3232);
+#endif
+
+#ifdef ESP8266
+ArduinoOTA.setPort(8266);
+#endif
+  
+  //ArduinoOTA.setPort(8266);
 
   // Hostname defaults to esp8266-[ChipID]
   ArduinoOTA.setHostname(hostName);
