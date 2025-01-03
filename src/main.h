@@ -1,10 +1,10 @@
-#define Numero_Version "1.0.23"
+#define Numero_Version "1.0.24"
 // Define for debug information
 //  #define debug
 
 //**************************************************   DEFINE   ********************************************
 
-#if defined(Board_4OutRelay_Living) || defined(Board_4OutRelay_Living2) || defined(Board_4OutRelay_Galeria) || defined(Board_4OutRelay_Tablero) || defined(Board_4OutRelay_Garage)  || defined(Board_4OutRelay_1erPiso) || defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero) || defined(Board_4OutRelay_Valencia_Living)
+#if defined(Board_4OutRelay_Living) || defined(Board_4OutRelay_Living2) || defined(Board_4OutRelay_Galeria) || defined(Board_4OutRelay_Tablero) || defined(Board_4OutRelay_Garage)  || defined(Board_4OutRelay_1erPiso) || defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero) || defined(Board_4OutRelay_Valencia_Living) || defined(Board_4OutRelay_Emmanuel_Living_ESP32)
 #define Board_4OutRelay
 #endif
 
