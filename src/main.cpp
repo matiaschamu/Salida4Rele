@@ -163,12 +163,14 @@ void loop()
 
 #if defined(Board_DHT22) || defined(Board_AHT10)
     TEMPERATURA_loop(temperature, humidity, hIndex, dPoint, AbsoluteH, perception);
+#if !defined(NO_MQTT)
     MQTTClient.publish(Temperatura_MQTT_Status.c_str(), String(temperature, 2).c_str());
     MQTTClient.publish(Humedad_MQTT_Status.c_str(), String(humidity, 2).c_str());
     MQTTClient.publish(SensacionTermica_MQTT_Status.c_str(), String(hIndex, 2).c_str());
     MQTTClient.publish(PuntoRocio_MQTT_Status.c_str(), String(dPoint, 2).c_str());
     MQTTClient.publish(HumedadAbsoluta_MQTT_Status.c_str(), String(AbsoluteH, 2).c_str());
     MQTTClient.publish(Percepcion_MQTT_Status.c_str(), String(perception, 2).c_str());
+#endif
 #endif
 
     // Verifica si ha pasado 1 minuto
@@ -664,8 +666,35 @@ void WEBSERVER_Loop()
               client.println("<p>Temperatura: " + String(temperature) + " grados" + "</p>");
               client.println("<p>Humedad: " + String(humidity) + " %" + "</p>");
 #endif
-#if !defined(NO_MQTT)
               client.println("<div class=\"foot\">");
+              int32_t rssi = WiFi.RSSI();
+              
+              String signalStrength;
+              if (rssi >= -60)
+              {
+                signalStrength = "Muy fuerte";
+              }
+              else if (rssi >= -70)
+              {
+                signalStrength = "Fuerte";
+              }
+              else if (rssi >= -80)
+              {
+                signalStrength = "Moderada";
+              }
+              else if (rssi >= -90)
+              {
+                signalStrength = "Débil";
+              }
+              else
+              {
+                signalStrength = "Muy débil";
+              }
+
+              // Enviar la respuesta al cliente con la señal y su clasificación
+              client.println("<p class=\"foot\">Nivel de se&ntilde;al Wi-Fi (RSSI): " + String(rssi) + " dBm (" + signalStrength + ")</p>");
+
+#if !defined(NO_MQTT)
               client.println("<p class=\"foot\">MQTT server status: " + MQTT_Status() + "</p>");
 #endif
 #ifdef Report_IP_DuckDNS
