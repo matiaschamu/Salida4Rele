@@ -8,6 +8,8 @@
 //**************************************************   Configuracion   ***************************************
 const String Version = Numero_Version;
 
+bool mqttEnabled = true;
+
 #if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero) || defined(Board_4OutRelay_Emmanuel_Living_ESP32)
 const char *ssid = "Camaras";
 const char *password = "37615097";
@@ -88,6 +90,12 @@ bool status_AHT;
 //**************************************************   CODE SETUP   *****************************************
 void setup()
 {
+#if defined(NO_MQTT)
+    mqttEnabled = false; // compilado sin soporte -> apagado siempre
+#else
+    mqttEnabled = true;  // compilado CON soporte -> encendido por defecto
+#endif
+
   // Inicializa el Watchdog Timer para 8 segundos
   // wdt_enable(WDTO_8S);
   Serial.begin(115200);
@@ -128,13 +136,15 @@ void loop()
   // SerialPrint("WIFI - LOOP()");
   ArduinoOTA.handle();
   // SerialPrint("OTA - LOOP()");
+
 #if !defined(NO_MQTT)
-  // Verifica si el cliente MQTT no está conectado
-  if (!MQTTClient.connected())
-  {
-    MQTT_Reconnect();
-  }
-  MQTTClient.loop();
+    if (mqttEnabled) {
+        if (!MQTTClient.connected()) {
+            MQTT_Reconnect();
+        }
+        MQTTClient.loop();
+    }
+    // si mqttEnabled = false → no hace nada
 #endif
 
   WEBSERVER_Loop();
@@ -262,6 +272,7 @@ void MQTT_Setup()
   MQTTClient.setCallback(MQTT_Callback);
   SerialPrint("MQTT - Setup done");
 }
+
 void MQTT_Reconnect()
 {
   static int connectionAttempts = 0;
@@ -302,11 +313,16 @@ void MQTT_Reconnect()
     SerialPrint("MQTT - Intentando en 5 seg...");
     delay(5000);
 
-    if (connectionAttempts >= 10) // Realizar un hard reset después de 10 intentos
+    if (connectionAttempts >= 10)
     {
-      SerialPrint("MQTT - Maximo de intentos alcanzado. Realizando hard reset...");
-      delay(5000);
-      ESP.restart(); // Realizar un reinicio completo (hard reset)
+        if (mqttEnabled) {
+            SerialPrint("MQTT - Maximo de intentos alcanzado. Realizando hard reset...");
+            delay(5000);
+            ESP.restart();
+        } else {
+            SerialPrint("MQTT disabled by user → NOT rebooting.");
+            connectionAttempts = 0;
+        }
     }
   }
 }
@@ -571,11 +587,24 @@ void WEBSERVER_Loop()
               reset = true;
             }
 #endif
+
 #if defined(Board_DHT22) || defined(Board_AHT10)
             if (header.indexOf("GET /reset") >= 0)
             {
               reset = true;
             }
+#endif
+
+#if !defined(NO_MQTT)
+else if (header.indexOf("GET /mqtt/enable") >= 0)
+{
+  mqttEnabled = true;
+}
+else if (header.indexOf("GET /mqtt/disable") >= 0)
+{
+  mqttEnabled = false;
+  if (MQTTClient.connected()) MQTTClient.disconnect();
+}
 #endif
             lastMsg10seg = 0;
 
@@ -666,6 +695,21 @@ void WEBSERVER_Loop()
               client.println("<p>Temperatura: " + String(temperature) + " grados" + "</p>");
               client.println("<p>Humedad: " + String(humidity) + " %" + "</p>");
 #endif
+
+#if !defined(NO_MQTT)
+{
+    client.println("<div class=\"foot\" style='padding:8px;'>");
+
+    // Checkbox
+    if (mqttEnabled) {
+        client.println("<p><input type='checkbox' checked onclick=\"location.href='/mqtt/disable'\"> MQTT habilitado</p>");
+    } else {
+        client.println("<p><input type='checkbox' onclick=\"location.href='/mqtt/enable'\"> MQTT deshabilitado</p>");
+    }
+    client.println("</div>");
+}
+#endif
+
               client.println("<div class=\"foot\">");
               int32_t rssi = WiFi.RSSI();
               
@@ -695,7 +739,16 @@ void WEBSERVER_Loop()
               client.println("<p class=\"foot\">Nivel de se&ntilde;al Wi-Fi (RSSI): " + String(rssi) + " dBm (" + signalStrength + ")</p>");
 
 #if !defined(NO_MQTT)
-              client.println("<p class=\"foot\">MQTT server status: " + MQTT_Status() + "</p>");
+{
+  String mqttText;
+  if (!mqttEnabled) {
+      mqttText = "Deshabilitado por el usuario";
+  } else {
+      mqttText = MQTT_Status();
+      if (mqttText == "") mqttText = "Desconocido";
+  }
+              client.println("<p class=\"foot\">MQTT server status: " + mqttText + "</p>");
+}
 #endif
 #ifdef Report_IP_DuckDNS
               client.println("<p class=\"foot\">DuckDNS Updated every 1 min: " + urlDuckDNS + "</p>");

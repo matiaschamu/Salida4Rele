@@ -1,4 +1,4 @@
-#define Numero_Version "1.0.25"
+#define Numero_Version "1.0.26"
 // Define for debug information
 #define debug
 
@@ -62,6 +62,8 @@
 #endif
 
 //**************************************************   DECLARACIONES   **************************************
+extern bool mqttEnabled;
+
 void WIFI_Setup();
 void InitOTA();
 #if !defined(NO_MQTT)
