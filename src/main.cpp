@@ -3,6 +3,7 @@
 #include "network/WifiManager.h"
 #include "relays/RelayManager.h"
 #include "varios/utils.h"
+#include "ota/OTAManager.h"
 
 #if defined(Board_DHT22)
 #include <DHTesp.h> // Incluir la librería DHTesp
@@ -27,21 +28,7 @@ const char *mqtt_user = "matias";
 const char *mqtt_pass = "Mato19428426.";
 
 //**************************************************   Inicializacion de variables   ************************
-#ifdef Board_4OutRelay
-bool Relay1Status = false;
-bool Relay2Status = false;
-bool Relay3Status = false;
-bool Relay4Status = false;
 
-byte Relay1_OFF[] = {0xa0, 0x01, 0x00, 0xa1};
-byte Relay1_ON[] = {0xa0, 0x01, 0x01, 0xa2};
-byte Relay2_OFF[] = {0xa0, 0x02, 0x00, 0xa2};
-byte Relay2_ON[] = {0xa0, 0x02, 0x01, 0xa3};
-byte Relay3_OFF[] = {0xa0, 0x03, 0x00, 0xa3};
-byte Relay3_ON[] = {0xa0, 0x03, 0x01, 0xa4};
-byte Relay4_OFF[] = {0xa0, 0x04, 0x00, 0xa4};
-byte Relay4_ON[] = {0xa0, 0x04, 0x01, 0xa5};
-#endif
 
 #ifdef Board_DHT22
 DHTesp dht;
@@ -71,10 +58,9 @@ byte perception;
 
 
 
-// Instanciar WiFi con los datos de config.h
-WifiManager wifi(ssid, password);
 
-// Instanciar Gestor de Relés
+WifiManager wifi(ssid, password);
+OTAManager ota(hostName);
 RelayManager relays;
 
 
@@ -96,24 +82,12 @@ void setup()
 #endif
 
 
-
-
-
-
-
-
-  // Inicializa el Watchdog Timer para 8 segundos
-  // wdt_enable(WDTO_8S);
   Serial.begin(115200);
 
-  
+  wifi.setup();
+  relays.setup();
+  ota.setup();
 
-  wifi.setup(); // Reemplaza a WIFI_Setup()
-  relays.setup();       // Inicializa relés en OFF
-
-  //WIFI_Setup();
-
-  InitOTA();
 #if defined(Board_DHT22)
   dht.setup(DHT_PIN, DHTesp::DHT22);
 #endif
@@ -135,15 +109,11 @@ void setup()
 //**************************************************   CODE LOOP   *****************************************
 void loop()
 {
-  // Reinicia el Watchdog Timer
-  // wdt_reset();
-
+   // SerialPrint("WIFI - LOOP()");
   wifi.loop();
-
-  
-  // SerialPrint("WIFI - LOOP()");
-  ArduinoOTA.handle();
   // SerialPrint("OTA - LOOP()");
+  ota.handle();
+
 
 #if !defined(NO_MQTT)
     if (mqttEnabled) {
@@ -175,9 +145,16 @@ void loop()
     lastMsg10seg = now;
 
 #ifdef Board_4OutRelay
-    relays.loop();
-    RELAY_Loop();
-    SerialPrint("RELAY - LOOP()");
+    relays.refresh();
+    SerialPrint("RELAY - Refresh()");
+
+    // Publicar estado actual en MQTT
+    #if !defined(NO_MQTT)
+    if (Relay1_Name != "") MQTTClient.publish(Relay1_MQTT_Status.c_str(), relays.getRelayState(1) ? "ON" : "OFF");
+    if (Relay2_Name != "") MQTTClient.publish(Relay2_MQTT_Status.c_str(), relays.getRelayState(2) ? "ON" : "OFF");
+    if (Relay3_Name != "") MQTTClient.publish(Relay3_MQTT_Status.c_str(), relays.getRelayState(3) ? "ON" : "OFF");
+    if (Relay4_Name != "") MQTTClient.publish(Relay4_MQTT_Status.c_str(), relays.getRelayState(4) ? "ON" : "OFF");
+    #endif
 #endif
 
 #if defined(Board_DHT22) || defined(Board_AHT10)
@@ -331,12 +308,12 @@ void MQTT_Callback(char *topic, byte *payload, unsigned int length)
   {
     if ((char)payload[1] == 'N')
     {
-      Relay1Status = true;
+      relays.setRelay(1, true);
       SerialPrint("Relay1_ON");
     }
     else
     {
-      Relay1Status = false;
+      relays.setRelay(1, false);
       SerialPrint("Relay1_OFF");
     }
     lastMsg10seg = 0;
@@ -345,12 +322,12 @@ void MQTT_Callback(char *topic, byte *payload, unsigned int length)
   {
     if ((char)payload[1] == 'N')
     {
-      Relay2Status = true;
+      relays.setRelay(2, true);
       SerialPrint("Relay2_ON");
     }
     else
     {
-      Relay2Status = false;
+      relays.setRelay(2, false);
       SerialPrint("Relay2_OFF");
     }
     lastMsg10seg = 0;
@@ -359,12 +336,12 @@ void MQTT_Callback(char *topic, byte *payload, unsigned int length)
   {
     if ((char)payload[1] == 'N')
     {
-      Relay3Status = true;
+      relays.setRelay(3, true);
       SerialPrint("Relay3_ON");
     }
     else
     {
-      Relay3Status = false;
+      relays.setRelay(3, false);
       SerialPrint("Relay3_OFF");
     }
     lastMsg10seg = 0;
@@ -373,12 +350,12 @@ void MQTT_Callback(char *topic, byte *payload, unsigned int length)
   {
     if ((char)payload[1] == 'N')
     {
-      Relay4Status = true;
+      relays.setRelay(4, true);
       SerialPrint("Relay4_ON");
     }
     else
     {
-      Relay4Status = false;
+      relays.setRelay(4, false);
       SerialPrint("Relay4_OFF");
     }
     lastMsg10seg = 0;
@@ -515,35 +492,35 @@ void WEBSERVER_Loop()
 #ifdef Board_4OutRelay
             if (header.indexOf("GET /relay1/on") >= 0)
             {
-              Relay1Status = 1;
+              relays.setRelay(1, true);
             }
             else if (header.indexOf("GET /relay1/off") >= 0)
             {
-              Relay1Status = 0;
+              relays.setRelay(1, false);
             }
             else if (header.indexOf("GET /relay2/on") >= 0)
             {
-              Relay2Status = 1;
+              relays.setRelay(2, true);
             }
             else if (header.indexOf("GET /relay2/off") >= 0)
             {
-              Relay2Status = 0;
+              relays.setRelay(2, false);
             }
             else if (header.indexOf("GET /relay3/on") >= 0)
             {
-              Relay3Status = 1;
+              relays.setRelay(3, true);
             }
             else if (header.indexOf("GET /relay3/off") >= 0)
             {
-              Relay3Status = 0;
+              relays.setRelay(3, false);
             }
             else if (header.indexOf("GET /relay4/on") >= 0)
             {
-              Relay4Status = 1;
+              relays.setRelay(4, true);
             }
             else if (header.indexOf("GET /relay4/off") >= 0)
             {
-              Relay4Status = 0;
+              relays.setRelay(4, false);
             }
             else if (header.indexOf("GET /reset") >= 0)
             {
@@ -598,9 +575,9 @@ else if (header.indexOf("GET /mqtt/disable") >= 0)
               client.println("<p  style=\"text-align: center;\"> Version: " + Numero_Version + "</p>");
 
 #ifdef Board_4OutRelay
-              if (Relay1Status == 0)
+              if (relays.getRelayState(1) == 0)
               {
-                client.println("<p>Relay 1 estado: " + String(Relay1Status) + " &rarr; " + Relay1_Name + "</p>");
+                client.println("<p>Relay 1 estado: " + String(relays.getRelayState(1)) + " &rarr; " + Relay1_Name + "</p>");
                 client.println("<p><a href=\"/relay1/on\"><button class=\"button\">OFF</button></a></p>");
               }
               else
@@ -608,13 +585,13 @@ else if (header.indexOf("GET /mqtt/disable") >= 0)
                 client.println("<p style="
                                "color:red;"
                                ">Relay 1 estado: " +
-                               String(Relay1Status) + " &rarr; " + Relay1_Name + "</p>");
+                               String(relays.getRelayState(1)) + " &rarr; " + Relay1_Name + "</p>");
                 client.println("<p><a href=\"/relay1/off\"><button class=\"button2\">ON</button></a></p>");
               }
 
-              if (Relay2Status == 0)
+              if (relays.getRelayState(2) == 0)
               {
-                client.println("<p>Relay 2 estado: " + String(Relay2Status) + " &rarr; " + Relay2_Name + "</p>");
+                client.println("<p>Relay 2 estado: " + String(relays.getRelayState(2)) + " &rarr; " + Relay2_Name + "</p>");
                 client.println("<p><a href=\"/relay2/on\"><button class=\"button\">OFF</button></a></p>");
               }
               else
@@ -622,13 +599,13 @@ else if (header.indexOf("GET /mqtt/disable") >= 0)
                 client.println("<p style="
                                "color:red;"
                                ">Relay 2 estado: " +
-                               String(Relay2Status) + " &rarr; " + Relay2_Name + "</p>");
+                               String(relays.getRelayState(2)) + " &rarr; " + Relay2_Name + "</p>");
                 client.println("<p><a href=\"/relay2/off\"><button class=\"button2\">ON</button></a></p>");
               }
 
-              if (Relay3Status == 0)
+              if (relays.getRelayState(3) == 0)
               {
-                client.println("<p>Relay 3 estado: " + String(Relay3Status) + " &rarr; " + Relay3_Name + "</p>");
+                client.println("<p>Relay 3 estado: " + String(relays.getRelayState(3)) + " &rarr; " + Relay3_Name + "</p>");
                 client.println("<p><a href=\"/relay3/on\"><button class=\"button\">OFF</button></a></p>");
               }
               else
@@ -636,13 +613,13 @@ else if (header.indexOf("GET /mqtt/disable") >= 0)
                 client.println("<p style="
                                "color:red;"
                                ">Relay 3 estado: " +
-                               String(Relay3Status) + " &rarr; " + Relay3_Name + "</p>");
+                               String(relays.getRelayState(3)) + " &rarr; " + Relay3_Name + "</p>");
                 client.println("<p><a href=\"/relay3/off\"><button class=\"button2\">ON</button></a></p>");
               }
 
-              if (Relay4Status == 0)
+              if (relays.getRelayState(4) == 0)
               {
-                client.println("<p>Relay 4 estado: " + String(Relay4Status) + " &rarr; " + Relay4_Name + "</p>");
+                client.println("<p>Relay 4 estado: " + String(relays.getRelayState(4)) + " &rarr; " + Relay4_Name + "</p>");
                 client.println("<p><a href=\"/relay4/on\"><button class=\"button\">OFF</button></a></p>");
               }
               else
@@ -650,7 +627,7 @@ else if (header.indexOf("GET /mqtt/disable") >= 0)
                 client.println("<p style="
                                "color:red;"
                                ">Relay 4 estado: " +
-                               String(Relay4Status) + " &rarr; " + Relay4_Name + "</p>");
+                               String(relays.getRelayState(4)) + " &rarr; " + Relay4_Name + "</p>");
                 client.println("<p><a href=\"/relay4/off\"><button class=\"button2\">ON</button></a></p>");
               }
 #endif
@@ -762,13 +739,13 @@ else if (header.indexOf("GET /mqtt/disable") >= 0)
     if (reset == true)
     {
 #ifdef Board_4OutRelay
-      Serial.write(Relay1_OFF, sizeof(Relay1_OFF));
+      relays.setRelay(1, false);
       delay(50);
-      Serial.write(Relay2_OFF, sizeof(Relay2_OFF));
+      relays.setRelay(2, false);
       delay(50);
-      Serial.write(Relay3_OFF, sizeof(Relay3_OFF));
+      relays.setRelay(3, false);
       delay(50);
-      Serial.write(Relay4_OFF, sizeof(Relay4_OFF));
+      relays.setRelay(4, false);
       delay(50);
 #endif
       Serial.println(" ");
@@ -778,92 +755,6 @@ else if (header.indexOf("GET /mqtt/disable") >= 0)
     }
   }
 }
-
-//**************************************************   Relay   **********************************************
-#ifdef Board_4OutRelay
-void RELAY_Loop()
-{
-  if (Relay1_Name != "")
-  {
-    if (Relay1Status == true)
-    {
-      Serial.write(Relay1_ON, sizeof(Relay1_ON));
-#if !defined(NO_MQTT)
-      MQTTClient.publish(Relay1_MQTT_Status.c_str(), "ON");
-#endif
-      SerialPrint("Relay 1 -> 1");
-    }
-    else
-    {
-      Serial.write(Relay1_OFF, sizeof(Relay1_OFF));
-#if !defined(NO_MQTT)
-      MQTTClient.publish(Relay1_MQTT_Status.c_str(), "OFF");
-#endif
-      SerialPrint("Relay 1 -> 0");
-    }
-  }
-  delay(50);
-  if (Relay2_Name != "")
-  {
-    if (Relay2Status == true)
-    {
-      Serial.write(Relay2_ON, sizeof(Relay2_ON));
-#if !defined(NO_MQTT)
-      MQTTClient.publish(Relay2_MQTT_Status.c_str(), "ON");
-#endif
-      SerialPrint("Relay 2 -> 1");
-    }
-    else
-    {
-      Serial.write(Relay2_OFF, sizeof(Relay2_OFF));
-#if !defined(NO_MQTT)
-      MQTTClient.publish(Relay2_MQTT_Status.c_str(), "OFF");
-#endif
-      SerialPrint("Relay 2 -> 0");
-    }
-  }
-  delay(50);
-  if (Relay3_Name != "")
-  {
-    if (Relay3Status == true)
-    {
-      Serial.write(Relay3_ON, sizeof(Relay3_ON));
-#if !defined(NO_MQTT)
-      MQTTClient.publish(Relay3_MQTT_Status.c_str(), "ON");
-#endif
-      SerialPrint("Relay 3 -> 1");
-    }
-    else
-    {
-      Serial.write(Relay3_OFF, sizeof(Relay3_OFF));
-#if !defined(NO_MQTT)
-      MQTTClient.publish(Relay3_MQTT_Status.c_str(), "OFF");
-#endif
-      SerialPrint("Relay 3 -> 0");
-    }
-  }
-  delay(50);
-  if (Relay4_Name != "")
-  {
-    if (Relay4Status == true)
-    {
-      Serial.write(Relay4_ON, sizeof(Relay4_ON));
-#if !defined(NO_MQTT)
-      MQTTClient.publish(Relay4_MQTT_Status.c_str(), "ON");
-#endif
-      SerialPrint("Relay 4 -> 1");
-    }
-    else
-    {
-      Serial.write(Relay4_OFF, sizeof(Relay4_OFF));
-#if !defined(NO_MQTT)
-      MQTTClient.publish(Relay4_MQTT_Status.c_str(), "OFF");
-#endif
-      SerialPrint("Relay 4 -> 0");
-    }
-  }
-}
-#endif
 
 //**************************************************   Funciones   ******************************************
 void HTTP_Get(String url)
@@ -906,58 +797,3 @@ void HTTP_Get(String url)
   }
 }
 
-//**************************************************   OTA   ***********************************************
-void InitOTA()
-{
-  // Port defaults to 8266
-  ArduinoOTA.setPort(8266);
-
-  // Hostname defaults to esp8266-[ChipID]
-  ArduinoOTA.setHostname(hostName);
-
-  // No authentication by default
-  // ArduinoOTA.setPassword("admin");
-
-  // Password can be set with it's md5 value as well
-  // MD5(admin) = 21232f297a57a5a743894a0e4a801fc3
-  // ArduinoOTA.setPasswordHash("21232f297a57a5a743894a0e4a801fc3");
-
-  ArduinoOTA.onStart([]()
-                     {
-  String type;
-  if (ArduinoOTA.getCommand() == U_FLASH) {
-    type = "sketch";
-  } else { // U_SPIFFS
-    type = "filesystem";
-  }
-
-  // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-  Serial.println("Start updating " + type); });
-
-  ArduinoOTA.onEnd([]()
-                   { Serial.println("\nEnd"); });
-
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total)
-                        { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); });
-
-  ArduinoOTA.onError([](ota_error_t error)
-                     {
-  Serial.printf("Error[%u]: ", error);
-  if (error == OTA_AUTH_ERROR) {
-    Serial.println("Auth Failed");
-  } else if (error == OTA_BEGIN_ERROR) {
-    Serial.println("Begin Failed");
-  } else if (error == OTA_CONNECT_ERROR) {
-    Serial.println("Connect Failed");
-  } else if (error == OTA_RECEIVE_ERROR) {
-    Serial.println("Receive Failed");
-  } else if (error == OTA_END_ERROR) {
-    Serial.println("End Failed");
-  } });
-
-  SerialPrint("OTA Configurado");
-  ArduinoOTA.begin();
-  SerialPrint("OTA iniciado");
-  // Serial.println("");
-  // Serial.println("OTA iniciado");
-}

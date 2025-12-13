@@ -4,7 +4,7 @@
 class RelayManager {
 public:
     RelayManager();
-    void setup(); // Si necesitas inicializar pines (aunque aquí usas Serial)
+    void setup(); 
     
     // Método para cambiar estado (index 1-4)
     void setRelay(int relayIndex, bool state);
@@ -12,13 +12,15 @@ public:
     // Obtener estado actual
     bool getRelayState(int relayIndex);
     
-    // Ejecutar lógica cíclica (enviar comandos Serial repetitivos si es necesario)
+    // Envia los comandos seriales actuales (para el ciclo de 10s)
+    void refresh();
+
     void loop();
 
 private:
     bool _relayStatus[4]; // Guardamos estado de los 4 relés (0 a 3)
     
-    // Comandos seriales hexadecimales (Los moví aquí para limpiar el main)
+    // Comandos seriales hexadecimales
     const byte RELAY_CMDS[4][2][4] = {
         { {0xa0, 0x01, 0x00, 0xa1}, {0xa0, 0x01, 0x01, 0xa2} }, // Relé 1 OFF, ON
         { {0xa0, 0x02, 0x00, 0xa2}, {0xa0, 0x02, 0x01, 0xa3} }, // Relé 2

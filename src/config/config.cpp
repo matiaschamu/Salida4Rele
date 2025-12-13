@@ -1,7 +1,7 @@
 #include "config.h"
 #include <Arduino.h>
 
-const String Numero_Version = "1.0.26";
+const String Numero_Version = "1.0.27";
 
 //**************************************************   WIFI   ********************************************
 #if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero) || defined(Board_4OutRelay_Emmanuel_Living_ESP32)
