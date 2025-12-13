@@ -1,4 +1,21 @@
+#pragma once
 #include <Arduino.h>
+
+#define debug
+extern const String Numero_Version;
+
+//**************************************************   WIFI   ********************************************
+#if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero) || defined(Board_4OutRelay_Emmanuel_Living_ESP32)
+extern const char *ssid;
+extern const char *password;
+#elif defined(Board_4OutRelay_Valencia_Living)
+extern const char *ssid;
+extern const char *password;
+#else
+extern const char *ssid;
+extern const char *password;
+#endif
+
 //**************************************************   BOARDS   ********************************************
 
 #ifdef Board_4OutRelay_Living
@@ -6,22 +23,22 @@
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
-const char *hostName = "ESP_Living";
-const int webServerPort = 80;
-String Relay1_Name = "Luz Living";
-String Relay1_MQTT_Command = "Acantilados/Luz/Living/Comando";
-String Relay1_MQTT_Status = "Acantilados/Luz/Living/Estado";
-String Relay2_Name = "Luz Frente";
-String Relay2_MQTT_Command = "Acantilados/Luz/Frente/Comando";
-String Relay2_MQTT_Status = "Acantilados/Luz/Frente/Estado";
-String Relay3_Name = "Luz Ventanal";
-String Relay3_MQTT_Command = "Acantilados/Luz/Ventanal/Comando";
-String Relay3_MQTT_Status = "Acantilados/Luz/Ventanal/Estado";
-String Relay4_Name = "Luz Arcada";
-String Relay4_MQTT_Command = "Acantilados/Luz/Arcada/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/Arcada/Estado";
-String urlHealthChecks = "http://hc-ping.com/d5283654-660f-4c1a-b812-389f443233d9";
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
+extern const char *hostName;
+extern const int webServerPort;
+extern const String Relay1_Name;
+extern const String Relay1_MQTT_Command;
+extern const String Relay1_MQTT_Status;
+extern const String Relay2_Name;
+extern const String Relay2_MQTT_Command;
+extern const String Relay2_MQTT_Status;
+extern const String Relay3_Name;
+extern const String Relay3_MQTT_Command;
+extern const String Relay3_MQTT_Status;
+extern const String Relay4_Name;
+extern const String Relay4_MQTT_Command;
+extern const String Relay4_MQTT_Status;
+extern const String urlHealthChecks;
+extern const String urlDuckDNS;
 #endif
 
 #ifdef Board_4OutRelay_Living2
@@ -29,22 +46,22 @@ String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-483
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
-const char *hostName = "ESP_Living2";
-const int webServerPort = 80;
-String Relay1_Name = "Luz PuertaEnt";
-String Relay1_MQTT_Command = "Acantilados/Luz/PuertaEnt/Comando";
-String Relay1_MQTT_Status = "Acantilados/Luz/PuertaEnt/Estado";
-String Relay2_Name = "Luz Entrada";
-String Relay2_MQTT_Command = "Acantilados/Luz/Entrada/Comando";
-String Relay2_MQTT_Status = "Acantilados/Luz/Entrada/Estado";
-String Relay3_Name = "Luz Habitacion";
-String Relay3_MQTT_Command = "Acantilados/Luz/Habitacion/Comando";
-String Relay3_MQTT_Status = "Acantilados/Luz/Habitacion/Estado";
-String Relay4_Name = "Luz CaraSur";
-String Relay4_MQTT_Command = "Acantilados/Luz/CaraSur/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/CaraSur/Estado";
-String urlHealthChecks = "http://hc-ping.com/1774013e-4433-4ee4-8229-5449a16e7ca2";
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
+extern const char *hostName;
+extern const int webServerPort;
+extern const String Relay1_Name;
+extern const String Relay1_MQTT_Command;
+extern const String Relay1_MQTT_Status;
+extern const String Relay2_Name;
+extern const String Relay2_MQTT_Command;
+extern const String Relay2_MQTT_Status;
+extern const String Relay3_Name;
+extern const String Relay3_MQTT_Command;
+extern const String Relay3_MQTT_Status;
+extern const String Relay4_Name;
+extern const String Relay4_MQTT_Command;
+extern const String Relay4_MQTT_Status;
+extern const String urlHealthChecks;
+extern const String urlDuckDNS;
 #endif
 
 #ifdef Board_4OutRelay_Galeria
@@ -52,22 +69,22 @@ String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-483
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
-const char *hostName = "ESP_Galeria";
-const int webServerPort = 80;
-String Relay1_Name = "Luz Comedor";
-String Relay1_MQTT_Command = "Acantilados/Luz/Comedor/Comando";
-String Relay1_MQTT_Status = "Acantilados/Luz/Comedor/Estado";
-String Relay2_Name = "Luz Cocina";
-String Relay2_MQTT_Command = "Acantilados/Luz/Cocina/Comando";
-String Relay2_MQTT_Status = "Acantilados/Luz/Cocina/Estado";
-String Relay3_Name = "Luz Galeria";
-String Relay3_MQTT_Command = "Acantilados/Luz/Galeria/Comando";
-String Relay3_MQTT_Status = "Acantilados/Luz/Galeria/Estado";
-String Relay4_Name = "Luz Farolas";
-String Relay4_MQTT_Command = "Acantilados/Luz/Farolas/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/Farolas/Estado";
-String urlHealthChecks = "http://hc-ping.com/4390036e-80a9-4fee-99cc-42f6201f6336";
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
+extern const char *hostName;
+extern const int webServerPort;
+extern const String Relay1_Name;
+extern const String Relay1_MQTT_Command;
+extern const String Relay1_MQTT_Status;
+extern const String Relay2_Name;
+extern const String Relay2_MQTT_Command;
+extern const String Relay2_MQTT_Status;
+extern const String Relay3_Name;
+extern const String Relay3_MQTT_Command;
+extern const String Relay3_MQTT_Status;
+extern const String Relay4_Name;
+extern const String Relay4_MQTT_Command;
+extern const String Relay4_MQTT_Status;
+extern const String urlHealthChecks;
+extern const String urlDuckDNS;
 #endif
 
 #ifdef Board_4OutRelay_Garage
@@ -75,22 +92,22 @@ String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-483
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
-const char *hostName = "ESP_Garage";
-const int webServerPort = 80;
-String Relay1_Name = "Luz Garage";
-String Relay1_MQTT_Command = "Acantilados/Luz/Garage/Comando";
-String Relay1_MQTT_Status = "Acantilados/Luz/Garage/Estado";
-String Relay2_Name = "Luz LateralGarage";
-String Relay2_MQTT_Command = "Acantilados/Luz/LateralGarage/Comando";
-String Relay2_MQTT_Status = "Acantilados/Luz/LateralGarage/Estado";
-String Relay3_Name = "Luz Servicio";
-String Relay3_MQTT_Command = "Acantilados/Luz/Servicio/Comando";
-String Relay3_MQTT_Status = "Acantilados/Luz/Servicio/Estado";
-String Relay4_Name = "Luz Lavadero";
-String Relay4_MQTT_Command = "Acantilados/Luz/Lavadero/Comando";
-String Relay4_MQTT_Status = "Acantilados/Luz/Lavadero/Estado";
-String urlHealthChecks = "http://hc-ping.com/74e92fc0-61bd-41ac-b751-be1c333c06af";
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
+extern const char *hostName;
+extern const int webServerPort;
+extern const String Relay1_Name;
+extern const String Relay1_MQTT_Command;
+extern const String Relay1_MQTT_Status;
+extern const String Relay2_Name;
+extern const String Relay2_MQTT_Command;
+extern const String Relay2_MQTT_Status;
+extern const String Relay3_Name;
+extern const String Relay3_MQTT_Command;
+extern const String Relay3_MQTT_Status;
+extern const String Relay4_Name;
+extern const String Relay4_MQTT_Command;
+extern const String Relay4_MQTT_Status;
+extern const String urlHealthChecks;
+extern const String urlDuckDNS;
 #endif
 
 #ifdef Board_4OutRelay_Tablero
@@ -98,22 +115,22 @@ String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-483
 #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
-const char *hostName = "ESP_Tablero";
-const int webServerPort = 80;
-String Relay1_Name = "Bomba Agua";
-String Relay1_MQTT_Command = "Acantilados/Servicios/BombaAgua/Comando";
-String Relay1_MQTT_Status = "Acantilados/Servicios/BombaAgua/Estado";
-String Relay2_Name = "";
-String Relay2_MQTT_Command = "";
-String Relay2_MQTT_Status = "";
-String Relay3_Name = "";
-String Relay3_MQTT_Command = "";
-String Relay3_MQTT_Status = "";
-String Relay4_Name = "";
-String Relay4_MQTT_Command = "";
-String Relay4_MQTT_Status = "";
-String urlHealthChecks = "http://hc-ping.com/6b750dde-84ed-424a-b708-7c869b8c5253";
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
+extern const char *hostName;
+extern const int webServerPort;
+extern const String Relay1_Name;
+extern const String Relay1_MQTT_Command;
+extern const String Relay1_MQTT_Status;
+extern const String Relay2_Name;
+extern const String Relay2_MQTT_Command;
+extern const String Relay2_MQTT_Status;
+extern const String Relay3_Name;
+extern const String Relay3_MQTT_Command;
+extern const String Relay3_MQTT_Status;
+extern const String Relay4_Name;
+extern const String Relay4_MQTT_Command;
+extern const String Relay4_MQTT_Status;
+extern const String urlHealthChecks;
+extern const String urlDuckDNS;
 #endif
 
 #ifdef Board_4OutRelay_1erPiso
@@ -121,22 +138,22 @@ String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-483
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
-const char *hostName = "ESP_1erPiso";
-const int webServerPort = 80;
-String Relay1_Name = "Luz 1er Piso 1";
-String Relay1_MQTT_Command = "Acantilados/Luz/PlantaAlta/Comando";
-String Relay1_MQTT_Status = "Acantilados/Luz/PlantaAlta/Estado";
-String Relay2_Name = "Luz Reflector";
-String Relay2_MQTT_Command = "Acantilados/Luz/Reflector/Comando";
-String Relay2_MQTT_Status = "Acantilados/Luz/Reflector/Estado";
-String Relay3_Name = "Resistencia Termo";
-String Relay3_MQTT_Command = "Acantilados/Servicios/ResistenciaTermo/Comando";
-String Relay3_MQTT_Status = "Acantilados/Servicios/ResistenciaTermo/Estado";
-String Relay4_Name = "Luz 1er Piso 2";
-String Relay4_MQTT_Command = "Acantilados/Luz/PlantaAlta2/Comando";;
-String Relay4_MQTT_Status = "Acantilados/Luz/PlantaAlta2/Estado";
-String urlHealthChecks = "http://hc-ping.com/fa586267-0c9e-4b02-bd6d-7d2ac39cc7ed";
-String urlDuckDNS = "http://www.duckdns.org/update/acantilados/f4be5f35-a9c4-4837-b709-f38afbfaaabd";
+extern const char *hostName;
+extern const int webServerPort;
+extern const String Relay1_Name;
+extern const String Relay1_MQTT_Command;
+extern const String Relay1_MQTT_Status;
+extern const String Relay2_Name;
+extern const String Relay2_MQTT_Command;
+extern const String Relay2_MQTT_Status;
+extern const String Relay3_Name;
+extern const String Relay3_MQTT_Command;
+extern const String Relay3_MQTT_Status;
+extern const String Relay4_Name;
+extern const String Relay4_MQTT_Command;
+extern const String Relay4_MQTT_Status;
+extern const String urlHealthChecks;
+extern const String urlDuckDNS;
 #endif
 
 #ifdef Board_Temp_Humedad_PB

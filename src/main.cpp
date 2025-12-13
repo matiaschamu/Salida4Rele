@@ -1,38 +1,27 @@
 #include <main.h>
-#include <mainDefinition.h>
+#include "config/config.h"
+#include "network/WifiManager.h"
+#include "relays/RelayManager.h"
+#include "varios/utils.h"
 
 #if defined(Board_DHT22)
 #include <DHTesp.h> // Incluir la librería DHTesp
 #endif
 
 //**************************************************   Configuracion   ***************************************
-const String Version = Numero_Version;
+
 
 bool mqttEnabled = true;
 
-#if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero) || defined(Board_4OutRelay_Emmanuel_Living_ESP32)
-const char *ssid = "Camaras";
-const char *password = "37615097";
-#elif defined(Board_4OutRelay_Valencia_Living)
-const char *ssid = "PoneteWifi";
-const char *password = "ratondemierda";
-#else
-const char *ssid = "Domotics";
-const char *password = "Mato19428426";
-#endif
 
-IPAddress local_IP(IP1, IP2, IP3, IP4);
-IPAddress gateway(IP1, IP2, IP3, 1);
-IPAddress subnet(255, 255, 255, 0);
-IPAddress primaryDNS(IP1, IP2, IP3, 1);
-// IPAddress secondaryDNS(8, 8, 4, 4);
+
+
 
 #if defined(Board_4OutRelay_Valencia_Living)
 const char *mqtt_server = "https:www.acantilados-io.com";
 #else
 const char *mqtt_server = "192.168.1.10";
 #endif
-
 const uint16_t mqtt_port = 1883;
 const char *mqtt_user = "matias";
 const char *mqtt_pass = "Mato19428426.";
@@ -79,6 +68,16 @@ DataAnalisis temp;
 float temperature = 0, humidity = 0, hIndex = 0, dPoint = 0, AbsoluteH = 0;
 byte perception;
 
+
+
+
+// Instanciar WiFi con los datos de config.h
+WifiManager wifi(ssid, password);
+
+// Instanciar Gestor de Relés
+RelayManager relays;
+
+
 //**************************************************   web server Config   *********************************
 WiFiServer WEB_Server(webServerPort);
 String header;
@@ -96,12 +95,23 @@ void setup()
     mqttEnabled = true;  // compilado CON soporte -> encendido por defecto
 #endif
 
+
+
+
+
+
+
+
   // Inicializa el Watchdog Timer para 8 segundos
   // wdt_enable(WDTO_8S);
   Serial.begin(115200);
 
-  SerialPrint("WIFI - Configurando WiFI");
-  WIFI_Setup();
+  
+
+  wifi.setup(); // Reemplaza a WIFI_Setup()
+  relays.setup();       // Inicializa relés en OFF
+
+  //WIFI_Setup();
 
   InitOTA();
 #if defined(Board_DHT22)
@@ -128,11 +138,9 @@ void loop()
   // Reinicia el Watchdog Timer
   // wdt_reset();
 
-  // Verifica si no está conectado a WiFi
-  if (WiFi.status() != WL_CONNECTED)
-  {
-    WIFI_Setup();
-  }
+  wifi.loop();
+
+  
   // SerialPrint("WIFI - LOOP()");
   ArduinoOTA.handle();
   // SerialPrint("OTA - LOOP()");
@@ -167,6 +175,7 @@ void loop()
     lastMsg10seg = now;
 
 #ifdef Board_4OutRelay
+    relays.loop();
     RELAY_Loop();
     SerialPrint("RELAY - LOOP()");
 #endif
@@ -215,53 +224,7 @@ void loop()
   }
 }
 
-//**************************************************   WIFI   **********************************************
-void WIFI_Setup()
-{
-  WiFi.mode(WIFI_STA);
-  WiFi.disconnect();
-  SerialPrint("WIFI - Desconectado");
-  delay(500);
 
-  if (WiFi.config(local_IP, gateway, subnet, primaryDNS) == false)
-  {
-    SerialPrint("WIFI - Configuration failed.");
-  }
-
-  // SerialPrint();
-  SerialPrint("WIFI - Connecting to ->" + String(ssid));
-  // SerialPrint(ssid);
-  WiFi.hostname(hostName);
-  SerialPrint("WIFI - Status  : " + String(WiFi.status()));
-  // SerialPrint(WiFi.status());
-  SerialPrint("WIFI - Conectando...");
-  WiFi.begin(ssid, password);
-
-  unsigned long startMillis = millis();
-  while (WiFi.status() != WL_CONNECTED && (millis() - startMillis) < 60000)
-  {
-    SerialPrint(".");
-    delay(500);
-  }
-
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    // SerialPrint("");
-    SerialPrint("WIFI - connected");
-    SerialPrint("WIFI - IP address: " + WiFi.localIP().toString());
-    // SerialPrint(WiFi.localIP().toString());
-    SerialPrint("WIFI - RRSI: " + String(WiFi.RSSI()));
-    // SerialPrint(WiFi.RSSI());
-  }
-  else
-  {
-    SerialPrint("");
-    SerialPrint("WIFI - Connection timeout");
-    SerialPrint("WIFI - Performing hard reset...");
-    delay(5000);
-    ESP.restart();
-  }
-}
 
 #if !defined(NO_MQTT)
 //**************************************************   MQTT   ***********************************************
@@ -632,7 +595,7 @@ else if (header.indexOf("GET /mqtt/disable") >= 0)
             if (reset == false)
             {
               client.println("<h1 style=\"font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: bold; text-align: center;\">" + String(hostName) + "<br>(" + WiFi.localIP().toString() + ")</h1>");
-              client.println("<p  style=\"text-align: center;\"> Version: " + Version + "</p>");
+              client.println("<p  style=\"text-align: center;\"> Version: " + Numero_Version + "</p>");
 
 #ifdef Board_4OutRelay
               if (Relay1Status == 0)
@@ -941,60 +904,6 @@ void HTTP_Get(String url)
       SerialPrint("[HTTP] Unable to connect\n");
     }
   }
-}
-
-String convertToString(char *a, int size)
-{
-  int i;
-  String s = "";
-  for (i = 0; i < size; i++)
-  {
-    s = s + a[i];
-  }
-  return s;
-}
-String convertToString(byte *a, int size)
-{
-  int i;
-  String s = "";
-  for (i = 0; i < size; i++)
-  {
-    s = s + a[i];
-  }
-  return s;
-}
-
-void SerialPrint()
-{
-  int a = 0;
-  a = a;
-#ifdef debug
-  Serial.println();
-#endif
-}
-void SerialPrint(String msg)
-{
-  int a = 0;
-  a = a;
-#ifdef debug
-  Serial.println(msg);
-#endif
-}
-void SerialPrint(char msg)
-{
-  int a = 0;
-  a = a;
-#ifdef debug
-  Serial.println(msg);
-#endif
-}
-void SerialPrint(int msg)
-{
-  int a = 0;
-  a = a;
-#ifdef debug
-  Serial.println(msg);
-#endif
 }
 
 //**************************************************   OTA   ***********************************************

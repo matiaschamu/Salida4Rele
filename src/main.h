@@ -1,6 +1,7 @@
-#define Numero_Version "1.0.26"
+#pragma once
+
 // Define for debug information
-#define debug
+
 
 //**************************************************   DEFINE   ********************************************
 
@@ -64,7 +65,7 @@
 //**************************************************   DECLARACIONES   **************************************
 extern bool mqttEnabled;
 
-void WIFI_Setup();
+//void WIFI_Setup();
 void InitOTA();
 #if !defined(NO_MQTT)
 void MQTT_Setup();
@@ -77,16 +78,16 @@ void WEBSERVER_Loop();
 void HTTP_Get(String);
 void DuckDNS_Loop();
 void HealthChecks_Loop();
-void SerialPrint();
-void SerialPrint(String);
-void SerialPrint(char);
-void SerialPrint(int);
-String convertToString(char *, int);
-String convertToString(byte *, int);
+//void SerialPrint();
+//void SerialPrint(String);
+//void SerialPrint(char);
+//void SerialPrint(int);
+//String convertToString(char *, int);
+//String convertToString(byte *, int);
 
-#ifdef Board_4OutRelay
+//#ifdef Board_4OutRelay
 void RELAY_Loop();
-#endif
+//#endif
 
 #if defined(Board_DHT22) || defined(Board_AHT10)
 void TEMPERATURA_loop(float &temperature, float &humidity, float &hIndex, float &dPoint, float &AbsoluteH, byte &perception);
