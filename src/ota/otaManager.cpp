@@ -46,7 +46,7 @@ void OTAManager::setup() {
     });
 
     ArduinoOTA.begin();
-    Serial.println("OTA: Configurado e Iniciado");
+    SerialPrint ("OTA: Configurado e Iniciado");
 }
 
 void OTAManager::handle() {

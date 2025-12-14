@@ -1,6 +1,6 @@
 #pragma once
+#include "config/config.h"
 #include <Arduino.h>
-#include "config.h" // Asegurate de que aquí esté definido 'debug' si lo usas
 
 // Esta función acepta CUALQUIER tipo de dato (String, int, char, float...)
 // gracias al "template <typename T>"

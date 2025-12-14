@@ -1,6 +1,6 @@
+#include "config/config.h"
 #include "WifiManager.h"
 #include "varios/utils.h"
-#include "config/config.h"
 
 WifiManager::WifiManager(const char* ssid, const char* password) {
 

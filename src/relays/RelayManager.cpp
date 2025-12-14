@@ -1,5 +1,5 @@
-#include "RelayManager.h"
 #include "config/config.h"
+#include "RelayManager.h"
 #include "varios/utils.h"
 
 RelayManager::RelayManager() {
@@ -31,10 +31,12 @@ void RelayManager::refresh() {
     // Replica la lógica de RELAY_Loop del main: enviar comandos si el nombre no está vacío
     // Se agregan delays para no saturar el puerto serie, igual que tenías antes.
     
+#ifdef Board_4OutRelay
     if (Relay1_Name != "") { sendSerialCommand(0, _relayStatus[0]); delay(50); }
     if (Relay2_Name != "") { sendSerialCommand(1, _relayStatus[1]); delay(50); }
     if (Relay3_Name != "") { sendSerialCommand(2, _relayStatus[2]); delay(50); }
     if (Relay4_Name != "") { sendSerialCommand(3, _relayStatus[3]); delay(50); }
+#endif
 }
 
 void RelayManager::sendSerialCommand(int idx, bool state) {

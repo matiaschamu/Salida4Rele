@@ -1,9 +1,11 @@
-#include <main.h>
 #include "config/config.h"
+#include <main.h>
 #include "network/WifiManager.h"
 #include "relays/RelayManager.h"
 #include "varios/utils.h"
 #include "ota/OTAManager.h"
+#include "mqtt/mqttManager.h"
+#include "web/webManager.h"
 
 #if defined(Board_DHT22)
 #include <DHTesp.h> // Incluir la librería DHTesp
@@ -14,18 +16,6 @@
 
 bool mqttEnabled = true;
 
-
-
-
-
-#if defined(Board_4OutRelay_Valencia_Living)
-const char *mqtt_server = "https:www.acantilados-io.com";
-#else
-const char *mqtt_server = "192.168.1.10";
-#endif
-const uint16_t mqtt_port = 1883;
-const char *mqtt_user = "matias";
-const char *mqtt_pass = "Mato19428426.";
 
 //**************************************************   Inicializacion de variables   ************************
 
@@ -41,9 +31,9 @@ AHT10 aht(AHT10_ADDRESS_0X38);
 #endif
 
 int status = WL_IDLE_STATUS;
-WiFiClient WifiClient;
+//WiFiClient WifiClient;
 #if !defined(NO_MQTT)
-PubSubClient MQTTClient(WifiClient);
+//PubSubClient MQTTClient(WifiClient);
 #endif
 unsigned long lastMsg10seg = 0;
 unsigned long lastMsg1min = 60;
@@ -52,17 +42,23 @@ char msg[50];
 
 DataAnalisis temp;
 
-float temperature = 0, humidity = 0, hIndex = 0, dPoint = 0, AbsoluteH = 0;
+
 byte perception;
 
 
-
-
-
+// --- Instancias ---
 WifiManager wifi(ssid, password);
 OTAManager ota(hostName);
+#ifdef Board_4OutRelay
 RelayManager relays;
+MqttManager mqttManager(&relays);
+#else
+  MqttManager mqttManager(nullptr);
+#endif
 
+WebManager webManager(webServerPort);
+
+float temperature = 0, humidity = 0, hIndex = 0, dPoint = 0, AbsoluteH = 0;
 
 //**************************************************   web server Config   *********************************
 WiFiServer WEB_Server(webServerPort);
@@ -83,10 +79,13 @@ void setup()
 
 
   Serial.begin(115200);
-
+  SerialPrint("WIFI - Ingresando Setup:");
   wifi.setup();
+  #ifdef Board_4OutRelay
   relays.setup();
+  #endif
   ota.setup();
+  mqttManager.setup();
 
 #if defined(Board_DHT22)
   dht.setup(DHT_PIN, DHTesp::DHT22);
@@ -96,10 +95,17 @@ void setup()
   aht.setCycleMode();
 #endif
 
-#if !defined(NO_MQTT)
-  SerialPrint("MQTT - Configurando MQTT");
-  MQTT_Setup();
+#ifdef Board_4OutRelay
+      webManager.setup(&relays, &mqttManager, &temperature, &humidity);
+#else
+      // Si no hay relays, pasamos nullptr en el primer argumento
+      webManager.setup(nullptr, &mqttManager, &temperature, &humidity);
 #endif
+
+// #if !defined(NO_MQTT)
+//   SerialPrint("MQTT - Configurando MQTT");
+//   MQTT_Setup();
+// #endif
 
   WEB_Server.begin();
   SerialPrint("WEBServer - Iniciado:");
@@ -113,19 +119,10 @@ void loop()
   wifi.loop();
   // SerialPrint("OTA - LOOP()");
   ota.handle();
+  mqttManager.loop();
 
-
-#if !defined(NO_MQTT)
-    if (mqttEnabled) {
-        if (!MQTTClient.connected()) {
-            MQTT_Reconnect();
-        }
-        MQTTClient.loop();
-    }
-    // si mqttEnabled = false → no hace nada
-#endif
-
-  WEBSERVER_Loop();
+  webManager.loop();
+  //WEBSERVER_Loop();
   // SerialPrint("WEBServer - LOOP()");
 
   unsigned long now = millis();
@@ -150,23 +147,23 @@ void loop()
 
     // Publicar estado actual en MQTT
     #if !defined(NO_MQTT)
-    if (Relay1_Name != "") MQTTClient.publish(Relay1_MQTT_Status.c_str(), relays.getRelayState(1) ? "ON" : "OFF");
-    if (Relay2_Name != "") MQTTClient.publish(Relay2_MQTT_Status.c_str(), relays.getRelayState(2) ? "ON" : "OFF");
-    if (Relay3_Name != "") MQTTClient.publish(Relay3_MQTT_Status.c_str(), relays.getRelayState(3) ? "ON" : "OFF");
-    if (Relay4_Name != "") MQTTClient.publish(Relay4_MQTT_Status.c_str(), relays.getRelayState(4) ? "ON" : "OFF");
+    if (Relay1_Name != "") mqttManager.publish(Relay1_MQTT_Status.c_str(), relays.getRelayState(1) ? "ON" : "OFF");
+    if (Relay2_Name != "") mqttManager.publish(Relay2_MQTT_Status.c_str(), relays.getRelayState(2) ? "ON" : "OFF");
+    if (Relay3_Name != "") mqttManager.publish(Relay3_MQTT_Status.c_str(), relays.getRelayState(3) ? "ON" : "OFF");
+    if (Relay4_Name != "") mqttManager.publish(Relay4_MQTT_Status.c_str(), relays.getRelayState(4) ? "ON" : "OFF");
     #endif
 #endif
 
 #if defined(Board_DHT22) || defined(Board_AHT10)
     TEMPERATURA_loop(temperature, humidity, hIndex, dPoint, AbsoluteH, perception);
-#if !defined(NO_MQTT)
-    MQTTClient.publish(Temperatura_MQTT_Status.c_str(), String(temperature, 2).c_str());
-    MQTTClient.publish(Humedad_MQTT_Status.c_str(), String(humidity, 2).c_str());
-    MQTTClient.publish(SensacionTermica_MQTT_Status.c_str(), String(hIndex, 2).c_str());
-    MQTTClient.publish(PuntoRocio_MQTT_Status.c_str(), String(dPoint, 2).c_str());
-    MQTTClient.publish(HumedadAbsoluta_MQTT_Status.c_str(), String(AbsoluteH, 2).c_str());
-    MQTTClient.publish(Percepcion_MQTT_Status.c_str(), String(perception, 2).c_str());
-#endif
+  #if !defined(NO_MQTT)
+      mqttManager.publish(Temperatura_MQTT_Status.c_str(), String(temperature, 2).c_str());
+      mqttManager.publish(Humedad_MQTT_Status.c_str(), String(humidity, 2).c_str());
+      mqttManager.publish(SensacionTermica_MQTT_Status.c_str(), String(hIndex, 2).c_str());
+      mqttManager.publish(PuntoRocio_MQTT_Status.c_str(), String(dPoint, 2).c_str());
+      mqttManager.publish(HumedadAbsoluta_MQTT_Status.c_str(), String(AbsoluteH, 2).c_str());
+      mqttManager.publish(Percepcion_MQTT_Status.c_str(), String(perception, 2).c_str());
+  #endif
 #endif
 
     // Verifica si ha pasado 1 minuto
@@ -201,207 +198,6 @@ void loop()
   }
 }
 
-
-
-#if !defined(NO_MQTT)
-//**************************************************   MQTT   ***********************************************
-void MQTT_Setup()
-{
-  MQTTClient.setServer(mqtt_server, mqtt_port);
-  SerialPrint("MQTT - Declarando el Callback");
-  MQTTClient.setCallback(MQTT_Callback);
-  SerialPrint("MQTT - Setup done");
-}
-
-void MQTT_Reconnect()
-{
-  static int connectionAttempts = 0;
-  SerialPrint("MQTT - Intentando Conexion...");
-  SerialPrint("MQTT - " + MQTTClient.state());
-
-  if (MQTTClient.connect(hostName, mqtt_user, mqtt_pass))
-  {
-    SerialPrint("MQTT - Conectado");
-
-#ifdef Board_4OutRelay
-    // Suscribir a los temas MQTT si se han configurado
-    if (!Relay1_MQTT_Command.isEmpty())
-    {
-      MQTT_SubscribeToTopic(Relay1_MQTT_Command);
-    }
-    if (!Relay2_MQTT_Command.isEmpty())
-    {
-      MQTT_SubscribeToTopic(Relay2_MQTT_Command);
-    }
-    if (!Relay3_MQTT_Command.isEmpty())
-    {
-      MQTT_SubscribeToTopic(Relay3_MQTT_Command);
-    }
-    if (!Relay4_MQTT_Command.isEmpty())
-    {
-      MQTT_SubscribeToTopic(Relay4_MQTT_Command);
-    }
-#endif
-
-    connectionAttempts = 0;
-  }
-  else
-  {
-    connectionAttempts++; // Incrementar el contador de intentos de conexión fallidos
-    SerialPrint("MQTT - Fallo conexion");
-    SerialPrint(MQTTClient.state());
-    SerialPrint("MQTT - Intentando en 5 seg...");
-    delay(5000);
-
-    if (connectionAttempts >= 10)
-    {
-        if (mqttEnabled) {
-            SerialPrint("MQTT - Maximo de intentos alcanzado. Realizando hard reset...");
-            delay(5000);
-            ESP.restart();
-        } else {
-            SerialPrint("MQTT disabled by user → NOT rebooting.");
-            connectionAttempts = 0;
-        }
-    }
-  }
-}
-// Función auxiliar para suscribir a un tema MQTT de forma no bloqueante
-void MQTT_SubscribeToTopic(String topic)
-{
-  if (topic != "")
-  {
-    SerialPrint("MQTT - Suscribiendo en " + topic + " ...");
-
-    unsigned long startTime = millis();
-    while (!MQTTClient.subscribe(topic.c_str()))
-    {
-      MQTTClient.loop();
-
-      if (millis() - startTime > 5000)
-      {
-        SerialPrint("MQTT - Fallo suscripcion");
-        // rebootCount++;
-        // EEPROM.put(0, rebootCount);
-        // EEPROM.commit();
-        delay(5000);
-        ESP.restart();
-        while (true)
-          ;
-        break;
-      }
-    }
-    SerialPrint("MQTT - Suscripcion OK");
-  }
-}
-void MQTT_Callback(char *topic, byte *payload, unsigned int length)
-{
-  SerialPrint("MQTT - Message arrived: ");
-  String mTopic = convertToString(topic, strlen(topic));
-  String mPayload = convertToString(payload, sizeof(payload));
-  SerialPrint(mTopic);
-  SerialPrint(mPayload);
-  SerialPrint();
-
-#ifdef Board_4OutRelay
-  if (mTopic == Relay1_MQTT_Command)
-  {
-    if ((char)payload[1] == 'N')
-    {
-      relays.setRelay(1, true);
-      SerialPrint("Relay1_ON");
-    }
-    else
-    {
-      relays.setRelay(1, false);
-      SerialPrint("Relay1_OFF");
-    }
-    lastMsg10seg = 0;
-  }
-  else if (mTopic == Relay2_MQTT_Command)
-  {
-    if ((char)payload[1] == 'N')
-    {
-      relays.setRelay(2, true);
-      SerialPrint("Relay2_ON");
-    }
-    else
-    {
-      relays.setRelay(2, false);
-      SerialPrint("Relay2_OFF");
-    }
-    lastMsg10seg = 0;
-  }
-  else if (mTopic == Relay3_MQTT_Command)
-  {
-    if ((char)payload[1] == 'N')
-    {
-      relays.setRelay(3, true);
-      SerialPrint("Relay3_ON");
-    }
-    else
-    {
-      relays.setRelay(3, false);
-      SerialPrint("Relay3_OFF");
-    }
-    lastMsg10seg = 0;
-  }
-  else if (mTopic == Relay4_MQTT_Command)
-  {
-    if ((char)payload[1] == 'N')
-    {
-      relays.setRelay(4, true);
-      SerialPrint("Relay4_ON");
-    }
-    else
-    {
-      relays.setRelay(4, false);
-      SerialPrint("Relay4_OFF");
-    }
-    lastMsg10seg = 0;
-  }
-#endif
-}
-String MQTT_Status()
-{
-  switch (MQTTClient.state())
-  {
-  case -4:
-    return "MQTT_CONNECTION_TIMEOUT - the server didn't respond within the keepalive time";
-    break;
-  case -3:
-    return "MQTT_CONNECTION_LOST - the network connection was broken";
-    break;
-  case -2:
-    return "MQTT_CONNECT_FAILED - the network connection failed";
-    break;
-  case -1:
-    return "MQTT_DISCONNECTED - the client is disconnected cleanly";
-    break;
-  case 0:
-    return "MQTT_CONNECTED - the client is connected";
-    break;
-  case 1:
-    return "MQTT_CONNECT_BAD_PROTOCOL - the server doesn't support the requested version of MQTT";
-    break;
-  case 2:
-    return "MQTT_CONNECT_BAD_CLIENT_ID - the server rejected the client identifier";
-    break;
-  case 3:
-    return "MQTT_CONNECT_UNAVAILABLE - the server was unable to accept the connection";
-    break;
-  case 4:
-    return "MQTT_CONNECT_BAD_CREDENTIALS - the username/password were rejected";
-    break;
-  case 5:
-    return "MQTT_CONNECT_UNAUTHORIZED - the client was not authorized to connect";
-    break;
-  default:
-    return "";
-    break;
-  }
-}
-#endif
 //**************************************************   Temperature   ***************************************
 #if defined(Board_DHT22) || defined(Board_AHT10)
 void TEMPERATURA_loop(float &temperature, float &humidity, float &hIndex, float &dPoint, float &AbsoluteH, byte &perception)
@@ -411,6 +207,7 @@ void TEMPERATURA_loop(float &temperature, float &humidity, float &hIndex, float 
   float t = val.temperature + Calibracion; // Obtener la temperatura en grados Celsius
   float h = val.humidity;                  // Obtener la humedad relativa en porcentaje
 #endif
+
 #if defined(Board_AHT10)
   // sensors_event_t hh, tt;
   // aht.getEvent(&hh, &tt);
@@ -431,6 +228,10 @@ void TEMPERATURA_loop(float &temperature, float &humidity, float &hIndex, float 
   // MQTTClient.publish("Debug/status", String(status_AHT, 10).c_str());
 
 #endif
+
+    SerialPrint("Temperatura: " + String(temperature) + " °C");
+    SerialPrint("Humedad: " + String(humidity) + " %");
+
   // Verificar si la lectura del sensor es válida
   if (!isnan(t) && !isnan(h))
   {
@@ -536,16 +337,15 @@ void WEBSERVER_Loop()
 #endif
 
 #if !defined(NO_MQTT)
-else if (header.indexOf("GET /mqtt/enable") >= 0)
-{
-  mqttEnabled = true;
-}
-else if (header.indexOf("GET /mqtt/disable") >= 0)
-{
-  mqttEnabled = false;
-  if (MQTTClient.connected()) MQTTClient.disconnect();
-}
+    if (header.indexOf("GET /mqtt/enable") >= 0) {
+      mqttManager.setEnabled(true);
+      mqttManager.setup(); // Re-setup para conectar
+    }
+    else if (header.indexOf("GET /mqtt/disable") >= 0) {
+      mqttManager.setEnabled(false);
+    }
 #endif
+
             lastMsg10seg = 0;
 
             client.println("<!DOCTYPE html><html>");
@@ -554,6 +354,7 @@ else if (header.indexOf("GET /mqtt/disable") >= 0)
 
             client.println("<style>body{font-family: \"Helvetica Neue\", Arial, sans-serif; background-color: #f9f9f9; color: #333; margin: 0; padding: 0;}");
             client.println(".container{max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0px 0px 5px rgba(0,0,0,0.2);}");
+
             client.println("h1{font-size: 36px; margin-bottom: 20px; color: #007bff; background-color: #f0f0f0; padding: 10px 20px; border-radius: 5px;}");
             client.println("p{font-size: 18px;margin: 10px 0;color: #666;}");
 
@@ -636,19 +437,16 @@ else if (header.indexOf("GET /mqtt/disable") >= 0)
               client.println("<p>Humedad: " + String(humidity) + " %" + "</p>");
 #endif
 
-#if !defined(NO_MQTT)
-{
-    client.println("<div class=\"foot\" style='padding:8px;'>");
-
-    // Checkbox
-    if (mqttEnabled) {
-        client.println("<p><input type='checkbox' checked onclick=\"location.href='/mqtt/disable'\"> MQTT habilitado</p>");
-    } else {
-        client.println("<p><input type='checkbox' onclick=\"location.href='/mqtt/enable'\"> MQTT deshabilitado</p>");
-    }
-    client.println("</div>");
-}
-#endif
+        // En la parte de mostrar el estado MQTT:
+        #if !defined(NO_MQTT)
+            //client.println("<p class=\"foot\">MQTT server status: " + mqttManager.getStatus() + "</p>");
+            
+            if (mqttManager.isEnabled()) {
+                 client.println("<p><input type='checkbox' checked onclick=\"location.href='/mqtt/disable'\"> MQTT habilitado</p>");
+            } else {
+                 client.println("<p><input type='checkbox' onclick=\"location.href='/mqtt/enable'\"> MQTT deshabilitado</p>");
+            }
+        #endif
 
               client.println("<div class=\"foot\">");
               int32_t rssi = WiFi.RSSI();
@@ -679,16 +477,9 @@ else if (header.indexOf("GET /mqtt/disable") >= 0)
               client.println("<p class=\"foot\">Nivel de se&ntilde;al Wi-Fi (RSSI): " + String(rssi) + " dBm (" + signalStrength + ")</p>");
 
 #if !defined(NO_MQTT)
-{
-  String mqttText;
-  if (!mqttEnabled) {
-      mqttText = "Deshabilitado por el usuario";
-  } else {
-      mqttText = MQTT_Status();
-      if (mqttText == "") mqttText = "Desconocido";
-  }
-              client.println("<p class=\"foot\">MQTT server status: " + mqttText + "</p>");
-}
+    // El método getStatus() ya se encarga de decir si está "Deshabilitado" 
+    // o de devolver el error/estado de conexión.
+    client.println("<p class=\"foot\">MQTT server status: " + mqttManager.getStatus() + "</p>");
 #endif
 #ifdef Report_IP_DuckDNS
               client.println("<p class=\"foot\">DuckDNS Updated every 1 min: " + urlDuckDNS + "</p>");

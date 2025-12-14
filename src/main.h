@@ -15,26 +15,7 @@
 //#define ESP32
 //#endif
 
-#if defined(Board_4OutRelay_Living) || defined(Board_4OutRelay_Living2) || defined(Board_4OutRelay_Galeria) || defined(Board_4OutRelay_Tablero) || defined(Board_4OutRelay_Garage)  || defined(Board_4OutRelay_1erPiso) || defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero) || defined(Board_4OutRelay_Valencia_Living)
-#define Board_4OutRelay
-#define ESP8266
-#endif
 
-#if defined(Board_Temp_Humedad_PB) || defined(Board_Temp_Humedad_Exterior)
-#define Board_DHT22
-#define DHT_PIN 3
-#define ESP8266
-#endif
-
-#if defined(Board_Temp_Humedad_Galeria)
-#define Board_AHT10
-#define ESP8266
-#endif
-
-#if defined(Board_4OutRelay_Emmanuel_Living_ESP32)
-#define Board_4OutRelay
-//#define ESP32
-#endif
 
 //**************************************************   LIBRERIAS   ******************************************
 
@@ -51,28 +32,19 @@
 #endif
 #include <PubSubClient.h>
 
-#if defined(Board_DHT22)
-#include <DHTesp.h>
-#endif
 
-#if defined(Board_AHT10)
-#include <DHTesp.h>
-#include <Adafruit_AHTX0.h>
-#include <Wire.h>
-#include <AHT10.h>
-#endif
 
 //**************************************************   DECLARACIONES   **************************************
 extern bool mqttEnabled;
 
-#if !defined(NO_MQTT)
-void MQTT_Setup();
-void MQTT_Callback(char *, byte *, unsigned int);
-void MQTT_Reconnect();
-void MQTT_SubscribeToTopic(String);
-String MQTT_Status();
-#endif
-void WEBSERVER_Loop();
+//#if !defined(NO_MQTT)
+//void MQTT_Setup();
+//void MQTT_Callback(char *, byte *, unsigned int);
+//void MQTT_Reconnect();
+//void MQTT_SubscribeToTopic(String);
+//String MQTT_Status();
+//#endif
+//void WEBSERVER_Loop();
 void HTTP_Get(String);
 void DuckDNS_Loop();
 void HealthChecks_Loop();

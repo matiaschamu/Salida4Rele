@@ -1,7 +1,19 @@
 #include "config.h"
 #include <Arduino.h>
 
-const String Numero_Version = "1.0.27";
+const String Numero_Version = "1.0.29";
+
+
+//************************************************** MQTT   ********************************************
+#if defined(Board_4OutRelay_Valencia_Living)
+const char *mqtt_server = "https:www.acantilados-io.com"; 
+#else
+const char *mqtt_server = "192.168.1.10";
+#endif
+
+const uint16_t mqtt_port = 1883;
+const char *mqtt_user = "matias";
+const char *mqtt_pass = "Mato19428426.";
 
 //**************************************************   WIFI   ********************************************
 #if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero) || defined(Board_4OutRelay_Emmanuel_Living_ESP32)
