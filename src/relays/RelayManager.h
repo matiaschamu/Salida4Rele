@@ -1,24 +1,48 @@
 #pragma once
 #include <Arduino.h>
 
+class MqttManager;
+
 class RelayManager {
 public:
+    /**
+     * Constructor de la clase RelayManager.
+     */
     RelayManager();
-    void setup(); 
+
+    /**
+     * Inicializa los relés en estado apagado y configura el manager de MQTT.
+     * @param _mqtt Puntero al MqttManager.
+     */
+    void setup(MqttManager* _mqtt = nullptr); 
     
-    // Método para cambiar estado (index 1-4)
-    void setRelay(int relayIndex, bool state);
+    /**
+     * Establece el estado de un relé específico.
+     * @param _relayIndex Índice del relé (1-4).
+     * @param _state Estado deseado (true = ON, false = OFF).
+     */
+    void setRelay(int _relayIndex, bool _state);
     
-    // Obtener estado actual
-    bool getRelayState(int relayIndex);
+    /**
+     * Obtiene el estado actual de un relé.
+     * @param _relayIndex Índice del relé (1-4).
+     * @return true si está encendido, false si está apagado.
+     */
+    bool getRelayState(int _relayIndex);
     
-    // Envia los comandos seriales actuales (para el ciclo de 10s)
+    /**
+     * Actualiza el estado de todos los relés enviando comandos seriales y publica en MQTT.
+     */
     void refresh();
 
+    /**
+     * Bucle de procesamiento para el manager de relés (no utilizado actualmente).
+     */
     void loop();
 
 private:
-    bool _relayStatus[4]; // Guardamos estado de los 4 relés (0 a 3)
+    bool _relayStatus[4];
+    MqttManager* _mqttManager;
     
     // Comandos seriales hexadecimales
     const byte RELAY_CMDS[4][2][4] = {
@@ -28,5 +52,6 @@ private:
         { {0xa0, 0x04, 0x00, 0xa4}, {0xa0, 0x04, 0x01, 0xa5} }  // Relé 4
     };
 
-    void sendSerialCommand(int relayIndex, bool state);
+    void sendSerialCommand(int _idx, bool _state);
 };
+

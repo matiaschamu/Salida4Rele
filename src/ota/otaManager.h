@@ -2,15 +2,29 @@
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 
+/**
+ * Clase OTAManager
+ * Gestiona las actualizaciones inalámbricas (Over-The-Air).
+ */
 class OTAManager {
 public:
-    // Constructor: le pasamos el hostname para no depender de variables globales dentro de la clase
-    OTAManager(const char* hostname, const char* password = nullptr);
+    /**
+     * Constructor de la clase OTAManager.
+     * @param hostname Nombre de red para el dispositivo (por defecto "ESP-Relay").
+     */
+    OTAManager(const char* hostname = "ESP-Relay");
     
+    /**
+     * Configura ArduinoOTA e inicia el servicio.
+     */
     void setup();
-    void handle();
+    
+    /**
+     * Procesa las peticiones OTA en el bucle principal.
+     */
+    void loop();
 
 private:
     const char* _hostname;
-    const char* _password;
+    bool _configured;
 };

@@ -3,32 +3,32 @@
 
 //#define debug
 
-#if defined(Board_4OutRelay_Living) || defined(Board_4OutRelay_Living2) || defined(Board_4OutRelay_Galeria) || defined(Board_4OutRelay_Tablero) || defined(Board_4OutRelay_Garage)  || defined(Board_4OutRelay_1erPiso) || defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero) || defined(Board_4OutRelay_Valencia_Living)
-#define Board_4OutRelay
+#if defined(BOARD_4OUT_RELAY_LIVING) || defined(BOARD_4OUT_RELAY_LIVING2) || defined(BOARD_4OUT_RELAY_GALERIA) || defined(BOARD_4OUT_RELAY_TABLERO) || defined(BOARD_4OUT_RELAY_GARAGE)  || defined(BOARD_4OUT_RELAY_1ERPISO) || defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING) || defined(BOARD_4OUT_RELAY_EMMANUEL_LAVADERO) || defined(BOARD_4OUT_RELAY_VALENCIA_LIVING)
+#define BOARD_4OUT_RELAY
 #define ESP8266
 #endif
 
-#if defined(Board_Temp_Humedad_PB) || defined(Board_Temp_Humedad_Exterior)
-#define Board_DHT22
+#if defined(BOARD_TEMP_HUMEDAD_PB) || defined(BOARD_TEMP_HUMEDAD_EXTERIOR)
+#define BOARD_DHT22
 #define DHT_PIN 3
 #define ESP8266
 #endif
 
-#if defined(Board_Temp_Humedad_Galeria)
-#define Board_AHT10
+#if defined(BOARD_TEMP_HUMEDAD_GALERIA)
+#define BOARD_AHT10
 #define ESP8266
 #endif
 
-#if defined(Board_4OutRelay_Emmanuel_Living_ESP32)
-#define Board_4OutRelay
+#if defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING_ESP32)
+#define BOARD_4OUT_RELAY
 //#define ESP32
 #endif
 
-#if defined(Board_DHT22)
+#if defined(BOARD_DHT22)
 #include <DHTesp.h>
 #endif
 
-#if defined(Board_AHT10)
+#if defined(BOARD_AHT10)
 #include <DHTesp.h>
 #include <Adafruit_AHTX0.h>
 #include <Wire.h>
@@ -37,7 +37,7 @@
 
 //**************************************************   GENERAL   ******************************************
 
-extern const String Numero_Version;
+extern const String versionNumber;
 
 //**************************************************   MQTT   ********************************************
 extern const char *mqtt_server;
@@ -46,10 +46,10 @@ extern const char *mqtt_user;
 extern const char *mqtt_pass;
 
 //**************************************************   WIFI   ********************************************
-#if defined(Board_4OutRelay_Emmanuel_Living) || defined(Board_4OutRelay_Emmanuel_Lavadero) || defined(Board_4OutRelay_Emmanuel_Living_ESP32)
+#if defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING) || defined(BOARD_4OUT_RELAY_EMMANUEL_LAVADERO) || defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING_ESP32)
 extern const char *ssid;
 extern const char *password;
-#elif defined(Board_4OutRelay_Valencia_Living)
+#elif defined(BOARD_4OUT_RELAY_VALENCIA_LIVING)
 extern const char *ssid;
 extern const char *password;
 #else
@@ -59,286 +59,287 @@ extern const char *password;
 
 //**************************************************   BOARDS   ********************************************
 
-#ifdef Board_4OutRelay_Living
+#ifdef BOARD_4OUT_RELAY_LIVING
 // Placa1
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const String Relay1_Name;
-extern const String Relay1_MQTT_Command;
-extern const String Relay1_MQTT_Status;
-extern const String Relay2_Name;
-extern const String Relay2_MQTT_Command;
-extern const String Relay2_MQTT_Status;
-extern const String Relay3_Name;
-extern const String Relay3_MQTT_Command;
-extern const String Relay3_MQTT_Status;
-extern const String Relay4_Name;
-extern const String Relay4_MQTT_Command;
-extern const String Relay4_MQTT_Status;
+extern const String relay1Name;
+extern const String relay1MqttCommand;
+extern const String relay1MqttStatus;
+extern const String relay2Name;
+extern const String relay2MqttCommand;
+extern const String relay2MqttStatus;
+extern const String relay3Name;
+extern const String relay3MqttCommand;
+extern const String relay3MqttStatus;
+extern const String relay4Name;
+extern const String relay4MqttCommand;
+extern const String relay4MqttStatus;
 extern const String urlHealthChecks;
-extern const String urlDuckDNS;
+extern const String urlDuckDns;
 #endif
 
-#ifdef Board_4OutRelay_Living2
+#ifdef BOARD_4OUT_RELAY_LIVING2
 // Placa2
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const String Relay1_Name;
-extern const String Relay1_MQTT_Command;
-extern const String Relay1_MQTT_Status;
-extern const String Relay2_Name;
-extern const String Relay2_MQTT_Command;
-extern const String Relay2_MQTT_Status;
-extern const String Relay3_Name;
-extern const String Relay3_MQTT_Command;
-extern const String Relay3_MQTT_Status;
-extern const String Relay4_Name;
-extern const String Relay4_MQTT_Command;
-extern const String Relay4_MQTT_Status;
+extern const String relay1Name;
+extern const String relay1MqttCommand;
+extern const String relay1MqttStatus;
+extern const String relay2Name;
+extern const String relay2MqttCommand;
+extern const String relay2MqttStatus;
+extern const String relay3Name;
+extern const String relay3MqttCommand;
+extern const String relay3MqttStatus;
+extern const String relay4Name;
+extern const String relay4MqttCommand;
+extern const String relay4MqttStatus;
 extern const String urlHealthChecks;
-extern const String urlDuckDNS;
+extern const String urlDuckDns;
 #endif
 
-#ifdef Board_4OutRelay_Galeria
+#ifdef BOARD_4OUT_RELAY_GALERIA
 // Placa3
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const String Relay1_Name;
-extern const String Relay1_MQTT_Command;
-extern const String Relay1_MQTT_Status;
-extern const String Relay2_Name;
-extern const String Relay2_MQTT_Command;
-extern const String Relay2_MQTT_Status;
-extern const String Relay3_Name;
-extern const String Relay3_MQTT_Command;
-extern const String Relay3_MQTT_Status;
-extern const String Relay4_Name;
-extern const String Relay4_MQTT_Command;
-extern const String Relay4_MQTT_Status;
+extern const String relay1Name;
+extern const String relay1MqttCommand;
+extern const String relay1MqttStatus;
+extern const String relay2Name;
+extern const String relay2MqttCommand;
+extern const String relay2MqttStatus;
+extern const String relay3Name;
+extern const String relay3MqttCommand;
+extern const String relay3MqttStatus;
+extern const String relay4Name;
+extern const String relay4MqttCommand;
+extern const String relay4MqttStatus;
 extern const String urlHealthChecks;
-extern const String urlDuckDNS;
+extern const String urlDuckDns;
 #endif
 
-#ifdef Board_4OutRelay_Garage
+#ifdef BOARD_4OUT_RELAY_GARAGE
 // Placa4
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const String Relay1_Name;
-extern const String Relay1_MQTT_Command;
-extern const String Relay1_MQTT_Status;
-extern const String Relay2_Name;
-extern const String Relay2_MQTT_Command;
-extern const String Relay2_MQTT_Status;
-extern const String Relay3_Name;
-extern const String Relay3_MQTT_Command;
-extern const String Relay3_MQTT_Status;
-extern const String Relay4_Name;
-extern const String Relay4_MQTT_Command;
-extern const String Relay4_MQTT_Status;
+extern const String relay1Name;
+extern const String relay1MqttCommand;
+extern const String relay1MqttStatus;
+extern const String relay2Name;
+extern const String relay2MqttCommand;
+extern const String relay2MqttStatus;
+extern const String relay3Name;
+extern const String relay3MqttCommand;
+extern const String relay3MqttStatus;
+extern const String relay4Name;
+extern const String relay4MqttCommand;
+extern const String relay4MqttStatus;
 extern const String urlHealthChecks;
-extern const String urlDuckDNS;
+extern const String urlDuckDns;
 #endif
 
-#ifdef Board_4OutRelay_Tablero
+#ifdef BOARD_4OUT_RELAY_TABLERO
 // Placa5
 #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const String Relay1_Name;
-extern const String Relay1_MQTT_Command;
-extern const String Relay1_MQTT_Status;
-extern const String Relay2_Name;
-extern const String Relay2_MQTT_Command;
-extern const String Relay2_MQTT_Status;
-extern const String Relay3_Name;
-extern const String Relay3_MQTT_Command;
-extern const String Relay3_MQTT_Status;
-extern const String Relay4_Name;
-extern const String Relay4_MQTT_Command;
-extern const String Relay4_MQTT_Status;
+extern const String relay1Name;
+extern const String relay1MqttCommand;
+extern const String relay1MqttStatus;
+extern const String relay2Name;
+extern const String relay2MqttCommand;
+extern const String relay2MqttStatus;
+extern const String relay3Name;
+extern const String relay3MqttCommand;
+extern const String relay3MqttStatus;
+extern const String relay4Name;
+extern const String relay4MqttCommand;
+extern const String relay4MqttStatus;
 extern const String urlHealthChecks;
-extern const String urlDuckDNS;
+extern const String urlDuckDns;
 #endif
 
-#ifdef Board_4OutRelay_1erPiso
+#ifdef BOARD_4OUT_RELAY_1ERPISO
 // Placa6
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const String Relay1_Name;
-extern const String Relay1_MQTT_Command;
-extern const String Relay1_MQTT_Status;
-extern const String Relay2_Name;
-extern const String Relay2_MQTT_Command;
-extern const String Relay2_MQTT_Status;
-extern const String Relay3_Name;
-extern const String Relay3_MQTT_Command;
-extern const String Relay3_MQTT_Status;
-extern const String Relay4_Name;
-extern const String Relay4_MQTT_Command;
-extern const String Relay4_MQTT_Status;
+extern const String relay1Name;
+extern const String relay1MqttCommand;
+extern const String relay1MqttStatus;
+extern const String relay2Name;
+extern const String relay2MqttCommand;
+extern const String relay2MqttStatus;
+extern const String relay3Name;
+extern const String relay3MqttCommand;
+extern const String relay3MqttStatus;
+extern const String relay4Name;
+extern const String relay4MqttCommand;
+extern const String relay4MqttStatus;
 extern const String urlHealthChecks;
-extern const String urlDuckDNS;
+extern const String urlDuckDns;
 #endif
 
-#ifdef Board_Temp_Humedad_PB
+#ifdef BOARD_TEMP_HUMEDAD_PB
 // Placa7
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const float Calibracion;
-extern const String Temperatura_MQTT_Status;
-extern const String Humedad_MQTT_Status;
-extern const String SensacionTermica_MQTT_Status;
-extern const String PuntoRocio_MQTT_Status;
-extern const String HumedadAbsoluta_MQTT_Status;
-extern const String Percepcion_MQTT_Status;
+extern const float calibrationOffset;
+extern const String temperatureMqttStatus;
+extern const String humidityMqttStatus;
+extern const String heatIndexMqttStatus;
+extern const String dewPointMqttStatus;
+extern const String absoluteHumidityMqttStatus;
+extern const String perceptionMqttStatus;
 extern const String urlHealthChecks;
-extern const String urlDuckDNS;
+extern const String urlDuckDns;
 #endif
 
-#ifdef Board_Temp_Humedad_Galeria
+#ifdef BOARD_TEMP_HUMEDAD_GALERIA
 // Placa8
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const float Calibracion;
-extern const String Temperatura_MQTT_Status;
-extern const String Humedad_MQTT_Status;
-extern const String SensacionTermica_MQTT_Status;
-extern const String PuntoRocio_MQTT_Status;
-extern const String HumedadAbsoluta_MQTT_Status;
-extern const String Percepcion_MQTT_Status;
+extern const float calibrationOffset;
+extern const String temperatureMqttStatus;
+extern const String humidityMqttStatus;
+extern const String heatIndexMqttStatus;
+extern const String dewPointMqttStatus;
+extern const String absoluteHumidityMqttStatus;
+extern const String perceptionMqttStatus;
 extern const String urlHealthChecks;
-extern const String urlDuckDNS;
+extern const String urlDuckDns;
 #endif
 
-#ifdef Board_Temp_Humedad_Exterior
+#ifdef BOARD_TEMP_HUMEDAD_EXTERIOR
 // Placa9
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const float Calibracion;
-extern const String Temperatura_MQTT_Status;
-extern const String Humedad_MQTT_Status;
-extern const String SensacionTermica_MQTT_Status;
-extern const String PuntoRocio_MQTT_Status;
-extern const String HumedadAbsoluta_MQTT_Status;
-extern const String Percepcion_MQTT_Status;
+extern const float calibrationOffset;
+extern const String temperatureMqttStatus;
+extern const String humidityMqttStatus;
+extern const String heatIndexMqttStatus;
+extern const String dewPointMqttStatus;
+extern const String absoluteHumidityMqttStatus;
+extern const String perceptionMqttStatus;
 extern const String urlHealthChecks;
-extern const String urlDuckDNS;
+extern const String urlDuckDns;
 #endif
 
-#ifdef Board_4OutRelay_Emmanuel_Living
+#ifdef BOARD_4OUT_RELAY_EMMANUEL_LIVING
 // Placa1
 // #define Report_IP_DuckDNS
 // #define Report_HealthChecks
 #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const  String Relay1_Name;
-extern const  String Relay1_MQTT_Command;
-extern const  String Relay1_MQTT_Status;
-extern const  String Relay2_Name;
-extern const  String Relay2_MQTT_Command;
-extern const  String Relay2_MQTT_Status;
-extern const  String Relay3_Name;
-extern const  String Relay3_MQTT_Command;
-extern const  String Relay3_MQTT_Status;
-extern const  String Relay4_Name;
-extern const  String Relay4_MQTT_Command;
-extern const  String Relay4_MQTT_Status;
+extern const  String relay1Name;
+extern const  String relay1MqttCommand;
+extern const  String relay1MqttStatus;
+extern const  String relay2Name;
+extern const  String relay2MqttCommand;
+extern const  String relay2MqttStatus;
+extern const  String relay3Name;
+extern const  String relay3MqttCommand;
+extern const  String relay3MqttStatus;
+extern const  String relay4Name;
+extern const  String relay4MqttCommand;
+extern const  String relay4MqttStatus;
 extern const  String urlHealthChecks;
-extern const  String urlDuckDNS;
+extern const  String urlDuckDns;
 #endif
 
-#ifdef Board_4OutRelay_Emmanuel_Lavadero
+#ifdef BOARD_4OUT_RELAY_EMMANUEL_LAVADERO
 // Placa2
 #define Report_IP_DuckDNS
 // #define Report_HealthChecks
 #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const  String Relay1_Name;
-extern const  String Relay1_MQTT_Command;
-extern const  String Relay1_MQTT_Status;
-extern const  String Relay2_Name;
-extern const  String Relay2_MQTT_Command;
-extern const  String Relay2_MQTT_Status;
-extern const  String Relay3_Name;
-extern const  String Relay3_MQTT_Command;
-extern const  String Relay3_MQTT_Status;
-extern const  String Relay4_Name;
-extern const  String Relay4_MQTT_Command;
-extern const  String Relay4_MQTT_Status;
+extern const  String relay1Name;
+extern const  String relay1MqttCommand;
+extern const  String relay1MqttStatus;
+extern const  String relay2Name;
+extern const  String relay2MqttCommand;
+extern const  String relay2MqttStatus;
+extern const  String relay3Name;
+extern const  String relay3MqttCommand;
+extern const  String relay3MqttStatus;
+extern const  String relay4Name;
+extern const  String relay4MqttCommand;
+extern const  String relay4MqttStatus;
 extern const  String urlHealthChecks;
-extern const  String urlDuckDNS;
+extern const  String urlDuckDns;
 #endif
 
-#ifdef Board_4OutRelay_Valencia_Living
+#ifdef BOARD_4OUT_RELAY_VALENCIA_LIVING
 // Placa1
 #define Report_IP_DuckDNS
 // #define Report_HealthChecks
 #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const  String Relay1_Name;
-extern const  String Relay1_MQTT_Command;
-extern const  String Relay1_MQTT_Status;
-extern const  String Relay2_Name;
-extern const  String Relay2_MQTT_Command;
-extern const  String Relay2_MQTT_Status;
-extern const  String Relay3_Name;
-extern const  String Relay3_MQTT_Command;
-extern const  String Relay3_MQTT_Status;
-extern const  String Relay4_Name;
-extern const  String Relay4_MQTT_Command;
-extern const  String Relay4_MQTT_Status;
+extern const  String relay1Name;
+extern const  String relay1MqttCommand;
+extern const  String relay1MqttStatus;
+extern const  String relay2Name;
+extern const  String relay2MqttCommand;
+extern const  String relay2MqttStatus;
+extern const  String relay3Name;
+extern const  String relay3MqttCommand;
+extern const  String relay3MqttStatus;
+extern const  String relay4Name;
+extern const  String relay4MqttCommand;
+extern const  String relay4MqttStatus;
 extern const  String urlHealthChecks;
-extern const  String urlDuckDNS;
+extern const  String urlDuckDns;
 #endif
 
-#ifdef Board_4OutRelay_Emmanuel_Living_ESP32
+#ifdef BOARD_4OUT_RELAY_EMMANUEL_LIVING_ESP32
 // Placa1
 // #define Report_IP_DuckDNS
 #define Report_HealthChecks
 #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const  String Relay1_Name;
-extern const  String Relay1_MQTT_Command;
-extern const  String Relay1_MQTT_Status;
-extern const  String Relay2_Name;
-extern const  String Relay2_MQTT_Command;
-extern const  String Relay2_MQTT_Status;
-extern const  String Relay3_Name;
-extern const  String Relay3_MQTT_Command;
-extern const  String Relay3_MQTT_Status;
-extern const  String Relay4_Name;
-extern const  String Relay4_MQTT_Command;
-extern const  String Relay4_MQTT_Status;
+extern const  String relay1Name;
+extern const  String relay1MqttCommand;
+extern const  String relay1MqttStatus;
+extern const  String relay2Name;
+extern const  String relay2MqttCommand;
+extern const  String relay2MqttStatus;
+extern const  String relay3Name;
+extern const  String relay3MqttCommand;
+extern const  String relay3MqttStatus;
+extern const  String relay4Name;
+extern const  String relay4MqttCommand;
+extern const  String relay4MqttStatus;
 extern const  String urlHealthChecks;
-extern const  String urlDuckDNS;
+extern const  String urlDuckDns;
 #endif
+

@@ -13,10 +13,12 @@ public:
     WifiManager(const char* ssid, const char* password);
     
     void setup();
-    void loop(); // Para gestionar reconexiones si fuera necesario
+    void loop(); 
+    void httpGet(String _url);
 
 private:
     const char* _ssid;
     const char* _password;
     IPAddress _ip, _gw, _subnet, _dns, _dns2;
 };
+

@@ -7,23 +7,21 @@
 #include <WiFi.h>
 #endif
 
-#include "../config/config.h" 
+#include "../config/Config.h" 
 
-// Declaraciones anticipadas (Forward declarations) para evitar dependencias circulares
+// Declaraciones anticipadas
 class RelayManager;
+class SensorManager;
 class MqttManager;
 
 class WebManager {
 private:
     WiFiServer server;
     
-    // Punteros a objetos y variables externas
+    // Punteros a objetos Manager
     RelayManager* _relays;
+    SensorManager* _sensors;
     MqttManager* _mqttManager;
-    
-    // Punteros a variables de sensores
-    float* _temperature;
-    float* _humidity;
     
     // Variables internas del servidor
     String header;
@@ -31,15 +29,29 @@ private:
     unsigned long previousTime;
     const long timeoutTime = 2000;
     
-    // Helper privado para generar el HTML
-    void sendHTML(WiFiClient& client, bool reset);
+    /**
+     * Envía el contenido HTML de respuesta al cliente.
+     * @param _client Cliente al que se envía la respuesta.
+     * @param _reset Indica si se debe mostrar un mensaje de reinicio.
+     */
+    void sendHTML(WiFiClient& _client, bool _reset);
 
 public:
-    WebManager(int port);
+    /**
+     * Constructor de WebManager.
+     * @param _relays Puntero al RelayManager.
+     * @param _sensors Puntero al SensorManager.
+     * @param _mqtt Puntero al MqttManager.
+     */
+    WebManager(RelayManager* _relays, SensorManager* _sensors, MqttManager* _mqtt);
     
-    // Método de configuración para inyectar dependencias
-    void setup(RelayManager* relays, MqttManager* mqtt, float* temp, float* hum);
-    
-    // El loop principal del webserver
+    /**
+     * Inicializa el servidor web.
+     */
+    void setup();
+
+    /**
+     * Loop procesador de peticiones del servidor web.
+     */
     void loop();
 };

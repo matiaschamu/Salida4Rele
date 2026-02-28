@@ -1,71 +1,112 @@
-#include "config/config.h"
+#include "config/Config.h"
 #include "WifiManager.h"
-#include "varios/utils.h"
+#include "varios/Utils.h"
 
-WifiManager::WifiManager(const char* ssid, const char* password) {
+/**
+ * Constructor de la clase WifiManager.
+ * @param _ssid Nombre de la red Wi-Fi.
+ * @param _password Contraseña de la red Wi-Fi.
+ */
+WifiManager::WifiManager(const char* _ssid, const char* _password) {
+    IPAddress _localIP(IP1, IP2, IP3, IP4);
+    IPAddress _gateway(IP1, IP2, IP3, 1);
+    IPAddress _subnet(255, 255, 255, 0);
+    IPAddress _primaryDNS(IP1, IP2, IP3, 1);
 
-    IPAddress local_IP(IP1, IP2, IP3, IP4);
-    IPAddress gateway(IP1, IP2, IP3, 1);
-    IPAddress subnet(255, 255, 255, 0);
-    IPAddress primaryDNS(IP1, IP2, IP3, 1);
-    // IPAddress secondaryDNS(8, 8, 4, 4);
-
-    _ssid = ssid;
-    _password = password;
-    _ip = local_IP;
-    _gw = gateway;
-    _subnet = subnet;
-    _dns = primaryDNS;
-    //_dns2 = secondaryDNS;
+    this->_ssid = _ssid;
+    this->_password = _password;
+    this->_ip = _localIP;
+    this->_gw = _gateway;
+    this->_subnet = _subnet;
+    this->_dns = _primaryDNS;
 }
 
+/**
+ * Configura la conexión Wi-Fi con IP estática y hostname.
+ */
 void WifiManager::setup() {
-    SerialPrint("WIFI - Configurando WiFI");
+    serialPrint("WIFI - Configurando WiFI");
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
-    SerialPrint("WIFI - Desconectado");
+    serialPrint("WIFI - Desconectado");
     delay(500);
 
-    // Configuración IP estática
     if (!WiFi.config(_ip, _gw, _subnet, _dns)) {
-        SerialPrint("WIFI - Fallo configuracion IP Estatica");
+        serialPrint("WIFI - Fallo configuracion IP Estatica");
     }
 
-    // SerialPrint();
-    SerialPrint("WIFI - Connecting to ->" + String(_ssid));
-    // SerialPrint(ssid);
+    serialPrint("WIFI - Connecting to ->" + String(_ssid));
     WiFi.hostname(hostName);
-    SerialPrint("WIFI - Status  : " + String(WiFi.status()));
-    // SerialPrint(WiFi.status());
+    serialPrint("WIFI - Status  : " + String(WiFi.status()));
 
-    SerialPrint("WIFI - Conectando a: ");
-    SerialPrint(_ssid);
+    serialPrint("WIFI - Conectando a: ");
+    serialPrint(_ssid);
 
     WiFi.begin(_ssid, _password);
 
-    unsigned long startMillis = millis();
-    while (WiFi.status() != WL_CONNECTED && (millis() - startMillis) < 60000) {
-        SerialPrint(".");
+    unsigned long _startMillis = millis();
+    while (WiFi.status() != WL_CONNECTED && (millis() - _startMillis) < 60000) {
+        serialPrint(".");
         delay(500);
     }
 
     if (WiFi.status() == WL_CONNECTED) {
-        SerialPrint("\nWIFI - Conectado");
-        SerialPrint("WIFI - IP: ");
-        SerialPrint(WiFi.localIP());
-        SerialPrint("WIFI - RSSI: ");
-        SerialPrint(WiFi.RSSI());
+        serialPrint("\nWIFI - Conectado");
+        serialPrint("WIFI - IP: ");
+        serialPrint(WiFi.localIP());
+        serialPrint("WIFI - RSSI: ");
+        serialPrint(WiFi.RSSI());
     } else {
-        SerialPrint("\nWIFI - Error de conexion. Reiniciando...");
+        serialPrint("\nWIFI - Error de conexion. Reiniciando...");
         delay(5000);
         ESP.restart();
     }
 }
 
+#ifdef ESP8266
+#include <ESP8266HTTPClient.h>
+#elif defined(ESP32)
+#include <HTTPClient.h>
+#endif
+
+/**
+ * Mantiene la conexión Wi-Fi activa, reconectando si es necesario.
+ */
 void WifiManager::loop() {
-    // Verifica si no está conectado a WiFi
-    if (WiFi.status() != WL_CONNECTED)
-    {
+    if (WiFi.status() != WL_CONNECTED) {
         setup();
     }
 }
+
+/**
+ * Realiza una petición HTTP GET a la URL proporcionada.
+ * @param _url URL a la que se realizará la petición.
+ */
+void WifiManager::httpGet(String _url) {
+    if ((WiFi.status() == WL_CONNECTED)) {
+        WiFiClient _client;
+        HTTPClient _http;
+
+        serialPrint("Iniciando cliente HTTP");
+
+        if (_http.begin(_client, _url)) {
+            serialPrint(_url);
+            int _httpCode = _http.GET();
+
+            if (_httpCode > 0) {
+                serialPrint(_httpCode);
+                if (_httpCode == HTTP_CODE_OK || _httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
+                    String _payload = _http.getString();
+                    serialPrint(_payload);
+                }
+            } else {
+                serialPrint("[HTTP] Error on HTTP request");
+                serialPrint("[HTTP] GET... failed, error: %s\n" + _http.errorToString(_httpCode));
+            }
+            _http.end();
+        } else {
+            serialPrint("[HTTP] Unable to connect\n");
+        }
+    }
+}
+

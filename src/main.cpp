@@ -1,590 +1,117 @@
-#include "config/config.h"
-#include <main.h>
+#include <Arduino.h>
+#include "main.h"
+#include "config/Config.h"
+#include "varios/Utils.h"
 #include "network/WifiManager.h"
-#include "relays/RelayManager.h"
-#include "varios/utils.h"
 #include "ota/OTAManager.h"
-#include "mqtt/mqttManager.h"
-#include "web/webManager.h"
+#include "relays/RelayManager.h"
+#include "sensors/SensorManager.h"
+#include "mqtt/MqttManager.h"
+#include "web/WebManager.h"
 
-#if defined(Board_DHT22)
-#include <DHTesp.h> // Incluir la librería DHTesp
-#endif
-
-//**************************************************   Configuracion   ***************************************
-
-
-bool mqttEnabled = true;
-
-
-//**************************************************   Inicializacion de variables   ************************
-
-
-#ifdef Board_DHT22
-DHTesp dht;
-#endif
-
-#ifdef Board_AHT10
-DHTesp dht;
-// Adafruit_AHTX0 aht;
-AHT10 aht(AHT10_ADDRESS_0X38);
-#endif
-
-int status = WL_IDLE_STATUS;
-//WiFiClient WifiClient;
-#if !defined(NO_MQTT)
-//PubSubClient MQTTClient(WifiClient);
-#endif
-unsigned long lastMsg10seg = 0;
-unsigned long lastMsg1min = 60;
-unsigned long lastMsg5min = 60;
-char msg[50];
-
-DataAnalisis temp;
-
-
-byte perception;
-
-
-// --- Instancias ---
+// Instancias de los Managers
 WifiManager wifi(ssid, password);
 OTAManager ota(hostName);
-#ifdef Board_4OutRelay
 RelayManager relays;
+SensorManager sensorManager;
 MqttManager mqttManager(&relays);
-#else
-  MqttManager mqttManager(nullptr);
-#endif
+WebManager webManager(&relays, &sensorManager, &mqttManager);
 
-WebManager webManager(webServerPort);
+// Timers para tareas periódicas
+unsigned long lastMsg10seg = 0;
+int lastMsg1min = 0;
+int lastMsg5min = 0;
 
-float temperature = 0, humidity = 0, hIndex = 0, dPoint = 0, AbsoluteH = 0;
-
-//**************************************************   web server Config   *********************************
-WiFiServer WEB_Server(webServerPort);
-String header;
-unsigned long currentTime = millis();
-unsigned long previousTime = 0;
-const long timeoutTime = 2000;
-
-bool status_AHT;
-//**************************************************   CODE SETUP   *****************************************
+/**
+ * Inicialización principal del sistema.
+ */
 void setup()
 {
-#if defined(NO_MQTT)
-    mqttEnabled = false; // compilado sin soporte -> apagado siempre
-#else
-    mqttEnabled = true;  // compilado CON soporte -> encendido por defecto
-#endif
-
-
   Serial.begin(115200);
-  SerialPrint("WIFI - Ingresando Setup:");
+  serialPrint("");
+  serialPrint("Iniciando Salida 4 Relés...");
+
+  serialPrint("WIFI - Ingresando Setup:");
   wifi.setup();
-  #ifdef Board_4OutRelay
-  relays.setup();
+  
+  #ifdef BOARD_4OUT_RELAY
+  relays.setup(&mqttManager);
   #endif
+
+  sensorManager.setup(&mqttManager);
   ota.setup();
   mqttManager.setup();
+  webManager.setup();
 
-#if defined(Board_DHT22)
-  dht.setup(DHT_PIN, DHTesp::DHT22);
-#endif
-#if defined(Board_AHT10)
-  status_AHT = aht.begin(0, 2);
-  aht.setCycleMode();
-#endif
-
-#ifdef Board_4OutRelay
-      webManager.setup(&relays, &mqttManager, &temperature, &humidity);
-#else
-      // Si no hay relays, pasamos nullptr en el primer argumento
-      webManager.setup(nullptr, &mqttManager, &temperature, &humidity);
-#endif
-
-// #if !defined(NO_MQTT)
-//   SerialPrint("MQTT - Configurando MQTT");
-//   MQTT_Setup();
-// #endif
-
-  WEB_Server.begin();
-  SerialPrint("WEBServer - Iniciado:");
-  SerialPrint("WEBServer - Puerto: " + String(webServerPort));
+  serialPrint("Setup Finalizado.");
 }
 
-//**************************************************   CODE LOOP   *****************************************
+/**
+ * Bucle principal de ejecución.
+ */
 void loop()
 {
-   // SerialPrint("WIFI - LOOP()");
+  unsigned long _now = millis();
+
+  // Gestión de Managers
   wifi.loop();
-  // SerialPrint("OTA - LOOP()");
-  ota.handle();
+  ota.loop();
   mqttManager.loop();
-
   webManager.loop();
-  //WEBSERVER_Loop();
-  // SerialPrint("WEBServer - LOOP()");
 
-  unsigned long now = millis();
-  if (now < lastMsg10seg)
+  // Manejo de desbordamiento de millis()
+  if (_now < lastMsg10seg)
   {
-    SerialPrint("TIMER - ROLLOVER");
+    serialPrint("TIMER - ROLLOVER");
     lastMsg10seg = 0;
     lastMsg1min = 0;
     lastMsg5min = 0;
   }
 
   // Verifica si han pasado 10 segundos
-  if (now - lastMsg10seg > 10000)
+  if (_now - lastMsg10seg > 10000)
   {
-    SerialPrint("");
-    SerialPrint("10SEG -> " + String(now) + "-" + String(lastMsg10seg));
-    lastMsg10seg = now;
+    serialPrint("");
+    serialPrint("10SEG -> Syncing sensors and relays");
+    lastMsg10seg = _now;
 
-#ifdef Board_4OutRelay
+    #ifdef BOARD_4OUT_RELAY
     relays.refresh();
-    SerialPrint("RELAY - Refresh()");
-
-    // Publicar estado actual en MQTT
-    #if !defined(NO_MQTT)
-    if (Relay1_Name != "") mqttManager.publish(Relay1_MQTT_Status.c_str(), relays.getRelayState(1) ? "ON" : "OFF");
-    if (Relay2_Name != "") mqttManager.publish(Relay2_MQTT_Status.c_str(), relays.getRelayState(2) ? "ON" : "OFF");
-    if (Relay3_Name != "") mqttManager.publish(Relay3_MQTT_Status.c_str(), relays.getRelayState(3) ? "ON" : "OFF");
-    if (Relay4_Name != "") mqttManager.publish(Relay4_MQTT_Status.c_str(), relays.getRelayState(4) ? "ON" : "OFF");
     #endif
-#endif
 
-#if defined(Board_DHT22) || defined(Board_AHT10)
-    TEMPERATURA_loop(temperature, humidity, hIndex, dPoint, AbsoluteH, perception);
-  #if !defined(NO_MQTT)
-      mqttManager.publish(Temperatura_MQTT_Status.c_str(), String(temperature, 2).c_str());
-      mqttManager.publish(Humedad_MQTT_Status.c_str(), String(humidity, 2).c_str());
-      mqttManager.publish(SensacionTermica_MQTT_Status.c_str(), String(hIndex, 2).c_str());
-      mqttManager.publish(PuntoRocio_MQTT_Status.c_str(), String(dPoint, 2).c_str());
-      mqttManager.publish(HumedadAbsoluta_MQTT_Status.c_str(), String(AbsoluteH, 2).c_str());
-      mqttManager.publish(Percepcion_MQTT_Status.c_str(), String(perception, 2).c_str());
-  #endif
-#endif
-
-    // Verifica si ha pasado 1 minuto
-    if (lastMsg1min > 4)
-    {
-      SerialPrint("60SEG -> " + String(now) + "-" + String(lastMsg1min));
-      lastMsg1min = 0;
-
-#ifdef Report_IP_DuckDNS
-      HTTP_Get(urlDuckDNS);
-#endif
-    }
-    else
-    {
-      lastMsg1min++;
-    }
-
-    // Verifica si han pasado 5 minutos
-    if (lastMsg5min > 28)
-    {
-      SerialPrint("5MIN -> " + String(now) + "-" + String(lastMsg5min));
-      lastMsg5min = 0;
-
-#ifdef Report_HealthChecks
-      HTTP_Get(urlHealthChecks);
-#endif
-    }
-    else
-    {
-      lastMsg5min++;
-    }
+    sensorManager.refresh();
   }
-}
 
-//**************************************************   Temperature   ***************************************
-#if defined(Board_DHT22) || defined(Board_AHT10)
-void TEMPERATURA_loop(float &temperature, float &humidity, float &hIndex, float &dPoint, float &AbsoluteH, byte &perception)
-{
-#if defined(Board_DHT22)
-  TempAndHumidity val = dht.getTempAndHumidity();
-  float t = val.temperature + Calibracion; // Obtener la temperatura en grados Celsius
-  float h = val.humidity;                  // Obtener la humedad relativa en porcentaje
-#endif
-
-#if defined(Board_AHT10)
-  // sensors_event_t hh, tt;
-  // aht.getEvent(&hh, &tt);
-  // float t = tt.temperature + Calibracion;
-  // float h = hh.relative_humidity;
-
-  float t = aht.readTemperature(true) + Calibracion;
-  float h = aht.readHumidity(true);
-
-  /* String payload = "{\"temperature\":" + String(t) + ", \"humidity\":" + String(h) + "}";
-      char message[100];
-      payload.toCharArray(message, 100);
-
-   // Publish payload to MQTT
-     MQTTClient.publish("Debug", message); */
-  // MQTTClient.publish("Debug/temp", String(t, 2).c_str());
-  // MQTTClient.publish("Debug/hum", String(h, 2).c_str());
-  // MQTTClient.publish("Debug/status", String(status_AHT, 10).c_str());
-
-#endif
-
-    SerialPrint("Temperatura: " + String(temperature) + " °C");
-    SerialPrint("Humedad: " + String(humidity) + " %");
-
-  // Verificar si la lectura del sensor es válida
-  if (!isnan(t) && !isnan(h))
+  // Verifica si ha pasado 1 minuto
+  if (lastMsg1min > 4)
   {
-    temperature = t;
-    humidity = h;
-    hIndex = dht.computeHeatIndex(t, h);
-    dPoint = dht.computeDewPoint(t, h);
-    AbsoluteH = dht.computeAbsoluteHumidity(t, h);
-    perception = dht.computePerception(t, h);
+    serialPrint("60SEG Update (DuckDNS)");
+    lastMsg1min = 0;
 
-    SerialPrint("Temperatura: " + String(temperature) + " °C");
-    SerialPrint("Humedad: " + String(humidity) + " %");
+    #ifdef Report_IP_DuckDNS
+    wifi.httpGet(urlDuckDns);
+    #endif
   }
   else
   {
-    SerialPrint("Error al leer el sensor DHT22 o el AHT10");
+    lastMsg1min++;
   }
-}
-#endif
 
-//**************************************************   Web Server   ****************************************
-void WEBSERVER_Loop()
-{
-  WiFiClient client = WEB_Server.accept();
-
-  if (client)
+  // Verifica si han pasado 5 minutos
+  if (lastMsg5min > 28)
   {
-    currentTime = millis();
-    previousTime = currentTime;
-    bool reset = false;
-    SerialPrint("WebServer - New Client.");
-    String currentLine = "";
-    while (client.connected() && currentTime - previousTime <= timeoutTime)
-    {
-      currentTime = millis();
-      if (currentTime < previousTime)
-      {
-        previousTime = currentTime;
-      }
+    serialPrint("5MIN Update (HealthChecks)");
+    lastMsg5min = 0;
 
-      if (client.available())
-      {
-        char c = client.read();
-#ifdef debug
-        Serial.write(c);
-#endif
-        header += c;
-        if (c == '\n')
-        {
-
-          if (currentLine.length() == 0)
-          {
-
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println("Connection: close");
-            client.println();
-
-#ifdef Board_4OutRelay
-            if (header.indexOf("GET /relay1/on") >= 0)
-            {
-              relays.setRelay(1, true);
-            }
-            else if (header.indexOf("GET /relay1/off") >= 0)
-            {
-              relays.setRelay(1, false);
-            }
-            else if (header.indexOf("GET /relay2/on") >= 0)
-            {
-              relays.setRelay(2, true);
-            }
-            else if (header.indexOf("GET /relay2/off") >= 0)
-            {
-              relays.setRelay(2, false);
-            }
-            else if (header.indexOf("GET /relay3/on") >= 0)
-            {
-              relays.setRelay(3, true);
-            }
-            else if (header.indexOf("GET /relay3/off") >= 0)
-            {
-              relays.setRelay(3, false);
-            }
-            else if (header.indexOf("GET /relay4/on") >= 0)
-            {
-              relays.setRelay(4, true);
-            }
-            else if (header.indexOf("GET /relay4/off") >= 0)
-            {
-              relays.setRelay(4, false);
-            }
-            else if (header.indexOf("GET /reset") >= 0)
-            {
-              reset = true;
-            }
-#endif
-
-#if defined(Board_DHT22) || defined(Board_AHT10)
-            if (header.indexOf("GET /reset") >= 0)
-            {
-              reset = true;
-            }
-#endif
-
-#if !defined(NO_MQTT)
-    if (header.indexOf("GET /mqtt/enable") >= 0) {
-      mqttManager.setEnabled(true);
-      mqttManager.setup(); // Re-setup para conectar
-    }
-    else if (header.indexOf("GET /mqtt/disable") >= 0) {
-      mqttManager.setEnabled(false);
-    }
-#endif
-
-            lastMsg10seg = 0;
-
-            client.println("<!DOCTYPE html><html>");
-            client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">");
-            client.println("<link rel=\"icon\" href=\"data:,\">");
-
-            client.println("<style>body{font-family: \"Helvetica Neue\", Arial, sans-serif; background-color: #f9f9f9; color: #333; margin: 0; padding: 0;}");
-            client.println(".container{max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0px 0px 5px rgba(0,0,0,0.2);}");
-
-            client.println("h1{font-size: 36px; margin-bottom: 20px; color: #007bff; background-color: #f0f0f0; padding: 10px 20px; border-radius: 5px;}");
-            client.println("p{font-size: 18px;margin: 10px 0;color: #666;}");
-
-            client.println(".button{width:100px; text-align: center; display: inline-block;background-color: #007bff;color: #fff;padding: 12px 24px;font-size: 18px;text-decoration: none;margin: 5px;cursor: pointer;border: none;outline: none;transition: background-color 0.3s ease;border-radius: 5px;}");
-            client.println(".button:hover{background-color: #004a99;}");
-            client.println(".button2{width:100px; text-align: center; display: inline-block;background-color: #4CAF50;color: #fff;padding: 12px 24px;font-size: 18px;text-decoration: none;margin: 5px;cursor: pointer;border: none;outline: none;transition: background-color 0.3s ease;border-radius: 5px;}");
-            client.println(".button2:hover{background-color: #2f6a31;}");
-            client.println(".button3{width:100px; text-align: center; display: inline-block;background-color: #FF0000;color: #fff;padding: 12px 24px;font-size: 18px;text-decoration: none;margin: 5px;cursor: pointer;border: none;outline: none;transition: background-color 0.3s ease;border-radius: 5px;}");
-            client.println(".button3:hover{background-color: #990000;}");
-
-            // client.println(".bomb {color: #ff4545;}");
-            // client.println(".reset{margin-top: 40px;}");
-            client.println(".foot{font-size: 12px;background-color: #f0f0f0;border-radius: 5px;}</style></head>");
-
-            client.println("<body><div class=\"container\">");
-            if (reset == false)
-            {
-              client.println("<h1 style=\"font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: bold; text-align: center;\">" + String(hostName) + "<br>(" + WiFi.localIP().toString() + ")</h1>");
-              client.println("<p  style=\"text-align: center;\"> Version: " + Numero_Version + "</p>");
-
-#ifdef Board_4OutRelay
-              if (relays.getRelayState(1) == 0)
-              {
-                client.println("<p>Relay 1 estado: " + String(relays.getRelayState(1)) + " &rarr; " + Relay1_Name + "</p>");
-                client.println("<p><a href=\"/relay1/on\"><button class=\"button\">OFF</button></a></p>");
-              }
-              else
-              {
-                client.println("<p style="
-                               "color:red;"
-                               ">Relay 1 estado: " +
-                               String(relays.getRelayState(1)) + " &rarr; " + Relay1_Name + "</p>");
-                client.println("<p><a href=\"/relay1/off\"><button class=\"button2\">ON</button></a></p>");
-              }
-
-              if (relays.getRelayState(2) == 0)
-              {
-                client.println("<p>Relay 2 estado: " + String(relays.getRelayState(2)) + " &rarr; " + Relay2_Name + "</p>");
-                client.println("<p><a href=\"/relay2/on\"><button class=\"button\">OFF</button></a></p>");
-              }
-              else
-              {
-                client.println("<p style="
-                               "color:red;"
-                               ">Relay 2 estado: " +
-                               String(relays.getRelayState(2)) + " &rarr; " + Relay2_Name + "</p>");
-                client.println("<p><a href=\"/relay2/off\"><button class=\"button2\">ON</button></a></p>");
-              }
-
-              if (relays.getRelayState(3) == 0)
-              {
-                client.println("<p>Relay 3 estado: " + String(relays.getRelayState(3)) + " &rarr; " + Relay3_Name + "</p>");
-                client.println("<p><a href=\"/relay3/on\"><button class=\"button\">OFF</button></a></p>");
-              }
-              else
-              {
-                client.println("<p style="
-                               "color:red;"
-                               ">Relay 3 estado: " +
-                               String(relays.getRelayState(3)) + " &rarr; " + Relay3_Name + "</p>");
-                client.println("<p><a href=\"/relay3/off\"><button class=\"button2\">ON</button></a></p>");
-              }
-
-              if (relays.getRelayState(4) == 0)
-              {
-                client.println("<p>Relay 4 estado: " + String(relays.getRelayState(4)) + " &rarr; " + Relay4_Name + "</p>");
-                client.println("<p><a href=\"/relay4/on\"><button class=\"button\">OFF</button></a></p>");
-              }
-              else
-              {
-                client.println("<p style="
-                               "color:red;"
-                               ">Relay 4 estado: " +
-                               String(relays.getRelayState(4)) + " &rarr; " + Relay4_Name + "</p>");
-                client.println("<p><a href=\"/relay4/off\"><button class=\"button2\">ON</button></a></p>");
-              }
-#endif
-#if defined(Board_DHT22) || defined(Board_AHT10)
-              client.println("<p>Temperatura: " + String(temperature) + " grados" + "</p>");
-              client.println("<p>Humedad: " + String(humidity) + " %" + "</p>");
-#endif
-
-        // En la parte de mostrar el estado MQTT:
-        #if !defined(NO_MQTT)
-            //client.println("<p class=\"foot\">MQTT server status: " + mqttManager.getStatus() + "</p>");
-            
-            if (mqttManager.isEnabled()) {
-                 client.println("<p><input type='checkbox' checked onclick=\"location.href='/mqtt/disable'\"> MQTT habilitado</p>");
-            } else {
-                 client.println("<p><input type='checkbox' onclick=\"location.href='/mqtt/enable'\"> MQTT deshabilitado</p>");
-            }
-        #endif
-
-              client.println("<div class=\"foot\">");
-              int32_t rssi = WiFi.RSSI();
-              
-              String signalStrength;
-              if (rssi >= -60)
-              {
-                signalStrength = "Muy fuerte";
-              }
-              else if (rssi >= -70)
-              {
-                signalStrength = "Fuerte";
-              }
-              else if (rssi >= -80)
-              {
-                signalStrength = "Moderada";
-              }
-              else if (rssi >= -90)
-              {
-                signalStrength = "Débil";
-              }
-              else
-              {
-                signalStrength = "Muy débil";
-              }
-
-              // Enviar la respuesta al cliente con la señal y su clasificación
-              client.println("<p class=\"foot\">Nivel de se&ntilde;al Wi-Fi (RSSI): " + String(rssi) + " dBm (" + signalStrength + ")</p>");
-
-#if !defined(NO_MQTT)
-    // El método getStatus() ya se encarga de decir si está "Deshabilitado" 
-    // o de devolver el error/estado de conexión.
-    client.println("<p class=\"foot\">MQTT server status: " + mqttManager.getStatus() + "</p>");
-#endif
-#ifdef Report_IP_DuckDNS
-              client.println("<p class=\"foot\">DuckDNS Updated every 1 min: " + urlDuckDNS + "</p>");
-#endif
-#ifndef Report_IP_DuckDNS
-              client.println("<p class=\"foot\">DuckDNS Updated disabled</p>");
-#endif
-#ifdef Report_HealthChecks
-              client.println("<p class=\"foot\">HealthChecks Updated every 5 min: " + urlHealthChecks + "</p>");
-#endif
-#ifndef Report_HealthChecks
-              client.println("<p class=\"foot\">HealthChecks Updated disabled</p>");
-#endif
-              client.println("</div>");
-              client.println("<p><a href=\"/reset\"><button class=\"button3\">RESET</button></a></p>");
-            }
-            else
-            {
-              client.println("<script>");
-              client.println("setTimeout(function(){");
-              client.println("window.history.back();");
-              client.println("}, 20000);");
-              client.println("</script>");
-              client.println("<p>Reseting in 5 sec... Reloading page in 20 sec</p>");
-            }
-
-            client.println("</body></html>");
-            client.println();
-            break;
-          }
-          else
-          {
-            currentLine = "";
-          }
-        }
-        else if (c != '\r')
-        {
-          currentLine += c;
-        }
-      }
-    }
-    header = "";
-
-    client.stop();
-    SerialPrint("WebServer - Client disconnected.");
-    SerialPrint("");
-
-    if (reset == true)
-    {
-#ifdef Board_4OutRelay
-      relays.setRelay(1, false);
-      delay(50);
-      relays.setRelay(2, false);
-      delay(50);
-      relays.setRelay(3, false);
-      delay(50);
-      relays.setRelay(4, false);
-      delay(50);
-#endif
-      Serial.println(" ");
-      Serial.println("Reset in 5 sec..");
-      delay(5000);
-      ESP.restart();
-    }
+    #ifdef Report_HealthChecks
+    wifi.httpGet(urlHealthChecks);
+    #endif
   }
-}
-
-//**************************************************   Funciones   ******************************************
-void HTTP_Get(String url)
-{
-  if ((WiFi.status() == WL_CONNECTED))
+  else
   {
-    String urlRequest = url;
-    WiFiClient client;
-    HTTPClient http;
-
-    SerialPrint("Iniciando cliente HTTP");
-
-    if (http.begin(client, urlRequest))
-    {
-      SerialPrint(urlRequest);
-
-      int httpCode = http.GET();
-
-      if (httpCode > 0)
-      {
-        SerialPrint(httpCode);
-
-        if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
-        {
-          String payload = http.getString();
-          SerialPrint(payload);
-        }
-      }
-      else
-      {
-        SerialPrint("[HTTP] Error on HTTP request");
-        SerialPrint("[HTTP] GET... failed, error: %s\n" + http.errorToString(httpCode));
-      }
-      http.end();
-    }
-    else
-    {
-      SerialPrint("[HTTP] Unable to connect\n");
-    }
+    lastMsg5min++;
   }
+
+  delay(10); // Pequeño delay para estabilidad del sistema
 }
 

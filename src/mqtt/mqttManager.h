@@ -12,13 +12,28 @@
 
 class MqttManager {
 public:
-    // Constructor recibe puntero a RelayManager para actuar sobre ellos
+    /**
+     * Constructor de MqttManager.
+     * @param relays Puntero al RelayManager para ejecución de comandos.
+     */
     MqttManager(RelayManager* relays);
 
+    /**
+     * Configura el servidor MQTT y establece el callback de mensajes.
+     */
     void setup();
+
+    /**
+     * Procesa los mensajes entrantes y mantiene la conexión MQTT.
+     */
     void loop();
     
     // Métodos públicos para publicar
+    /**
+     * Publica un mensaje en un tópico específico.
+     * @param topic Tópico de destino.
+     * @param payload Contenido del mensaje.
+     */
     void publish(const char* topic, const char* payload);
     
     // Gestión de estado
@@ -49,3 +64,4 @@ private:
     // Callback estático necesario para PubSubClient
     static void callback(char* topic, byte* payload, unsigned int length);
 };
+
