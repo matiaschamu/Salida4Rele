@@ -10,6 +10,8 @@
 // Incluimos RelayManager para poder controlarlos desde el callback
 #include "../relays/RelayManager.h"
 
+class WifiManager;
+
 class MqttManager {
 public:
     /**
@@ -35,6 +37,12 @@ public:
      * @param payload Contenido del mensaje.
      */
     void publish(const char* topic, const char* payload);
+
+    /**
+     * Publica todos los datos de diagnóstico del sistema por MQTT.
+     * @param _wifi Puntero al WifiManager para obtener la última respuesta HTTP.
+     */
+    void publishDiagnostics(WifiManager* _wifi);
     
     // Gestión de estado
     bool isConnected();
@@ -52,6 +60,7 @@ private:
     PubSubClient _mqttClient;
 
     int _failedAttempts;
+    unsigned long _currentReconnectInterval;
 
     const int _maxRetries = 20;
 

@@ -1,5 +1,6 @@
 #include "config/Config.h"
 #include "MqttManager.h"
+#include "../network/WifiManager.h"
 #include "varios/Utils.h"
 
 extern unsigned long lastMsg10seg;
@@ -11,6 +12,7 @@ MqttManager::MqttManager(RelayManager* relays) : _relays(relays) {
     _enabled = true;
     instance = this; // Guardamos la referencia a esta instancia
     _failedAttempts = 0;
+    _currentReconnectInterval = 5000; // 5 segundos iniciales
 }
 
 /**
@@ -55,29 +57,41 @@ void MqttManager::loop() {
  */
 void MqttManager::reconnect() {
     if (!_enabled) return;
+    
+    // Solo intentar si WiFi tiene IP (está realmente conectado)
+    if (WiFi.status() != WL_CONNECTED || WiFi.localIP().toString() == "0.0.0.0") return;
 
     static unsigned long lastAttempt = 0;
     unsigned long _now = millis();
     
-    // Intento cada 5 segundos no bloqueante (mejor que delay en loop)
-    if (_now - lastAttempt < 5000) return;
+    // Usar el intervalo actual de backoff
+    if (_now - lastAttempt < _currentReconnectInterval) return;
     lastAttempt = _now;
 
-    serialPrint("MQTT - Intentando Conexion...");
+    serialPrint("MQTT - Intentando Conexion (Intervalo: " + String(_currentReconnectInterval / 1000) + "s)...");
     serialPrint("MQTT - Estado: " + String(_mqttClient.state()));
 
     if (_mqttClient.connect(_clientId.c_str(), mqtt_user, mqtt_pass)) {
         serialPrint("MQTT - Conectado");
         _failedAttempts = 0;
+        _currentReconnectInterval = 5000; // Resetear intervalo al conectar
         subscribeToTopics();
+        publishDiagnostics(nullptr); // Publicar inicial al conectar
     } else {
         _failedAttempts++;
+        
+        // Backoff exponencial: duplicar intervalo hasta un máximo de 60 segundos
+        if (_currentReconnectInterval < 60000) {
+            _currentReconnectInterval *= 2;
+            if (_currentReconnectInterval > 60000) _currentReconnectInterval = 60000;
+        }
 
         String _errorMsg = "MQTT - Fallo conexion (Intento " + String(_failedAttempts) + "/" + String(_maxRetries) + ") rc=" + String(_mqttClient.state());
         serialPrint(_errorMsg);
 
         if (_failedAttempts >= _maxRetries) {
-            serialPrint("!!! CRITICO: Demasiados fallos MQTT. Reiniciando sistema para recuperar pila TCP/IP...");
+            serialPrint("!!! CRITICO: Demasiados fallos MQTT continuos. Reiniciando sistema...");
+            setCustomResetReason(2);
             delay(1000); 
             ESP.restart();
         }
@@ -196,5 +210,45 @@ String MqttManager::getStatus() {
         case 5: return "UNAUTHORIZED";
         default: return String(_s);
     }
+}
+
+/**
+ * Publica todos los datos de diagnóstico del sistema por MQTT.
+ * @param _wifi Puntero al WifiManager para obtener la última respuesta HTTP.
+ */
+void MqttManager::publishDiagnostics(WifiManager* _wifi) {
+    if (!_enabled || !_mqttClient.connected()) return;
+
+    String _baseTopic = "Acantilados/Hardware/" + String(hostName);
+
+    // RSSI y Señal
+    int32_t _rssi = WiFi.RSSI();
+    String _diagRSSI = String(_rssi) + " dBm (" + getRSSILevel(_rssi) + ")";
+    publish((_baseTopic + "/rssi").c_str(), _diagRSSI.c_str());
+
+    // IP Address
+    publish((_baseTopic + "/ip").c_str(), WiFi.localIP().toString().c_str());
+
+    // Uptime
+    publish((_baseTopic + "/uptime").c_str(), getUptime().c_str());
+
+    // Reinicios
+    publish((_baseTopic + "/reset_count").c_str(), String(getResetCount()).c_str());
+
+    // Motivo de reinicio
+    publish((_baseTopic + "/reset_reason").c_str(), getResetReason().c_str());
+
+    // MAC Address
+    publish((_baseTopic + "/mac").c_str(), getBoardId().c_str());
+
+    // HealthCheck Response (si está disponible)
+    if (_wifi != nullptr) {
+        publish((_baseTopic + "/health_response").c_str(), _wifi->getLastResponse().c_str());
+    }
+
+    // Versión del Firmware
+    publish((_baseTopic + "/version").c_str(), versionNumber.c_str());
+
+    serialPrint("MQTT - Diagnosticos publicados en " + _baseTopic);
 }
 

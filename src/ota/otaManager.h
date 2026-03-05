@@ -10,14 +10,14 @@ class OTAManager {
 public:
     /**
      * Constructor de la clase OTAManager.
-     * @param hostname Nombre de red para el dispositivo (por defecto "ESP-Relay").
      */
-    OTAManager(const char* hostname = "ESP-Relay");
+    OTAManager();
     
     /**
-     * Configura ArduinoOTA e inicia el servicio.
+     * Configura ArduinoOTA con el hostname proporcionado.
+     * @param _hostname Nombre de red para el dispositivo.
      */
-    void setup();
+    void setup(const char* _hostname);
     
     /**
      * Procesa las peticiones OTA en el bucle principal.
@@ -26,5 +26,4 @@ public:
 
 private:
     const char* _hostname;
-    bool _configured;
 };

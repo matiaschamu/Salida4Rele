@@ -1,7 +1,7 @@
 #include "Config.h"
 #include <Arduino.h>
 
-const String versionNumber = "1.0.31";
+const String versionNumber = "1.0.33";
 
 
 //************************************************** MQTT   ********************************************

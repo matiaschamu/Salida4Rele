@@ -1,27 +1,20 @@
-#include "otaManager.h"
-#include "../varios/utils.h" 
+#include "OTAManager.h"
+#include "varios/Utils.h" 
 
 /**
  * Constructor de la clase OTAManager.
- * @param hostname Nombre de red para el dispositivo.
  */
-OTAManager::OTAManager(const char* hostname) : _hostname(hostname), _configured(false) {
+OTAManager::OTAManager() {
+    _hostname = "ESP-Relay";
 }
 
 /**
  * Configura los parámetros de ArduinoOTA y define los callbacks de eventos.
+ * @param _hostname Nombre de red asignado al dispositivo.
  */
-void OTAManager::setup() {
-    if (_configured) return; // Evitar múltiples configuraciones
-    
-    // Puerto 8266 para ESP8266, puerto 3232 por defecto es más compatible con ESP32
-    #if defined(ESP8266)
+void OTAManager::setup(const char* _hostname) {
+    this->_hostname = _hostname;
     ArduinoOTA.setPort(8266);
-    #elif defined(ESP32)
-    ArduinoOTA.setPort(3232);
-    #else
-    ArduinoOTA.setPort(3232);
-    #endif
     ArduinoOTA.setHostname(_hostname);
 
     ArduinoOTA.onStart([]() {
@@ -41,7 +34,6 @@ void OTAManager::setup() {
     });
 
     ArduinoOTA.begin();
-    _configured = true;
     serialPrint("OTA: Manager configurado e iniciado.");
 }
 

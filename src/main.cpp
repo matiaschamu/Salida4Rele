@@ -11,14 +11,15 @@
 
 // Instancias de los Managers
 WifiManager wifi(ssid, password);
-OTAManager ota(hostName);
+OTAManager ota;
 RelayManager relays;
 SensorManager sensorManager;
 MqttManager mqttManager(&relays);
-WebManager webManager(&relays, &sensorManager, &mqttManager);
+WebManager webManager(&relays, &sensorManager, &mqttManager, &wifi);
 
 // Timers para tareas periódicas
 unsigned long lastMsg10seg = 0;
+unsigned long lastMsgDiag = 0;
 int lastMsg1min = 0;
 int lastMsg5min = 0;
 
@@ -31,6 +32,11 @@ void setup()
   serialPrint("");
   serialPrint("Iniciando Salida 4 Relés...");
 
+  initEeprom();
+  incrementResetCount();
+  loadCustomResetReason();
+  serialPrint("Reset count: " + String(getResetCount()));
+
   serialPrint("WIFI - Ingresando Setup:");
   wifi.setup();
   
@@ -39,7 +45,7 @@ void setup()
   #endif
 
   sensorManager.setup(&mqttManager);
-  ota.setup();
+  ota.setup(hostName);
   mqttManager.setup();
   webManager.setup();
 
@@ -51,6 +57,7 @@ void setup()
  */
 void loop()
 {
+  refreshUptime();
   unsigned long _now = millis();
 
   // Gestión de Managers
@@ -110,6 +117,12 @@ void loop()
   else
   {
     lastMsg5min++;
+  }
+
+  // Tareas cada 60 segundos (Diagnósticos MQTT)
+  if (_now - lastMsgDiag > 60000) {
+    lastMsgDiag = _now;
+    mqttManager.publishDiagnostics(&wifi);
   }
 
   delay(10); // Pequeño delay para estabilidad del sistema

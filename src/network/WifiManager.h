@@ -15,10 +15,12 @@ public:
     void setup();
     void loop(); 
     void httpGet(String _url);
+    String getLastResponse() { return _lastResponse; }
 
 private:
     const char* _ssid;
     const char* _password;
     IPAddress _ip, _gw, _subnet, _dns, _dns2;
+    String _lastResponse;
 };
 

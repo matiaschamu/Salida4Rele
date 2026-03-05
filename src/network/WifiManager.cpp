@@ -18,7 +18,9 @@ WifiManager::WifiManager(const char* _ssid, const char* _password) {
     this->_ip = _localIP;
     this->_gw = _gateway;
     this->_subnet = _subnet;
+    this->_subnet = _subnet;
     this->_dns = _primaryDNS;
+    this->_lastResponse = "Ninguna";
 }
 
 /**
@@ -58,6 +60,7 @@ void WifiManager::setup() {
         serialPrint(WiFi.RSSI());
     } else {
         serialPrint("\nWIFI - Error de conexion. Reiniciando...");
+        setCustomResetReason(1);
         delay(5000);
         ESP.restart();
     }
@@ -96,10 +99,11 @@ void WifiManager::httpGet(String _url) {
             if (_httpCode > 0) {
                 serialPrint(_httpCode);
                 if (_httpCode == HTTP_CODE_OK || _httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
-                    String _payload = _http.getString();
-                    serialPrint(_payload);
+                    _lastResponse = _http.getString();
+                    serialPrint(_lastResponse);
                 }
             } else {
+                _lastResponse = "Error " + String(_httpCode);
                 serialPrint("[HTTP] Error on HTTP request");
                 serialPrint("[HTTP] GET... failed, error: %s\n" + _http.errorToString(_httpCode));
             }

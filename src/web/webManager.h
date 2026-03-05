@@ -13,6 +13,7 @@
 class RelayManager;
 class SensorManager;
 class MqttManager;
+class WifiManager;
 
 class WebManager {
 private:
@@ -22,6 +23,7 @@ private:
     RelayManager* _relays;
     SensorManager* _sensors;
     MqttManager* _mqttManager;
+    WifiManager* _wifi;
     
     // Variables internas del servidor
     String header;
@@ -42,8 +44,9 @@ public:
      * @param _relays Puntero al RelayManager.
      * @param _sensors Puntero al SensorManager.
      * @param _mqtt Puntero al MqttManager.
+     * @param _wifi Puntero al WifiManager.
      */
-    WebManager(RelayManager* _relays, SensorManager* _sensors, MqttManager* _mqtt);
+    WebManager(RelayManager* _relays, SensorManager* _sensors, MqttManager* _mqtt, WifiManager* _wifi);
     
     /**
      * Inicializa el servidor web.
