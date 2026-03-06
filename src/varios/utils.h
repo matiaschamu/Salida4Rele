@@ -1,5 +1,5 @@
 #pragma once
-#include "config/Config.h"
+#include "Config/Config.h"
 #include <Arduino.h>
 #include <EEPROM.h>
 
@@ -13,8 +13,9 @@
  * @param _msg Mensaje a imprimir (cualquier tipo de dato).
  */
 template <typename T>
-void serialPrint(T _msg) {
-    #ifdef debug
+void serialPrint(T _msg) 
+{
+    #ifdef DEBUG
         Serial.println(_msg);
     #endif
 }
@@ -22,8 +23,9 @@ void serialPrint(T _msg) {
 /**
  * Imprime una línea en blanco por el puerto serial si el modo debug está habilitado.
  */
-inline void serialPrint() {
-    #ifdef debug
+inline void serialPrint() 
+{
+    #ifdef DEBUG
         Serial.println();
     #endif
 }
@@ -34,7 +36,8 @@ inline void serialPrint() {
  * @param _size Tamaño del arreglo.
  * @return String con el contenido del arreglo.
  */
-inline String convertToString(const byte *_a, int _size) {
+inline String convertToString(const byte *_a, int _size) 
+{
     String _s = ""; 
     _s.concat((const char*)_a, (unsigned int)_size); 
     return _s;
@@ -46,7 +49,8 @@ inline String convertToString(const byte *_a, int _size) {
  * @param _size Tamaño del arreglo.
  * @return String con el contenido del arreglo.
  */
-inline String convertToString(const char *_a, int _size) {
+inline String convertToString(const char *_a, int _size) 
+{
     String _s = ""; 
     _s.concat(_a, (unsigned int)_size);
     return _s;

@@ -45,10 +45,13 @@ static uint32_t _lastMillis = 0;
 void refreshUptime() 
 {
     uint32_t _currentMillis = millis();
-    if (_currentMillis < _lastMillis) {
+    if (_currentMillis < _lastMillis) 
+    {
         // Ocurrió un desbordamiento (rollover)
         _totalUptimeMs += (0xFFFFFFFF - _lastMillis) + _currentMillis + 1;
-    } else {
+    } 
+    else 
+    {
         _totalUptimeMs += (_currentMillis - _lastMillis);
     }
     _lastMillis = _currentMillis;
@@ -90,7 +93,8 @@ String getResetReason()
     #elif defined(ESP32) || defined(ARDUINO_ARCH_ESP32)
         esp_reset_reason_t _reason = esp_reset_reason();
         String _baseReason = "";
-        switch (_reason) {
+        switch (_reason) 
+        {
             case ESP_RST_POWERON:  _baseReason = "Vcc (Power-on)"; break;
             case ESP_RST_EXT:      _baseReason = "External Pin"; break;
             case ESP_RST_SW:       _baseReason = "Software Reset"; break;
@@ -140,7 +144,8 @@ void loadCustomResetReason()
     else if (_code == 3) _cachedCustomReason = " [Software: Web Restart]";
     else _cachedCustomReason = "";
 
-    if (_code != 0) {
+    if (_code != 0) 
+    {
         EEPROM.write(EEPROM_CUSTOM_RESET_ADDR, 0);
         EEPROM.commit();
     }
@@ -156,6 +161,11 @@ void resetResetCount()
     EEPROM.commit();
 }
 
+/**
+ * Obtiene el nivel de señal WiFi en formato texto (Excelente, Buena, etc.).
+ * @param _rssi Valor del RSSI recibido.
+ * @return String descriptivo del nivel.
+ */
 String getRSSILevel(int32_t _rssi) 
 {
     if (_rssi >= -50) return "Excelente";
@@ -166,6 +176,11 @@ String getRSSILevel(int32_t _rssi)
     return "Inestable";
 }
 
+/**
+ * Obtiene el color asociado al nivel de señal WiFi para la interfaz web.
+ * @param _rssi Valor del RSSI recibido.
+ * @return String con el código hexadecimal del color.
+ */
 String getRSSIColor(int32_t _rssi) 
 {
     if (_rssi >= -50) return "#00f230"; // Verde brillante

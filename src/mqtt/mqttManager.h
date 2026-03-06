@@ -12,7 +12,8 @@
 
 class WifiManager;
 
-class MqttManager {
+class MqttManager 
+{
 public:
     /**
      * Constructor de MqttManager.
@@ -44,6 +45,11 @@ public:
      */
     void publishDiagnostics(WifiManager* _wifi);
     
+    /**
+     * Publica exclusivamente el tiempo de actividad (uptime) por MQTT.
+     */
+    void publishUptime();
+    
     // Gestión de estado
     bool isConnected();
     String getStatus();
@@ -51,7 +57,7 @@ public:
     
     // Habilitar/Deshabilitar MQTT
     bool isEnabled();
-    void setEnabled(bool state);
+    void setEnabled(bool _state);
      
 
 private:

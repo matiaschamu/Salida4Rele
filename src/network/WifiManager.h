@@ -7,7 +7,8 @@
 #include <WiFi.h>
 #endif
 
-class WifiManager {
+class WifiManager 
+{
 public:
     // Constructor que recibe toda la config de red
     WifiManager(const char* ssid, const char* password);

@@ -1,14 +1,15 @@
-#include "config/Config.h"
+#include "Config/Config.h"
 #include "MqttManager.h"
 #include "../network/WifiManager.h"
-#include "varios/Utils.h"
+#include "Varios/Utils.h"
 
 extern unsigned long lastMsg10seg;
 
 // Puntero global estático para acceder a la instancia desde el callback
 static MqttManager* instance = nullptr;
 
-MqttManager::MqttManager(RelayManager* relays) : _relays(relays) {
+MqttManager::MqttManager(RelayManager* relays) : _relays(relays) 
+{
     _enabled = true;
     instance = this; // Guardamos la referencia a esta instancia
     _failedAttempts = 0;
@@ -18,17 +19,18 @@ MqttManager::MqttManager(RelayManager* relays) : _relays(relays) {
 /**
  * Configura los parámetros iniciales del cliente MQTT.
  */
-void MqttManager::setup() {
+void MqttManager::setup() 
+{
     #if defined(NO_MQTT)
-        _enabled = false;
-        return;
+    _enabled = false;
+    return;
     #endif
 
     if (!_enabled) return;
 
     serialPrint("MQTT - Configurando MQTT");
     _mqttClient.setClient(_wifiClient);
-    _mqttClient.setServer(mqtt_server, mqtt_port);
+    _mqttClient.setServer(mqttServer, mqttPort);
     _mqttClient.setCallback(MqttManager::callback);
     
     _clientId = String(hostName); 
@@ -37,25 +39,26 @@ void MqttManager::setup() {
 /**
  * Ejecuta el procesamiento de mensajes y reconexión automática de MQTT.
  */
-void MqttManager::loop() {
+void MqttManager::loop() 
+{
     #if defined(NO_MQTT)
-        return;
+    return;
     #endif
 
     if (!_enabled) return;
 
-    if (!_mqttClient.connected()) {
-
+    if (!_mqttClient.connected()) 
+    {
         reconnect();
     }
     _mqttClient.loop();
-
 }
 
 /**
  * Gestiona el reintento de conexión al servidor MQTT de forma no bloqueante.
  */
-void MqttManager::reconnect() {
+void MqttManager::reconnect() 
+{
     if (!_enabled) return;
     
     // Solo intentar si WiFi tiene IP (está realmente conectado)
@@ -75,22 +78,26 @@ void MqttManager::reconnect() {
     _wifiClient.setTimeout(500); 
     yield();
     
-    bool _connected = _mqttClient.connect(_clientId.c_str(), mqtt_user, mqtt_pass);
+    bool _connected = _mqttClient.connect(_clientId.c_str(), mqttUser, mqttPass);
     
     yield();
     _wifiClient.setTimeout(5000); // Restaurar timeout por defecto
 
-    if (_connected) {
+    if (_connected) 
+    {
         serialPrint("MQTT - Conectado");
         _failedAttempts = 0;
         _currentReconnectInterval = 10000; // Resetear a 10s al conectar
         subscribeToTopics();
         // No publicamos diagnósticos aquí para no bloquear el inicio de la conexión
-    } else {
+    } 
+    else 
+    {
         _failedAttempts++;
         
         // Backoff exponencial: duplicar intervalo hasta un máximo de 60 segundos
-        if (_currentReconnectInterval < 60000) {
+        if (_currentReconnectInterval < 60000) 
+        {
             _currentReconnectInterval *= 2;
             if (_currentReconnectInterval > 60000) _currentReconnectInterval = 60000;
         }
@@ -98,7 +105,8 @@ void MqttManager::reconnect() {
         String _errorMsg = "MQTT - Fallo conexion (Intento " + String(_failedAttempts) + "/" + String(_maxRetries) + ") rc=" + String(_mqttClient.state());
         serialPrint(_errorMsg);
 
-        if (_failedAttempts >= _maxRetries) {
+        if (_failedAttempts >= _maxRetries) 
+        {
             serialPrint("!!! CRITICO: Demasiados fallos MQTT continuos. Reiniciando sistema...");
             setCustomResetReason(2);
             delay(1000); 
@@ -111,21 +119,23 @@ void MqttManager::reconnect() {
  * Obtiene la cantidad de intentos fallidos de conexión.
  * @return Número de intentos fallidos.
  */
-int MqttManager::getFailedAttempts() {
+int MqttManager::getFailedAttempts() 
+{
     return _failedAttempts;
 }
 
 /**
  * Se suscribe a los tópicos de comando configurados.
  */
-void MqttManager::subscribeToTopics() {
+void MqttManager::subscribeToTopics() 
+{
     #ifdef BOARD_4OUT_RELAY
-        // Suscribir a los temas configurados en config.h/cpp
-        if (relay1MqttCommand != "") _mqttClient.subscribe(relay1MqttCommand.c_str());
-        if (relay2MqttCommand != "") _mqttClient.subscribe(relay2MqttCommand.c_str());
-        if (relay3MqttCommand != "") _mqttClient.subscribe(relay3MqttCommand.c_str());
-        if (relay4MqttCommand != "") _mqttClient.subscribe(relay4MqttCommand.c_str());
-        serialPrint("MQTT - Suscripciones actualizadas");
+    // Suscribir a los temas configurados en Config.h/cpp
+    if (relay1MqttCommand != "") _mqttClient.subscribe(relay1MqttCommand.c_str());
+    if (relay2MqttCommand != "") _mqttClient.subscribe(relay2MqttCommand.c_str());
+    if (relay3MqttCommand != "") _mqttClient.subscribe(relay3MqttCommand.c_str());
+    if (relay4MqttCommand != "") _mqttClient.subscribe(relay4MqttCommand.c_str());
+    serialPrint("MQTT - Suscripciones actualizadas");
     #endif
 }
 
@@ -134,11 +144,13 @@ void MqttManager::subscribeToTopics() {
  * @param topic Tópico de destino.
  * @param payload Contenido del mensaje.
  */
-void MqttManager::publish(const char* topic, const char* payload) {
-    if (_enabled && _mqttClient.connected()) {
+void MqttManager::publish(const char* topic, const char* payload) 
+{
+    if (_enabled && _mqttClient.connected()) 
+    {
         serialPrint("MQTT - Publicando en " + String(topic) + ": " + String(payload));  
-        bool result = _mqttClient.publish(topic, payload);
-        serialPrint("resultado " + String(result));
+        bool _result = _mqttClient.publish(topic, payload);
+        serialPrint("resultado " + String(_result));
     }
 }
 
@@ -148,7 +160,8 @@ void MqttManager::publish(const char* topic, const char* payload) {
  * @param payload Puntero al contenido del mensaje.
  * @param length Longitud del contenido.
  */
-void MqttManager::callback(char* topic, byte* payload, unsigned int length) {
+void MqttManager::callback(char* topic, byte* payload, unsigned int length) 
+{
     serialPrint("MQTT - Message arrived: ");
     String _mTopic = convertToString(topic, strlen(topic));
     String _mPayload = convertToString(payload, length); // Ojo: en tu código usabas sizeof(payload) que es incorrecto para punteros, usa length
@@ -158,14 +171,14 @@ void MqttManager::callback(char* topic, byte* payload, unsigned int length) {
     if (instance == nullptr || instance->_relays == nullptr) return;
 
     #ifdef BOARD_4OUT_RELAY
-        bool _state = (_mPayload == "ON" || _mPayload.indexOf("ON") >= 0 || (char)payload[1] == 'N'); // Lógica adaptada de tu código original (check 'N')
+    bool _state = (_mPayload == "ON" || _mPayload.indexOf("ON") >= 0 || (char)payload[1] == 'N'); // Lógica adaptada de tu código original (check 'N')
 
-        if (_mTopic == relay1MqttCommand) instance->_relays->setRelay(1, _state);
-        else if (_mTopic == relay2MqttCommand) instance->_relays->setRelay(2, _state);
-        else if (_mTopic == relay3MqttCommand) instance->_relays->setRelay(3, _state);
-        else if (_mTopic == relay4MqttCommand) instance->_relays->setRelay(4, _state);
-        
-        serialPrint(String("Relay Set via MQTT: ") + (_state ? "ON" : "OFF"));
+    if (_mTopic == relay1MqttCommand) instance->_relays->setRelay(1, _state);
+    else if (_mTopic == relay2MqttCommand) instance->_relays->setRelay(2, _state);
+    else if (_mTopic == relay3MqttCommand) instance->_relays->setRelay(3, _state);
+    else if (_mTopic == relay4MqttCommand) instance->_relays->setRelay(4, _state);
+    
+    serialPrint(String("Relay Set via MQTT: ") + (_state ? "ON" : "OFF"));
     #endif
     lastMsg10seg = 0; // Reiniciamos el temporizador de 10s
 }
@@ -174,7 +187,8 @@ void MqttManager::callback(char* topic, byte* payload, unsigned int length) {
  * Indica si el cliente está actualmente conectado al servidor MQTT.
  * @return true si está conectado.
  */
-bool MqttManager::isConnected() {
+bool MqttManager::isConnected() 
+{
     return _mqttClient.connected();
 }
 
@@ -182,7 +196,8 @@ bool MqttManager::isConnected() {
  * Verifica si el servicio MQTT está habilitado.
  * @return true si está habilitado.
  */
-bool MqttManager::isEnabled() {
+bool MqttManager::isEnabled() 
+{
     return _enabled;
 }
 
@@ -190,9 +205,11 @@ bool MqttManager::isEnabled() {
  * Habilita o deshabilita el servicio MQTT.
  * @param state Nuevo estado deseado.
  */
-void MqttManager::setEnabled(bool state) {
-    _enabled = state;
-    if (!state) {
+void MqttManager::setEnabled(bool _state) 
+{
+    _enabled = _state;
+    if (!_state) 
+    {
         _mqttClient.disconnect();
         _failedAttempts = 0;
     }
@@ -202,11 +219,13 @@ void MqttManager::setEnabled(bool state) {
  * Devuelve un string descriptivo del estado actual de la conexión MQTT.
  * @return Mensaje de estado.
  */
-String MqttManager::getStatus() {
+String MqttManager::getStatus() 
+{
     if (!_enabled) return "Deshabilitado por usuario";
     
     int _s = _mqttClient.state();
-    switch (_s) {
+    switch (_s) 
+    {
         case -4: return "CONNECTION_TIMEOUT";
         case -3: return "CONNECTION_LOST";
         case -2: return "CONNECT_FAILED";
@@ -225,7 +244,8 @@ String MqttManager::getStatus() {
  * Publica todos los datos de diagnóstico del sistema por MQTT.
  * @param _wifi Puntero al WifiManager para obtener la última respuesta HTTP.
  */
-void MqttManager::publishDiagnostics(WifiManager* _wifi) {
+void MqttManager::publishDiagnostics(WifiManager* _wifi) 
+{
     if (!_enabled || !_mqttClient.connected()) return;
 
     String _baseTopic = "Acantilados/Hardware/" + String(hostName);
@@ -237,9 +257,6 @@ void MqttManager::publishDiagnostics(WifiManager* _wifi) {
 
     // IP Address
     publish((_baseTopic + "/ip").c_str(), WiFi.localIP().toString().c_str());
-
-    // Uptime
-    publish((_baseTopic + "/uptime").c_str(), getUptime().c_str());
 
     // Reinicios
     publish((_baseTopic + "/reset_count").c_str(), String(getResetCount()).c_str());
@@ -259,5 +276,16 @@ void MqttManager::publishDiagnostics(WifiManager* _wifi) {
     publish((_baseTopic + "/version").c_str(), versionNumber.c_str());
 
     serialPrint("MQTT - Diagnosticos publicados en " + _baseTopic);
+}
+
+/**
+ * Publica exclusivamente el tiempo de actividad (uptime) por MQTT.
+ */
+void MqttManager::publishUptime() 
+{
+    if (!_enabled || !_mqttClient.connected()) return;
+
+    String _baseTopic = "Acantilados/Hardware/" + String(hostName);
+    publish((_baseTopic + "/uptime").c_str(), getUptime().c_str());
 }
 

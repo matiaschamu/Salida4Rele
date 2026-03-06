@@ -1,8 +1,8 @@
 #pragma once
 #include <Arduino.h>
 
-#define debug
-#define NO_MQTT // Descomentar esta linea para deshabilitar MQTT totalmente y probar solo WiFi/Web
+//#define DEBUG
+//#define NO_MQTT // Descomentar esta linea para deshabilitar MQTT totalmente y probar solo WiFi/Web
 
 #if defined(BOARD_4OUT_RELAY_LIVING) || defined(BOARD_4OUT_RELAY_LIVING2) || defined(BOARD_4OUT_RELAY_GALERIA) || defined(BOARD_4OUT_RELAY_TABLERO) || defined(BOARD_4OUT_RELAY_GARAGE)  || defined(BOARD_4OUT_RELAY_1ERPISO) || defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING) || defined(BOARD_4OUT_RELAY_EMMANUEL_LAVADERO) || defined(BOARD_4OUT_RELAY_VALENCIA_LIVING)
 #define BOARD_4OUT_RELAY
@@ -41,10 +41,10 @@
 extern const String versionNumber;
 
 //**************************************************   MQTT   ********************************************
-extern const char *mqtt_server;
-extern const uint16_t mqtt_port;
-extern const char *mqtt_user;
-extern const char *mqtt_pass;
+extern const char *mqttServer;
+extern const uint16_t mqttPort;
+extern const char *mqttUser;
+extern const char *mqttPass;
 
 //**************************************************   WIFI   ********************************************
 #if defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING) || defined(BOARD_4OUT_RELAY_EMMANUEL_LAVADERO) || defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING_ESP32)
@@ -62,8 +62,8 @@ extern const char *password;
 
 #ifdef BOARD_4OUT_RELAY_LIVING
 // Placa1
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
@@ -85,8 +85,8 @@ extern const String urlDuckDns;
 
 #ifdef BOARD_4OUT_RELAY_LIVING2
 // Placa2
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
@@ -108,8 +108,8 @@ extern const String urlDuckDns;
 
 #ifdef BOARD_4OUT_RELAY_GALERIA
 // Placa3
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
@@ -131,8 +131,8 @@ extern const String urlDuckDns;
 
 #ifdef BOARD_4OUT_RELAY_GARAGE
 // Placa4
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
@@ -154,8 +154,8 @@ extern const String urlDuckDns;
 
 #ifdef BOARD_4OUT_RELAY_TABLERO
 // Placa5
-#define Report_IP_DuckDNS
-#define Report_HealthChecks
+#define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
@@ -177,8 +177,8 @@ extern const String urlDuckDns;
 
 #ifdef BOARD_4OUT_RELAY_1ERPISO
 // Placa6
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
@@ -200,8 +200,8 @@ extern const String urlDuckDns;
 
 #ifdef BOARD_TEMP_HUMEDAD_PB
 // Placa7
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
@@ -218,8 +218,8 @@ extern const String urlDuckDns;
 
 #ifdef BOARD_TEMP_HUMEDAD_GALERIA
 // Placa8
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
@@ -236,8 +236,8 @@ extern const String urlDuckDns;
 
 #ifdef BOARD_TEMP_HUMEDAD_EXTERIOR
 // Placa9
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
@@ -254,8 +254,8 @@ extern const String urlDuckDns;
 
 #ifdef BOARD_4OUT_RELAY_EMMANUEL_LIVING
 // Placa1
-// #define Report_IP_DuckDNS
-// #define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+// #define REPORT_HEALTH_CHECKS
 #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
@@ -277,8 +277,8 @@ extern const  String urlDuckDns;
 
 #ifdef BOARD_4OUT_RELAY_EMMANUEL_LAVADERO
 // Placa2
-#define Report_IP_DuckDNS
-// #define Report_HealthChecks
+#define REPORT_IP_DUCKDNS
+// #define REPORT_HEALTH_CHECKS
 #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
@@ -300,8 +300,8 @@ extern const  String urlDuckDns;
 
 #ifdef BOARD_4OUT_RELAY_VALENCIA_LIVING
 // Placa1
-#define Report_IP_DuckDNS
-// #define Report_HealthChecks
+#define REPORT_IP_DUCKDNS
+// #define REPORT_HEALTH_CHECKS
 #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
@@ -323,8 +323,8 @@ extern const  String urlDuckDns;
 
 #ifdef BOARD_4OUT_RELAY_EMMANUEL_LIVING_ESP32
 // Placa1
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;

@@ -3,7 +3,8 @@
 
 // Variables de entorno
 extern unsigned long lastMsg10seg;
-extern int lastMsg1min;
-extern int lastMsg5min;
+extern unsigned long lastMsgDiag;
+extern unsigned long lastMsgDuckDNS;
+extern unsigned long lastMsgHealthChecks;
 
 

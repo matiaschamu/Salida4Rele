@@ -1,6 +1,6 @@
 #pragma once
 #include <Arduino.h>
-#include "config/Config.h"
+#include "Config/Config.h"
 #include "../analysis/AnalysisManager.h"
 
 #if defined(BOARD_DHT22) || defined(BOARD_AHT10)
@@ -17,7 +17,8 @@ class MqttManager; // Forward declaration
  * Clase SensorManager
  * Gestiona la lectura de sensores (DHT22/AHT10) y la publicación de datos por MQTT.
  */
-class SensorManager {
+class SensorManager 
+{
 public:
     /**
      * Constructor de SensorManager.

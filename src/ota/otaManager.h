@@ -6,7 +6,8 @@
  * Clase OTAManager
  * Gestiona las actualizaciones inalámbricas (Over-The-Air).
  */
-class OTAManager {
+class OTAManager 
+{
 public:
     /**
      * Constructor de la clase OTAManager.

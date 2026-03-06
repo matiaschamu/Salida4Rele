@@ -16,3 +16,6 @@ Variables locales con el prefijo _
 
 # Revisar nombres de archivos
 Revisar los nombres de todos los archivos en el codigo y estandarizalos para que quede de forma profesional
+
+#Revisar tabulaciones
+Revisar que las directivas del preprocesador esten tabuladas igual que las instrucciones de arriba o de abajo.

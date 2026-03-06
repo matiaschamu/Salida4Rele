@@ -1,6 +1,6 @@
 #include "SensorManager.h"
-#include "varios/Utils.h"
-#include "mqtt/MqttManager.h"
+#include "Varios/Utils.h"
+#include "Mqtt/MqttManager.h"
 
 /**
  * Constructor de SensorManager.
@@ -20,7 +20,8 @@ SensorManager::SensorManager()
  * Configura los sensores según la placa definida.
  * @param _mqtt Puntero al manager de MQTT.
  */
-void SensorManager::setup(MqttManager* _mqtt) {
+void SensorManager::setup(MqttManager* _mqtt) 
+{
     _mqttManager = _mqtt;
 
     #if defined(BOARD_DHT22)
@@ -36,7 +37,8 @@ void SensorManager::setup(MqttManager* _mqtt) {
 /**
  * Realiza la lectura de los sensores y publica los datos en MQTT si está disponible y configurado.
  */
-void SensorManager::refresh() {
+void SensorManager::refresh() 
+{
     float _t = NAN;
     float _h = NAN;
 
@@ -51,7 +53,8 @@ void SensorManager::refresh() {
     _h = _aht.readHumidity(true);
     #endif
 
-    if (!isnan(_t) && !isnan(_h)) {
+    if (!isnan(_t) && !isnan(_h)) 
+    {
         _temperature = _t;
         _humidity = _h;
         
@@ -72,7 +75,8 @@ void SensorManager::refresh() {
 
         // Publicación MQTT (Solo si la placa tiene definidos los tópicos)
         #if !defined(NO_MQTT)
-        if (_mqttManager != nullptr) {
+        if (_mqttManager != nullptr) 
+        {
             #ifdef BOARD_TEMP_HUMEDAD_PB
             _mqttManager->publish(temperatureMqttStatus.c_str(), String(_temperature, 2).c_str());
             _mqttManager->publish(humidityMqttStatus.c_str(), String(_humidity, 2).c_str());
@@ -101,7 +105,9 @@ void SensorManager::refresh() {
             #endif
         }
         #endif
-    } else {
+    } 
+    else 
+    {
         serialPrint("Error al leer los sensores.");
     }
 }

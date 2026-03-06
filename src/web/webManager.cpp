@@ -3,7 +3,7 @@
 #include "../sensors/SensorManager.h"
 #include "../mqtt/MqttManager.h"
 #include "../network/WifiManager.h"
-#include "../varios/Utils.h"
+#include "../Varios/Utils.h"
 #include "WebTemplates.h"
 
 /**
@@ -14,7 +14,8 @@
  * @param _wifi Puntero al WifiManager.
  */
 WebManager::WebManager(RelayManager* _relays, SensorManager* _sensors, MqttManager* _mqtt, WifiManager* _wifi) 
-    : server(80), _relays(_relays), _sensors(_sensors), _mqttManager(_mqtt), _wifi(_wifi) {
+    : server(80), _relays(_relays), _sensors(_sensors), _mqttManager(_mqtt), _wifi(_wifi) 
+{
     header = "";
     header.reserve(256); // Evitar reasignaciones frecuentes
     currentTime = 0;
@@ -26,7 +27,8 @@ WebManager::WebManager(RelayManager* _relays, SensorManager* _sensors, MqttManag
 /**
  * Inicializa el servidor web.
  */
-void WebManager::setup() {
+void WebManager::setup() 
+{
     server.begin();
     serialPrint("WebServer - Iniciado en puerto 80");
 }
@@ -34,10 +36,13 @@ void WebManager::setup() {
 /**
  * Loop procesador de peticiones del servidor web.
  */
-void WebManager::loop() {
+void WebManager::loop() 
+{
     // Manejo de reinicio diferido no bloqueante
-    if (_pendingReset) {
-        if (millis() - _resetTime >= 5000) {
+    if (_pendingReset) 
+    {
+        if (millis() - _resetTime >= 5000) 
+        {
             serialPrint("WebServer - Ejecutando reinicio...");
             ESP.restart();
         }
@@ -46,7 +51,8 @@ void WebManager::loop() {
 
     WiFiClient _client = server.available();
 
-    if (_client) {
+    if (_client) 
+    {
         _client.setNoDelay(true); // Enviar paquetes de inmediato
         currentTime = millis();
         previousTime = currentTime;
@@ -55,21 +61,27 @@ void WebManager::loop() {
         _currentLine.reserve(64);
         bool _resetRequest = false;
 
-        while (_client.connected() && currentTime - previousTime <= timeoutTime) {
+        while (_client.connected() && currentTime - previousTime <= timeoutTime) 
+        {
             currentTime = millis();
             yield(); // Permitir que otros procesos (MQTT, etc.) se ejecuten
 
-            if (_client.available()) {
+            if (_client.available()) 
+            {
                 char _c = _client.read();
                 header += _c;
-                if (_c == '\n') {
-                    if (_currentLine.length() == 0) {
+                if (_c == '\n') 
+                {
+                    if (_currentLine.length() == 0) 
+                    {
                         // Acciones según la URL
-                        if (header.indexOf("GET /reset") >= 0 && header.indexOf("GET /reset/counter") < 0) {
+                        if (header.indexOf("GET /reset") >= 0 && header.indexOf("GET /reset/counter") < 0) 
+                        {
                             _resetRequest = true;
                         }
                         
-                        if (header.indexOf("GET /reset/counter") >= 0) {
+                        if (header.indexOf("GET /reset/counter") >= 0) 
+                        {
                             resetResetCount();
                             serialPrint("Reset Count - Counter cleared to 0");
                             _resetRequest = true; // Programar reinicio
@@ -103,10 +115,14 @@ void WebManager::loop() {
 
                         sendHTML(_client, _resetRequest);
                         break;
-                    } else {
+                    } 
+                    else 
+                    {
                         _currentLine = "";
                     }
-                } else if (_c != '\r') {
+                } 
+                else if (_c != '\r') 
+                {
                     _currentLine += _c;
                 }
             }
@@ -115,10 +131,13 @@ void WebManager::loop() {
         _client.stop();
         serialPrint("WebServer - Client disconnected.");
 
-        if (_resetRequest) {
+        if (_resetRequest) 
+        {
             #ifdef BOARD_4OUT_RELAY
-            if (_relays != nullptr) {
-                for(int _i=1; _i<=4; _i++) { 
+            if (_relays != nullptr) 
+            {
+                for(int _i=1; _i<=4; _i++) 
+                { 
                     _relays->setRelay(_i, false); 
                     yield(); // No bloquear mientras se apagan relés
                 }
@@ -137,12 +156,14 @@ void WebManager::loop() {
  * @param _client Referencia al objeto WiFiClient.
  * @param _reset Indica si se solicitó un reinicio.
  */
-void WebManager::sendHTML(WiFiClient& _client, bool _reset) {
+void WebManager::sendHTML(WiFiClient& _client, bool _reset) 
+{
     _client.print(FPSTR(WEB_HEADER_START));
     _client.print(FPSTR(WEB_STYLE));
     _client.print(FPSTR(WEB_BODY_START));
 
-    if (!_reset) {
+    if (!_reset) 
+    {
         _client.print(F("<h1 style=\"font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: bold; text-align: center;\">"));
         _client.print(hostName);
         _client.print(F("<br>("));
@@ -154,14 +175,16 @@ void WebManager::sendHTML(WiFiClient& _client, bool _reset) {
         _client.println(F("</p>"));
 
         #ifdef BOARD_4OUT_RELAY
-        if (_relays != nullptr) {
-            for(int _i=1; _i<=4; _i++) {
+        if (_relays != nullptr) 
+        {
+            for(int _i=1; _i<=4; _i++) 
+            {
                 bool _state = _relays->getRelayState(_i);
                 const char* _name = ""; 
-                if(_i==1) _name = relay1Name.c_str();
-                else if(_i==2) _name = relay2Name.c_str();
-                else if(_i==3) _name = relay3Name.c_str();
-                else if(_i==4) _name = relay4Name.c_str();
+                if (_i==1) _name = relay1Name.c_str();
+                else if (_i==2) _name = relay2Name.c_str();
+                else if (_i==3) _name = relay3Name.c_str();
+                else if (_i==4) _name = relay4Name.c_str();
 
                 _client.print(F("<p"));
                 if (_state) _client.print(F(" style=\"color:red;\""));
@@ -175,9 +198,12 @@ void WebManager::sendHTML(WiFiClient& _client, bool _reset) {
 
                 _client.print(F("<p><a href=\"/relay"));
                 _client.print(_i);
-                if (!_state) {
+                if (!_state) 
+                {
                     _client.println(F("/on\"><button class=\"button\">OFF</button></a></p>"));
-                } else {
+                } 
+                else 
+                {
                     _client.println(F("/off\"><button class=\"button2\">ON</button></a></p>"));
                 }
             }
@@ -268,7 +294,7 @@ void WebManager::sendHTML(WiFiClient& _client, bool _reset) {
             _client.println(F("</p>"));
         #endif
 
-        #ifdef Report_HealthChecks
+        #ifdef REPORT_HEALTH_CHECKS
               _client.print(F("<p class=\"foot\">Respuesta HealthCheck: <b>"));
               _client.print(_wifi->getLastResponse());
               _client.println(F("</b></p>"));
@@ -276,7 +302,9 @@ void WebManager::sendHTML(WiFiClient& _client, bool _reset) {
 
         _client.println(F("</div>"));
         _client.println(F("<p><a href=\"/reset\"><button class=\"button3\">RESET</button></a></p>"));
-    } else {
+    } 
+    else 
+    {
         _client.println("<script>setTimeout(function(){window.location.href='/';}, 20000);</script>");
         _client.println("<p>Reiniciando m&oacute;dulo... Espere 20 segundos por favor.</p>");
     }

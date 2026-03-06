@@ -15,7 +15,8 @@ class SensorManager;
 class MqttManager;
 class WifiManager;
 
-class WebManager {
+class WebManager 
+{
 private:
     WiFiServer server;
     

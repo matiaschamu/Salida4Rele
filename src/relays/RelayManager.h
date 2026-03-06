@@ -3,7 +3,8 @@
 
 class MqttManager;
 
-class RelayManager {
+class RelayManager 
+{
 public:
     /**
      * Constructor de la clase RelayManager.

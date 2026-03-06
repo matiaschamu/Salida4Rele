@@ -1,19 +1,19 @@
 #include "Config.h"
 #include <Arduino.h>
 
-const String versionNumber = "1.0.35";
+const String versionNumber = "1.0.37";
 
 
 //************************************************** MQTT   ********************************************
 #if defined(BOARD_4OUT_RELAY_VALENCIA_LIVING)
-const char *mqtt_server = "https:www.acantilados-io.com"; 
+const char *mqttServer = "https:www.acantilados-io.com"; 
 #else
-const char *mqtt_server = "192.168.1.10";
+const char *mqttServer = "192.168.1.10";
 #endif
 
-const uint16_t mqtt_port = 1883;
-const char *mqtt_user = "matias";
-const char *mqtt_pass = "Mato19428426.";
+const uint16_t mqttPort = 1883;
+const char *mqttUser = "matias";
+const char *mqttPass = "Mato19428426.";
 
 //**************************************************   WIFI   ********************************************
 #if defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING) || defined(BOARD_4OUT_RELAY_EMMANUEL_LAVADERO) || defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING_ESP32)
@@ -30,8 +30,8 @@ const char *password = "Mato19428426";
 //**************************************************   BOARDS   ********************************************
 #ifdef BOARD_4OUT_RELAY_LIVING
 // Placa1
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 const char *hostName = "ESP_Living";
 const int webServerPort = 80;
@@ -53,8 +53,8 @@ const String urlDuckDns = "http://www.duckdns.org/update/acantilados/f4be5f35-a9
 
 #ifdef BOARD_4OUT_RELAY_LIVING2
 // Placa2
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 const char *hostName = "ESP_Living2";
 const int webServerPort = 80;
@@ -76,8 +76,8 @@ const String urlDuckDns = "http://www.duckdns.org/update/acantilados/f4be5f35-a9
 
 #ifdef BOARD_4OUT_RELAY_GALERIA
 // Placa3
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 const char *hostName = "ESP_Galeria";
 const int webServerPort = 80;
@@ -99,8 +99,8 @@ const String urlDuckDns = "http://www.duckdns.org/update/acantilados/f4be5f35-a9
 
 #ifdef BOARD_4OUT_RELAY_GARAGE
 // Placa4
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 const char *hostName = "ESP_Garage";
 const int webServerPort = 80;
@@ -122,8 +122,8 @@ const String urlDuckDns = "http://www.duckdns.org/update/acantilados/f4be5f35-a9
 
 #ifdef BOARD_4OUT_RELAY_TABLERO
 // Placa5
-#define Report_IP_DuckDNS
-#define Report_HealthChecks
+#define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 const char *hostName = "ESP_Tablero";
 const int webServerPort = 80;
@@ -145,8 +145,8 @@ const String urlDuckDns = "http://www.duckdns.org/update/acantilados/f4be5f35-a9
 
 #ifdef BOARD_4OUT_RELAY_1ERPISO
 // Placa6
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 const char *hostName = "ESP_1erPiso";
 const int webServerPort = 80;
@@ -168,8 +168,8 @@ const String urlDuckDns = "http://www.duckdns.org/update/acantilados/f4be5f35-a9
 
 #ifdef BOARD_TEMP_HUMEDAD_PB
 // Placa7
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 const char *hostName = "ESP_TemperaturaPB";
 const int webServerPort = 80;
@@ -186,8 +186,8 @@ const String urlDuckDns = "http://www.duckdns.org/update/acantilados/f4be5f35-a9
 
 #ifdef BOARD_TEMP_HUMEDAD_GALERIA
 // Placa8
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 const char *hostName = "ESP_TemperaturaGaleria";
 const int webServerPort = 80;
@@ -204,8 +204,8 @@ const String urlDuckDns = "http://www.duckdns.org/update/acantilados/f4be5f35-a9
 
 #ifdef BOARD_TEMP_HUMEDAD_EXTERIOR
 // Placa9
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 // #define NO_MQTT
 const char *hostName = "ESP_TemperaturaExterior";
 const int webServerPort = 80;
@@ -222,8 +222,8 @@ const String urlDuckDns = "http://www.duckdns.org/update/acantilados/f4be5f35-a9
 
 #ifdef BOARD_4OUT_RELAY_EMMANUEL_LIVING
 // Placa1
-// #define Report_IP_DuckDNS
-// #define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+// #define REPORT_HEALTH_CHECKS
 #define NO_MQTT
 const char *hostName = "Living";
 const int webServerPort = 8083;
@@ -245,8 +245,8 @@ const String urlDuckDns = "http://www.duckdns.org/update/casaemmadebo/f4be5f35-a
 
 #ifdef BOARD_4OUT_RELAY_EMMANUEL_LAVADERO
 // Placa2
-#define Report_IP_DuckDNS
-// #define Report_HealthChecks
+#define REPORT_IP_DUCKDNS
+// #define REPORT_HEALTH_CHECKS
 #define NO_MQTT
 const char *hostName = "Lavadero";
 const int webServerPort = 8084;
@@ -268,8 +268,8 @@ const String urlDuckDns = "http://www.duckdns.org/update/casaemmadebo/f4be5f35-a
 
 #ifdef BOARD_4OUT_RELAY_VALENCIA_LIVING
 // Placa1
-#define Report_IP_DuckDNS
-// #define Report_HealthChecks
+#define REPORT_IP_DUCKDNS
+// #define REPORT_HEALTH_CHECKS
 #define NO_MQTT
 const char *hostName = "Living";
 const int webServerPort = 80;
@@ -291,8 +291,8 @@ const String urlDuckDns = "http://www.duckdns.org/update/valencia/f4be5f35-a9c4-
 
 #ifdef BOARD_4OUT_RELAY_EMMANUEL_LIVING_ESP32
 // Placa1
-// #define Report_IP_DuckDNS
-#define Report_HealthChecks
+// #define REPORT_IP_DUCKDNS
+#define REPORT_HEALTH_CHECKS
 #define NO_MQTT
 const char *hostName = "Living";
 const int webServerPort = 8083;

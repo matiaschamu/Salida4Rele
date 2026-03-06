@@ -1,27 +1,36 @@
 #include <Arduino.h>
 #include "main.h"
-#include "config/Config.h"
-#include "varios/Utils.h"
-#include "network/WifiManager.h"
-#include "ota/OTAManager.h"
-#include "relays/RelayManager.h"
-#include "sensors/SensorManager.h"
-#include "mqtt/MqttManager.h"
-#include "web/WebManager.h"
+#include "Config/Config.h"
+#include "Varios/Utils.h"
+#include "Network/WifiManager.h"
+#include "Ota/OtaManager.h"
+#include "Relays/RelayManager.h"
+#include "Sensors/SensorManager.h"
+#include "Mqtt/MqttManager.h"
+#include "Web/WebManager.h"
 
 // Instancias de los Managers
 WifiManager wifi(ssid, password);
 OTAManager ota;
 RelayManager relays;
+#if defined(BOARD_DHT22) || defined(BOARD_AHT10)
 SensorManager sensorManager;
+#endif
 MqttManager mqttManager(&relays);
-WebManager webManager(&relays, &sensorManager, &mqttManager, &wifi);
+WebManager webManager(&relays, 
+    #if defined(BOARD_DHT22) || defined(BOARD_AHT10)
+    &sensorManager, 
+    #else
+    nullptr, 
+    #endif
+    &mqttManager, &wifi);
 
 // Timers para tareas periódicas
 unsigned long lastMsg10seg = 0;
-unsigned long lastMsgDiag = 0;
-int lastMsg1min = 0;
-int lastMsg5min = 0;
+unsigned long lastMsgUptime = 0;
+unsigned long lastMsgDiag10m = 0;
+unsigned long lastMsgDuckDNS = 0;
+unsigned long lastMsgHealthChecks = 0;
 
 /**
  * Inicialización principal del sistema.
@@ -44,7 +53,9 @@ void setup()
   relays.setup(&mqttManager);
   #endif
 
+  #if defined(BOARD_DHT22) || defined(BOARD_AHT10)
   sensorManager.setup(&mqttManager);
+  #endif
   ota.setup(hostName);
   mqttManager.setup();
   webManager.setup();
@@ -71,8 +82,17 @@ void loop()
   {
     serialPrint("TIMER - ROLLOVER");
     lastMsg10seg = 0;
-    lastMsg1min = 0;
-    lastMsg5min = 0;
+    lastMsgDuckDNS = 0;
+    lastMsgHealthChecks = 0;
+    lastMsgUptime = 0;
+    lastMsgDiag10m = 0;
+  }
+
+  // Tareas cada 5 segundos (Uptime MQTT)
+  if (_now - lastMsgUptime > 5000)
+  {
+    lastMsgUptime = _now;
+    mqttManager.publishUptime();
   }
 
   // Verifica si han pasado 10 segundos
@@ -86,43 +106,51 @@ void loop()
     relays.refresh();
     #endif
 
+    #if defined(BOARD_DHT22) || defined(BOARD_AHT10)
     sensorManager.refresh();
-  }
-
-  // Verifica si ha pasado 1 minuto
-  if (lastMsg1min > 4)
-  {
-    serialPrint("60SEG Update (DuckDNS)");
-    lastMsg1min = 0;
-
-    #ifdef Report_IP_DuckDNS
-    wifi.httpGet(urlDuckDns);
     #endif
   }
-  else
-  {
-    lastMsg1min++;
-  }
 
-  // Verifica si han pasado 5 minutos
-  if (lastMsg5min > 28)
+  // Tareas cada 2 minutos (HealthChecks)
+  if (_now - lastMsgHealthChecks > 120000)
   {
-    serialPrint("5MIN Update (HealthChecks)");
-    lastMsg5min = 0;
+    lastMsgHealthChecks = _now;
+    serialPrint("2MIN Update (HealthChecks)");
 
-    #ifdef Report_HealthChecks
+    #ifdef REPORT_HEALTH_CHECKS
     wifi.httpGet(urlHealthChecks);
     #endif
   }
-  else
+
+  // Tareas cada 5 minutos (DuckDNS)
+  if (_now - lastMsgDuckDNS > 300000)
   {
-    lastMsg5min++;
+    lastMsgDuckDNS = _now;
+    serialPrint("5MIN Update (DuckDNS)");
+
+    #ifdef REPORT_IP_DUCKDNS
+    wifi.httpGet(urlDuckDns);
+    #endif
   }
 
-  // Tareas cada 5 segundos (Diagnósticos MQTT)
-  if (_now - lastMsgDiag > 5000) {
-    lastMsgDiag = _now;
+  // Detectar salto de estado de MQTT para forzar publicación inicial
+  static bool _wasMqttConnected = false;
+  bool _isMqttConnected = mqttManager.isConnected();
+  
+  if (_isMqttConnected && !_wasMqttConnected)
+  {
+    serialPrint("MQTT - Nueva conexion detectada. Forzando reporte completo...");
+    lastMsgDiag10m = 0; // Fuerza entrar al if de abajo
+  }
+  _wasMqttConnected = _isMqttConnected;
+
+  // Tareas cada 10 minutos (Diagnósticos MQTT completos)
+  if ((_now - lastMsgDiag10m > 600000) || (lastMsgDiag10m == 0 && _isMqttConnected))
+  {
+    serialPrint("10MIN Update (MQTT Diagnostics)");
     mqttManager.publishDiagnostics(&wifi);
+    lastMsgDiag10m = _now;
+    if (lastMsgDiag10m == 0) lastMsgDiag10m = 1; // Evitar que siga entrando si _now es 0
   }
 
   delay(1); // Mínimo delay para estabilidad manteniendo máxima fluidez

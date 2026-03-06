@@ -16,9 +16,9 @@ public:
     
     /**
      * Establece el nuevo valor y actualiza los máximos y mínimos
-     * @param value Nuevo valor a analizar
+     * @param _value Nuevo valor a analizar
      */
-    void setValue(float value);
+    void setValue(float _value);
 };
 
 
