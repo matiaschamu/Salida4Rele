@@ -71,12 +71,21 @@ void MqttManager::reconnect() {
     serialPrint("MQTT - Intentando Conexion (Intervalo: " + String(_currentReconnectInterval / 1000) + "s)...");
     serialPrint("MQTT - Estado: " + String(_mqttClient.state()));
 
-    if (_mqttClient.connect(_clientId.c_str(), mqtt_user, mqtt_pass)) {
+    // Configurar un timeout corto para evitar bloqueos largos del WebServer
+    _wifiClient.setTimeout(500); 
+    yield();
+    
+    bool _connected = _mqttClient.connect(_clientId.c_str(), mqtt_user, mqtt_pass);
+    
+    yield();
+    _wifiClient.setTimeout(5000); // Restaurar timeout por defecto
+
+    if (_connected) {
         serialPrint("MQTT - Conectado");
         _failedAttempts = 0;
-        _currentReconnectInterval = 5000; // Resetear intervalo al conectar
+        _currentReconnectInterval = 10000; // Resetear a 10s al conectar
         subscribeToTopics();
-        publishDiagnostics(nullptr); // Publicar inicial al conectar
+        // No publicamos diagnósticos aquí para no bloquear el inicio de la conexión
     } else {
         _failedAttempts++;
         

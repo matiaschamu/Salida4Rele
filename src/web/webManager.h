@@ -31,6 +31,10 @@ private:
     unsigned long previousTime;
     const long timeoutTime = 2000;
     
+    // Control de reinicio no bloqueante
+    bool _pendingReset;
+    unsigned long _resetTime;
+    
     /**
      * Envía el contenido HTML de respuesta al cliente.
      * @param _client Cliente al que se envía la respuesta.

@@ -119,12 +119,12 @@ void loop()
     lastMsg5min++;
   }
 
-  // Tareas cada 60 segundos (Diagnósticos MQTT)
-  if (_now - lastMsgDiag > 60000) {
+  // Tareas cada 5 segundos (Diagnósticos MQTT)
+  if (_now - lastMsgDiag > 5000) {
     lastMsgDiag = _now;
     mqttManager.publishDiagnostics(&wifi);
   }
 
-  delay(10); // Pequeño delay para estabilidad del sistema
+  delay(1); // Mínimo delay para estabilidad manteniendo máxima fluidez
 }
 

@@ -1,7 +1,8 @@
 #pragma once
 #include <Arduino.h>
 
-//#define debug
+#define debug
+#define NO_MQTT // Descomentar esta linea para deshabilitar MQTT totalmente y probar solo WiFi/Web
 
 #if defined(BOARD_4OUT_RELAY_LIVING) || defined(BOARD_4OUT_RELAY_LIVING2) || defined(BOARD_4OUT_RELAY_GALERIA) || defined(BOARD_4OUT_RELAY_TABLERO) || defined(BOARD_4OUT_RELAY_GARAGE)  || defined(BOARD_4OUT_RELAY_1ERPISO) || defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING) || defined(BOARD_4OUT_RELAY_EMMANUEL_LAVADERO) || defined(BOARD_4OUT_RELAY_VALENCIA_LIVING)
 #define BOARD_4OUT_RELAY

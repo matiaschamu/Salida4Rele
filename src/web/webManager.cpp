@@ -19,6 +19,8 @@ WebManager::WebManager(RelayManager* _relays, SensorManager* _sensors, MqttManag
     header.reserve(256); // Evitar reasignaciones frecuentes
     currentTime = 0;
     previousTime = 0;
+    _pendingReset = false;
+    _resetTime = 0;
 }
 
 /**
@@ -33,6 +35,15 @@ void WebManager::setup() {
  * Loop procesador de peticiones del servidor web.
  */
 void WebManager::loop() {
+    // Manejo de reinicio diferido no bloqueante
+    if (_pendingReset) {
+        if (millis() - _resetTime >= 5000) {
+            serialPrint("WebServer - Ejecutando reinicio...");
+            ESP.restart();
+        }
+        return; // No procesar más mientras se espera el reinicio
+    }
+
     WiFiClient _client = server.available();
 
     if (_client) {
@@ -42,27 +53,26 @@ void WebManager::loop() {
         serialPrint("WebServer - New Client.");
         String _currentLine = "";
         _currentLine.reserve(64);
-        bool _reset = false;
+        bool _resetRequest = false;
 
         while (_client.connected() && currentTime - previousTime <= timeoutTime) {
             currentTime = millis();
+            yield(); // Permitir que otros procesos (MQTT, etc.) se ejecuten
+
             if (_client.available()) {
                 char _c = _client.read();
                 header += _c;
                 if (_c == '\n') {
                     if (_currentLine.length() == 0) {
                         // Acciones según la URL
-                        if (header.indexOf("GET /reset") >= 0 && header.indexOf("GET /reset/counter") < 0) _reset = true;
+                        if (header.indexOf("GET /reset") >= 0 && header.indexOf("GET /reset/counter") < 0) {
+                            _resetRequest = true;
+                        }
                         
                         if (header.indexOf("GET /reset/counter") >= 0) {
                             resetResetCount();
                             serialPrint("Reset Count - Counter cleared to 0");
-                            _client.println("HTTP/1.1 200 OK");
-                            _client.println("Content-type:text/html");
-                            _client.println("Connection: close");
-                            _client.println();
-                            _client.println("<html><body><h1>Contador Reseteado</h1><a href=\"/\">Volver</a></body></html>");
-                            break;
+                            _resetRequest = true; // Programar reinicio
                         }
                         
                         #ifdef BOARD_4OUT_RELAY
@@ -91,7 +101,7 @@ void WebManager::loop() {
                         _client.println("Connection: close");
                         _client.println();
 
-                        sendHTML(_client, _reset);
+                        sendHTML(_client, _resetRequest);
                         break;
                     } else {
                         _currentLine = "";
@@ -105,16 +115,19 @@ void WebManager::loop() {
         _client.stop();
         serialPrint("WebServer - Client disconnected.");
 
-        if (_reset) {
+        if (_resetRequest) {
             #ifdef BOARD_4OUT_RELAY
             if (_relays != nullptr) {
-                for(int _i=1; _i<=4; _i++) { _relays->setRelay(_i, false); delay(50); }
+                for(int _i=1; _i<=4; _i++) { 
+                    _relays->setRelay(_i, false); 
+                    yield(); // No bloquear mientras se apagan relés
+                }
             }
             #endif
-            serialPrint("Reset in 5 sec..");
+            serialPrint("Reset programado en 5 segundos...");
             setCustomResetReason(3);
-            delay(5000);
-            ESP.restart();
+            _pendingReset = true;
+            _resetTime = millis();
         }
     }
 }

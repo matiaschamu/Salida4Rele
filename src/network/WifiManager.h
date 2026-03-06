@@ -22,5 +22,9 @@ private:
     const char* _password;
     IPAddress _ip, _gw, _subnet, _dns, _dns2;
     String _lastResponse;
+    unsigned long _lastReconnectAttempt;
+    unsigned long _disconnectedSince;
+    unsigned long _currentReconnectInterval;
+    bool _wasConnected;
 };
 
