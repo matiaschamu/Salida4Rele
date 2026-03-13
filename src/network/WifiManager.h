@@ -17,6 +17,21 @@ public:
     void loop(); 
     void httpGet(String _url);
     String getLastResponse() { return _lastResponse; }
+    
+    /**
+     * Realiza un ping al router local principal (192.168.1.1).
+     * Intenta una conexión TCP al puerto 80 para verificar disponibilidad.
+     * @return true si el router responde
+     */
+    bool pingRouterLocal();
+    
+    /**
+     * Verifica si se debe ejecutar un reset por falta de conectividad.
+     * Reset code: 4 (Ping Timeout - Router 192.168.1.1)
+     * Solo resetea tras 5 minutos sin comunicación exitosa con router.
+     * @return true si se debe resetear
+     */
+    bool shouldResetDueToConnectivity();
 
 private:
     const char* _ssid;
@@ -27,5 +42,9 @@ private:
     unsigned long _disconnectedSince;
     unsigned long _currentReconnectInterval;
     bool _wasConnected;
+    unsigned long _lastSuccessfulPing;
+    unsigned long _pingFailureStartTime;
+    bool _pingFailureInProgress;
+    static const uint32_t PING_FAILURE_TIMEOUT = 300000; // 5 minutos
 };
 

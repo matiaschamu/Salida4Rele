@@ -87,7 +87,7 @@ void MqttManager::reconnect()
     {
         serialPrint("MQTT - Conectado");
         _failedAttempts = 0;
-        _currentReconnectInterval = 10000; // Resetear a 10s al conectar
+        _currentReconnectInterval = 15000; // Resetear a 15s al conectar (Priority Beta)
         subscribeToTopics();
         // No publicamos diagnósticos aquí para no bloquear el inicio de la conexión
     } 
@@ -95,22 +95,19 @@ void MqttManager::reconnect()
     {
         _failedAttempts++;
         
-        // Backoff exponencial: duplicar intervalo hasta un máximo de 60 segundos
-        if (_currentReconnectInterval < 60000) 
-        {
-            _currentReconnectInterval *= 2;
-            if (_currentReconnectInterval > 60000) _currentReconnectInterval = 60000;
-        }
+        // Mantener intervalo fijo (entre 15 y 30 segundos) para no saturar al broker
+        _currentReconnectInterval = 15000;
 
-        String _errorMsg = "MQTT - Fallo conexion (Intento " + String(_failedAttempts) + "/" + String(_maxRetries) + ") rc=" + String(_mqttClient.state());
+        String _errorMsg = "MQTT - Fallo conexion (Intento " + String(_failedAttempts) + "/10) rc=" + String(_mqttClient.state());
         serialPrint(_errorMsg);
 
-        if (_failedAttempts >= _maxRetries) 
+        // Acción de Recuperación: Si tras 10 intentos el MQTT no conecta pero el WiFi sigue activo, refrescar WiFi
+        if (_failedAttempts >= 10) 
         {
-            serialPrint("!!! CRITICO: Demasiados fallos MQTT continuos. Reiniciando sistema...");
-            setCustomResetReason(2);
-            delay(1000); 
-            ESP.restart();
+            serialPrint("MQTT - CRITICO: 10 fallos continuos. Refrescando pila WiFi...");
+            WiFi.disconnect();
+            WiFi.begin(ssid, password);
+            _failedAttempts = 0;
         }
     }
 }

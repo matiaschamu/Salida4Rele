@@ -1,10 +1,16 @@
 #pragma once
 #include <Arduino.h>
 
-//#define DEBUG
-//#define NO_MQTT // Descomentar esta linea para deshabilitar MQTT totalmente y probar solo WiFi/Web
+// #define DEBUG
+// #define NO_MQTT // Descomentar esta linea para deshabilitar MQTT totalmente y
+// probar solo WiFi/Web
 
-#if defined(BOARD_4OUT_RELAY_LIVING) || defined(BOARD_4OUT_RELAY_LIVING2) || defined(BOARD_4OUT_RELAY_GALERIA) || defined(BOARD_4OUT_RELAY_TABLERO) || defined(BOARD_4OUT_RELAY_GARAGE)  || defined(BOARD_4OUT_RELAY_1ERPISO) || defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING) || defined(BOARD_4OUT_RELAY_EMMANUEL_LAVADERO) || defined(BOARD_4OUT_RELAY_VALENCIA_LIVING)
+#if defined(BOARD_4OUT_RELAY_LIVING) || defined(BOARD_4OUT_RELAY_LIVING2) ||   \
+    defined(BOARD_4OUT_RELAY_GALERIA) || defined(BOARD_4OUT_RELAY_TABLERO) ||  \
+    defined(BOARD_4OUT_RELAY_GARAGE) || defined(BOARD_4OUT_RELAY_1ERPISO) ||   \
+    defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING) ||                               \
+    defined(BOARD_4OUT_RELAY_EMMANUEL_LAVADERO) ||                             \
+    defined(BOARD_4OUT_RELAY_VALENCIA_LIVING)
 #define BOARD_4OUT_RELAY
 #define ESP8266
 #endif
@@ -22,7 +28,7 @@
 
 #if defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING_ESP32)
 #define BOARD_4OUT_RELAY
-//#define ESP32
+// #define ESP32
 #endif
 
 #if defined(BOARD_DHT22)
@@ -30,24 +36,30 @@
 #endif
 
 #if defined(BOARD_AHT10)
-#include <DHTesp.h>
-#include <Adafruit_AHTX0.h>
-#include <Wire.h>
 #include <AHT10.h>
+#include <Adafruit_AHTX0.h>
+#include <DHTesp.h>
+#include <Wire.h>
+
 #endif
 
-//**************************************************   GENERAL   ******************************************
+//**************************************************   GENERAL
+//******************************************
 
 extern const String versionNumber;
 
-//**************************************************   MQTT   ********************************************
+//**************************************************   MQTT
+//********************************************
 extern const char *mqttServer;
 extern const uint16_t mqttPort;
 extern const char *mqttUser;
 extern const char *mqttPass;
 
-//**************************************************   WIFI   ********************************************
-#if defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING) || defined(BOARD_4OUT_RELAY_EMMANUEL_LAVADERO) || defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING_ESP32)
+//**************************************************   WIFI
+//********************************************
+#if defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING) ||                               \
+    defined(BOARD_4OUT_RELAY_EMMANUEL_LAVADERO) ||                             \
+    defined(BOARD_4OUT_RELAY_EMMANUEL_LIVING_ESP32)
 extern const char *ssid;
 extern const char *password;
 #elif defined(BOARD_4OUT_RELAY_VALENCIA_LIVING)
@@ -58,7 +70,8 @@ extern const char *ssid;
 extern const char *password;
 #endif
 
-//**************************************************   BOARDS   ********************************************
+//**************************************************   BOARDS
+//********************************************
 
 #ifdef BOARD_4OUT_RELAY_LIVING
 // Placa1
@@ -259,20 +272,20 @@ extern const String urlDuckDns;
 #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const  String relay1Name;
-extern const  String relay1MqttCommand;
-extern const  String relay1MqttStatus;
-extern const  String relay2Name;
-extern const  String relay2MqttCommand;
-extern const  String relay2MqttStatus;
-extern const  String relay3Name;
-extern const  String relay3MqttCommand;
-extern const  String relay3MqttStatus;
-extern const  String relay4Name;
-extern const  String relay4MqttCommand;
-extern const  String relay4MqttStatus;
-extern const  String urlHealthChecks;
-extern const  String urlDuckDns;
+extern const String relay1Name;
+extern const String relay1MqttCommand;
+extern const String relay1MqttStatus;
+extern const String relay2Name;
+extern const String relay2MqttCommand;
+extern const String relay2MqttStatus;
+extern const String relay3Name;
+extern const String relay3MqttCommand;
+extern const String relay3MqttStatus;
+extern const String relay4Name;
+extern const String relay4MqttCommand;
+extern const String relay4MqttStatus;
+extern const String urlHealthChecks;
+extern const String urlDuckDns;
 #endif
 
 #ifdef BOARD_4OUT_RELAY_EMMANUEL_LAVADERO
@@ -282,20 +295,20 @@ extern const  String urlDuckDns;
 #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const  String relay1Name;
-extern const  String relay1MqttCommand;
-extern const  String relay1MqttStatus;
-extern const  String relay2Name;
-extern const  String relay2MqttCommand;
-extern const  String relay2MqttStatus;
-extern const  String relay3Name;
-extern const  String relay3MqttCommand;
-extern const  String relay3MqttStatus;
-extern const  String relay4Name;
-extern const  String relay4MqttCommand;
-extern const  String relay4MqttStatus;
-extern const  String urlHealthChecks;
-extern const  String urlDuckDns;
+extern const String relay1Name;
+extern const String relay1MqttCommand;
+extern const String relay1MqttStatus;
+extern const String relay2Name;
+extern const String relay2MqttCommand;
+extern const String relay2MqttStatus;
+extern const String relay3Name;
+extern const String relay3MqttCommand;
+extern const String relay3MqttStatus;
+extern const String relay4Name;
+extern const String relay4MqttCommand;
+extern const String relay4MqttStatus;
+extern const String urlHealthChecks;
+extern const String urlDuckDns;
 #endif
 
 #ifdef BOARD_4OUT_RELAY_VALENCIA_LIVING
@@ -305,20 +318,20 @@ extern const  String urlDuckDns;
 #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const  String relay1Name;
-extern const  String relay1MqttCommand;
-extern const  String relay1MqttStatus;
-extern const  String relay2Name;
-extern const  String relay2MqttCommand;
-extern const  String relay2MqttStatus;
-extern const  String relay3Name;
-extern const  String relay3MqttCommand;
-extern const  String relay3MqttStatus;
-extern const  String relay4Name;
-extern const  String relay4MqttCommand;
-extern const  String relay4MqttStatus;
-extern const  String urlHealthChecks;
-extern const  String urlDuckDns;
+extern const String relay1Name;
+extern const String relay1MqttCommand;
+extern const String relay1MqttStatus;
+extern const String relay2Name;
+extern const String relay2MqttCommand;
+extern const String relay2MqttStatus;
+extern const String relay3Name;
+extern const String relay3MqttCommand;
+extern const String relay3MqttStatus;
+extern const String relay4Name;
+extern const String relay4MqttCommand;
+extern const String relay4MqttStatus;
+extern const String urlHealthChecks;
+extern const String urlDuckDns;
 #endif
 
 #ifdef BOARD_4OUT_RELAY_EMMANUEL_LIVING_ESP32
@@ -328,19 +341,18 @@ extern const  String urlDuckDns;
 #define NO_MQTT
 extern const char *hostName;
 extern const int webServerPort;
-extern const  String relay1Name;
-extern const  String relay1MqttCommand;
-extern const  String relay1MqttStatus;
-extern const  String relay2Name;
-extern const  String relay2MqttCommand;
-extern const  String relay2MqttStatus;
-extern const  String relay3Name;
-extern const  String relay3MqttCommand;
-extern const  String relay3MqttStatus;
-extern const  String relay4Name;
-extern const  String relay4MqttCommand;
-extern const  String relay4MqttStatus;
-extern const  String urlHealthChecks;
-extern const  String urlDuckDns;
+extern const String relay1Name;
+extern const String relay1MqttCommand;
+extern const String relay1MqttStatus;
+extern const String relay2Name;
+extern const String relay2MqttCommand;
+extern const String relay2MqttStatus;
+extern const String relay3Name;
+extern const String relay3MqttCommand;
+extern const String relay3MqttStatus;
+extern const String relay4Name;
+extern const String relay4MqttCommand;
+extern const String relay4MqttStatus;
+extern const String urlHealthChecks;
+extern const String urlDuckDns;
 #endif
-

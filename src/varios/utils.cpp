@@ -124,7 +124,7 @@ String getBoardId()
 
 /**
  * Guarda un código de motivo de reinicio personalizado en EEPROM.
- * @param _code Código del motivo (1: WiFi, 2: MQTT, 3: Manual).
+ * @param _code Código del motivo (1: WiFi Failure, 2: MQTT Failure, 3: Web Restart, 4: Ping Timeout Router).
  */
 void setCustomResetReason(uint8_t _code) 
 {
@@ -142,6 +142,7 @@ void loadCustomResetReason()
     if (_code == 1) _cachedCustomReason = " [Software: WiFi Failure]";
     else if (_code == 2) _cachedCustomReason = " [Software: MQTT Failure]";
     else if (_code == 3) _cachedCustomReason = " [Software: Web Restart]";
+    else if (_code == 4) _cachedCustomReason = " [Software: Ping Timeout - Router 192.168.1.1]";
     else _cachedCustomReason = "";
 
     if (_code != 0) 
