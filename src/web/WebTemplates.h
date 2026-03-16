@@ -17,7 +17,8 @@ p{font-size: 18px;margin: 10px 0;color: #666;}
 .button2:hover{background-color: #2f6a31;}
 .button3{width:100px; text-align: center; display: inline-block;background-color: #FF0000;color: #fff;padding: 12px 24px;font-size: 18px;text-decoration: none;margin: 5px;cursor: pointer;border: none;outline: none;transition: background-color 0.3s ease;border-radius: 5px;}
 .button3:hover{background-color: #990000;}
-.foot{font-size: 12px;background-color: #f0f0f0;border-radius: 5px;}
+.foot{font-size: 12px;background-color: #f0f0f0;border-radius: 5px; padding: 10px;}
+.foot p{margin: 0; padding: 3px;}
 .stats-box{background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 10px; margin: 10px 0; font-size: 14px;}
 .stats-title{font-weight: bold; color: #333; margin-bottom: 5px;}
 </style>

@@ -100,12 +100,6 @@ void WebManager::loop()
                         }
                         #endif
 
-                        #if !defined(NO_MQTT)
-                        if (_mqttManager != nullptr) {
-                            if (header.indexOf("GET /mqtt/enable") >= 0) _mqttManager->setEnabled(true);
-                            if (header.indexOf("GET /mqtt/disable") >= 0) _mqttManager->setEnabled(false);
-                        }
-                        #endif
 
                         // Enviar cabeceras HTTP mínimas antes del cuerpo
                         _client.println("HTTP/1.1 200 OK");
@@ -243,17 +237,6 @@ void WebManager::sendHTML(WiFiClient& _client, bool _reset)
         }
         #endif
 
-        #if !defined(NO_MQTT)
-        if (_mqttManager != nullptr) {
-            _client.println(F("<div class=\"foot\" style='padding:8px;'>"));
-            if (_mqttManager->isEnabled()) {
-                 _client.println(F("<p><input type='checkbox' checked onclick=\"location.href='/mqtt/disable'\"> MQTT habilitado</p>"));
-            } else {
-                 _client.println(F("<p><input type='checkbox' onclick=\"location.href='/mqtt/enable'\"> MQTT deshabilitado</p>"));
-            }
-            _client.println(F("</div>"));
-        }
-        #endif
 
         _client.println(F("<div class=\"foot\">"));
         int32_t _rssi = WiFi.RSSI();
@@ -289,15 +272,24 @@ void WebManager::sendHTML(WiFiClient& _client, bool _reset)
             if (_attempts > 0) {
                 _client.print(F(" <span style='color:orange; font-weight:bold;'>("));
                 _client.print(_attempts);
-                _client.print(F("/100)</span>"));
+                _client.print(F("/10)</span>"));
             }
             _client.println(F("</p>"));
         #endif
 
         #ifdef REPORT_HEALTH_CHECKS
+              _client.print(F("<p class=\"foot\">URL HealthCheck: <span style='color:#666;'>"));
+              _client.print(urlHealthChecks);
+              _client.println(F("</span></p>"));
               _client.print(F("<p class=\"foot\">Respuesta HealthCheck: <b>"));
               _client.print(_wifi->getLastResponse());
               _client.println(F("</b></p>"));
+        #endif
+
+        #ifdef REPORT_IP_DUCKDNS
+              _client.print(F("<p class=\"foot\">URL DuckDNS: <span style='color:#666;'>"));
+              _client.print(urlDuckDns);
+              _client.println(F("</span></p>"));
         #endif
 
         _client.println(F("</div>"));

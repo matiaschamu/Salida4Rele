@@ -10,7 +10,6 @@ static MqttManager* instance = nullptr;
 
 MqttManager::MqttManager(RelayManager* relays) : _relays(relays) 
 {
-    _enabled = true;
     instance = this; // Guardamos la referencia a esta instancia
     _failedAttempts = 0;
     _currentReconnectInterval = 5000; // 5 segundos iniciales
@@ -22,11 +21,8 @@ MqttManager::MqttManager(RelayManager* relays) : _relays(relays)
 void MqttManager::setup() 
 {
     #if defined(NO_MQTT)
-    _enabled = false;
     return;
     #endif
-
-    if (!_enabled) return;
 
     serialPrint("MQTT - Configurando MQTT");
     _mqttClient.setClient(_wifiClient);
@@ -45,8 +41,6 @@ void MqttManager::loop()
     return;
     #endif
 
-    if (!_enabled) return;
-
     if (!_mqttClient.connected()) 
     {
         reconnect();
@@ -59,8 +53,6 @@ void MqttManager::loop()
  */
 void MqttManager::reconnect() 
 {
-    if (!_enabled) return;
-    
     // Solo intentar si WiFi tiene IP (está realmente conectado)
     if (WiFi.status() != WL_CONNECTED || WiFi.localIP().toString() == "0.0.0.0") return;
 
@@ -143,7 +135,7 @@ void MqttManager::subscribeToTopics()
  */
 void MqttManager::publish(const char* topic, const char* payload) 
 {
-    if (_enabled && _mqttClient.connected()) 
+    if (_mqttClient.connected()) 
     {
         serialPrint("MQTT - Publicando en " + String(topic) + ": " + String(payload));  
         bool _result = _mqttClient.publish(topic, payload);
@@ -189,28 +181,6 @@ bool MqttManager::isConnected()
     return _mqttClient.connected();
 }
 
-/**
- * Verifica si el servicio MQTT está habilitado.
- * @return true si está habilitado.
- */
-bool MqttManager::isEnabled() 
-{
-    return _enabled;
-}
-
-/**
- * Habilita o deshabilita el servicio MQTT.
- * @param state Nuevo estado deseado.
- */
-void MqttManager::setEnabled(bool _state) 
-{
-    _enabled = _state;
-    if (!_state) 
-    {
-        _mqttClient.disconnect();
-        _failedAttempts = 0;
-    }
-}
 
 /**
  * Devuelve un string descriptivo del estado actual de la conexión MQTT.
@@ -218,8 +188,6 @@ void MqttManager::setEnabled(bool _state)
  */
 String MqttManager::getStatus() 
 {
-    if (!_enabled) return "Deshabilitado por usuario";
-    
     int _s = _mqttClient.state();
     switch (_s) 
     {
@@ -243,7 +211,7 @@ String MqttManager::getStatus()
  */
 void MqttManager::publishDiagnostics(WifiManager* _wifi) 
 {
-    if (!_enabled || !_mqttClient.connected()) return;
+    if (!_mqttClient.connected()) return;
 
     String _baseTopic = "Acantilados/Hardware/" + String(hostName);
 
@@ -280,7 +248,7 @@ void MqttManager::publishDiagnostics(WifiManager* _wifi)
  */
 void MqttManager::publishUptime() 
 {
-    if (!_enabled || !_mqttClient.connected()) return;
+    if (!_mqttClient.connected()) return;
 
     String _baseTopic = "Acantilados/Hardware/" + String(hostName);
     publish((_baseTopic + "/uptime").c_str(), getUptime().c_str());

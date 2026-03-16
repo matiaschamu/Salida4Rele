@@ -54,10 +54,6 @@ public:
     bool isConnected();
     String getStatus();
     int getFailedAttempts();
-    
-    // Habilitar/Deshabilitar MQTT
-    bool isEnabled();
-    void setEnabled(bool _state);
      
 
 private:
@@ -70,7 +66,6 @@ private:
 
     const int _maxRetries = 20;
 
-    bool _enabled;
     String _clientId;
 
     void reconnect();
